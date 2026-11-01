@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Nectar Kingdom — Idle Bee Empire</title>
+  <meta name="description" content="Build a buzzing honey empire. Click, hire bees, expand to the stars and earn while you're away.">
+  <meta name="theme-color" content="#1d1608">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐝</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">🐝 <span data-i18n="title">Nectar Kingdom</span></div>
+    <div class="top-actions">
+      <button id="boostBtn" class="btn btn-ad" title=""></button>
+      <button id="langBtn" class="btn btn-ghost">PL</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: the hive -->
+    <section class="hive-panel">
+      <div class="bank">
+        <div class="honey-amount"><span id="honey">0</span> 🍯</div>
+        <div class="hps"><span id="hps">0</span> <span data-i18n="perSec">per second</span></div>
+        <div id="buffs" class="buffs"></div>
+      </div>
+      <button id="hive" class="hive" aria-label="Collect honey">
+        <span class="hive-emoji">🍯</span>
+      </button>
+      <div class="click-info"><span data-i18n="perClick">Per click</span>: <b id="perClick">1</b></div>
+      <div id="floaters"></div>
+    </section>
+
+    <!-- RIGHT: tabs -->
+    <section class="side-panel">
+      <nav class="tabs">
+        <button class="tab active" data-tab="shop" data-i18n="tabShop">Colony</button>
+        <button class="tab" data-tab="upgrades"><span data-i18n="tabUpgrades">Upgrades</span> <span id="upgBadge" class="badge hidden"></span></button>
+        <button class="tab" data-tab="ach" data-i18n="tabAch">Trophies</button>
+        <button class="tab" data-tab="prestige" data-i18n="tabPrestige">Royal Jelly</button>
+        <button class="tab" data-tab="settings" data-i18n="tabSettings">⚙</button>
+      </nav>
+
+      <div class="tab-body" id="tab-shop">
+        <div class="buy-amount">
+          <span data-i18n="buy">Buy</span>:
+          <button class="amt active" data-amt="1">×1</button>
+          <button class="amt" data-amt="10">×10</button>
+          <button class="amt" data-amt="100">×100</button>
+          <button class="amt" data-amt="max">MAX</button>
+        </div>
+        <div id="genList" class="gen-list"></div>
+      </div>
+
+      <div class="tab-body hidden" id="tab-upgrades">
+        <div id="upgList" class="upg-list"></div>
+        <p id="upgEmpty" class="muted" data-i18n="noUpgrades">Keep growing your colony to unlock upgrades.</p>
+      </div>
+
+      <div class="tab-body hidden" id="tab-ach">
+        <p class="muted"><span data-i18n="achInfo">Each trophy gives +1% production.</span> <b id="achCount"></b></p>
+        <div id="achList" class="ach-grid"></div>
+      </div>
+
+      <div class="tab-body hidden" id="tab-prestige">
+        <div class="prestige-box">
+          <h3>👑 <span data-i18n="tabPrestige">Royal Jelly</span>: <span id="jelly">0</span></h3>
+          <p class="muted" data-i18n="jellyInfo">Each unspent Royal Jelly gives +3% production forever.</p>
+          <p><span data-i18n="jellyGain">Swarm now to gain</span>: <b id="jellyGain">0</b></p>
+          <p class="muted"><span data-i18n="jellyNext">Next jelly at lifetime honey</span>: <span id="jellyNext"></span></p>
+          <button id="prestigeBtn" class="btn btn-gold" data-i18n="swarm">🐝 Swarm (reset)</button>
+        </div>
+        <h4 data-i18n="perksTitle">Queen's Perks</h4>
+        <div id="perkList" class="upg-list"></div>
+      </div>
+
+      <div class="tab-body hidden" id="tab-settings">
+        <div class="stats" id="stats"></div>
+        <div class="settings-buttons">
+          <button id="saveBtn" class="btn" data-i18n="save">Save now</button>
+          <button id="exportBtn" class="btn" data-i18n="export">Export save</button>
+          <button id="importBtn" class="btn" data-i18n="import">Import save</button>
+          <button id="resetBtn" class="btn btn-danger" data-i18n="hardReset">Hard reset</button>
+        </div>
+        <textarea id="saveText" class="save-text hidden" rows="4"></textarea>
+      </div>
+    </section>
+  </main>
+
+  <div id="goldenLayer"></div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div id="modalBody"></div>
+      <div id="modalButtons" class="modal-buttons"></div>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/ads.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
