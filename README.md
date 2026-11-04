@@ -1,74 +1,78 @@
-# 🐝 Nectar Kingdom / Królestwo Nektaru
+# 🏰 Pogranicza: Droga do Korony
 
-Prosta, wciągająca gra **idle / incremental** w przeglądarce. Gracz klika ul, zatrudnia pszczoły i rozbudowuje imperium miodu: od jednej robotnicy aż po galaktyczny rój. Gra działa także, gdy gracz jest offline.
+Średniowieczna gra strategiczna w przeglądarce, zbudowana na podstawie dokumentu
+„Koncepcja średniowiecznej gry strategicznej” (wersja 1.3, 4 listopada 2026).
 
-Napisana w czystym HTML, CSS i JavaScript, bez bibliotek i bez kroku budowania. Wystarczy otworzyć `index.html`.
+To **prototyp do testów**. Gra jest jednoosobowa: inni gracze, sojusze, arena, wojny
+o forty i koronę są symulowane przez postacie komputerowe. Docelowa gra online
+wymaga serwera, kont i płatności. Ten prototyp ich nie ma.
 
-## Co jest w grze
+## Uruchomienie
 
-| Mechanika | Po co jest |
-|---|---|
-| Klikanie ula | Szybki start i satysfakcja na początku gry |
-| 12 rodzajów producentów (koszt rośnie o 14% za sztukę) | Główna pętla „kup, produkuj więcej, kup więcej” |
-| ok. 90 ulepszeń (×2 dla producentów, kliknięć i całej produkcji) | Stałe cele i skoki mocy |
-| 68 trofeów (+1% produkcji za każde) | Kolekcjonowanie |
-| Złote pszczoły (losowo co 1–3 minuty: bonus, szał ×7 albo szał klikania ×10) | Powód, żeby zaglądać do gry |
-| **Mleczko Pszczele (prestiż)**: reset za trwały bonus +3% za sztukę | Gra na tygodnie, a nie na godzinę |
-| Przywileje Królowej (5 trwałych drzewek za Mleczko) | Decyzje: wydać czy trzymać dla bonusu |
-| Postęp offline (do 8 h, 50% wydajności, rozszerzane przywilejami) | Gracz wraca, żeby odebrać miód |
-| Zapis automatyczny co 10 s, eksport i import zapisu | Gracz nie traci postępu |
-| Język EN / PL (wykrywany automatycznie) | Rynek globalny |
-| Responsywny układ | Telefon i komputer |
-
-Balans gry (ceny, produkcja, progi) jest w jednym pliku: `js/data.js`.
-
-## 💰 Jak zarabia: reklamy z nagrodą
-
-W grze są dwa miejsca na reklamy z nagrodą, czyli reklamy, które gracz **sam chce** obejrzeć:
-1. **„📺 x2 na 10 min”**: podwaja produkcję (przycisk na górze ekranu).
-2. **„📺 Podwój!”**: podwaja zarobek offline po powrocie do gry.
-
-Do tego dochodzi reklama przerywnikowa (interstitial) po prestiżu, najwyżej raz na 3 minuty.
-
-Cała obsługa reklam jest w `js/ads.js`. Bez podłączonego SDK gra symuluje 3-sekundową reklamę, więc możesz przetestować cały przebieg.
-
-### Plan publikacji (od najłatwiejszego)
-
-1. **GitHub Pages** (darmowy hosting, do testów i pokazywania znajomym)
-   W repozytorium jest workflow `.github/workflows/pages.yml`. Włącz *Settings → Pages → Source: GitHub Actions*. Każdy push na `main` opublikuje grę.
-2. **CrazyGames** (crazygames.com/developers): duży ruch, podział przychodu z reklam.
-   Dodaj w `index.html` przed `js/ads.js`:
-   ```html
-   <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
-   ```
-   `ads.js` sam wykryje SDK i zacznie wyświetlać prawdziwe reklamy.
-3. **Poki** (poki.com/developers) i **GameDistribution**: podobny model. Dopisz nową gałąź w `ads.js`.
-4. **itch.io**: spakuj folder do ZIP i wgraj jako grę HTML. Dochód z dobrowolnych wpłat.
-5. **Android (Google Play)**: zapakuj grę w Capacitor i podłącz AdMob (reklamy z nagrodą). To zwykle najbardziej dochodowa opcja dla gier idle.
-
-> Realnie: dochód pasywny zależy od liczby graczy. Gra jest gotowym fundamentem. Największy wpływ na zarobki mają publikacja na portalach z ruchem i dopracowanie balansu na podstawie tego, jak długo gracze zostają w grze.
-
-## Uruchomienie lokalne
+Otwórz `index.html` w przeglądarce (komputer lub telefon). Możesz też uruchomić
+lokalny serwer:
 
 ```bash
-# wystarczy otworzyć index.html, albo:
-python3 -m http.server 8000   # → http://localhost:8000
+python3 -m http.server 8000   # potem http://localhost:8000
 ```
+
+Postęp zapisuje się automatycznie w przeglądarce. Po powrocie gra nadrabia czas
+nieobecności (produkcja, budowy, napady, marsze).
+
+**Tempo testowe:** kliknij zegar w prawym górnym rogu (×1 / ×10 / ×60 / ×360).
+W *Więcej → Ustawienia* można też przewinąć czas o 1 h, 8 h, dzień lub tydzień.
+
+## Co jest w grze (odniesienia do rozdziałów koncepcji)
+
+| Obszar | Zakres w prototypie |
+|---|---|
+| Osada (3, 4, 37) | Taras pod skałą, wąwóz z rzeką, mury na zachodzie i południu, brama od szlaku. 23 budynki. Siedziba, stajnia i trzy budynki piechoty mają 30 poziomów i 6 etapów wyglądu (1, 6, 11, 16, 21, 26). Widać rusztowania, dzień i noc, mieszkańców w ruchu. |
+| Samouczek (2) | 7 zadań: od studni do otwarcia drogi, uratowanie zwiadowcy Wita, pierwszy napad. |
+| Surowce (6) | Jedzenie, drewno, kamień, żelazo, srebro. Mieszkańcy jako pracownicy, utrzymanie armii, chroniona część magazynu. |
+| Władca (7) | Postać obracana przeciągnięciem, 6 miejsc wyposażenia, zestawy wojenny i gospodarczy, tytuły od przywódcy ocalałych do księcia. |
+| Towarzysze (8) | 6 postaci zdobywanych z historii, zleceń i wydarzeń. Doświadczenie, specjalizacje, próby awansu z kamieniami hartu, skupienia i ducha. Własne wyposażenie. |
+| Wojsko (9, 16) | Miecznicy, pikinierzy, łucznicy, kawaleria i tarany. Stopnie I–VI, przeszkalanie, lazaret i ranni. Sześć jednostek fortowych z limitami. |
+| Bitwy (10) | Automatyczny silnik rund: przewagi jednostek, linie (front, strzelcy, kawaleria), teren, taktyki, dowódca i pomocnik, mury, wieże i tarany. Raport z przyczynami wyniku, np. „Pikinierzy zatrzymali szarżę kawalerii”. |
+| Obrona (11) | Napady także offline, ostrzeżenie przed atakiem, dowódca obrony, tryby wież, posiłki sojuszu, rabunek niechronionych zasobów, uszkodzenia murów, ochrona początkowa. |
+| Mapa (12, 13) | 48×48 pól, 9 regionów, mgła i zwiad, przeciwnicy 6 rodzajów, złoża do zbierania, znaleziska, mosty do odbudowy (skracają marsze), wielka bestia. |
+| Tablica (14) i energia (15) | 3 zlecenia co 8 h (limit 9), 4 rodzaje zadań, łańcuchy fabularne. Pasek 240 punktów, 1 punkt co 6 minut, rezerwacja i zwrot przy zawróceniu. |
+| Forty i korona (16, 17) | 3 forty w oknach walk, centralny zamek, Wojna o Koronę co 14 dni, tytuł króla na 7 dni. |
+| Sojusz (18–22) | Dołączenie lub własny sojusz, role, limit 40→100, 9 badań po 5 poziomów, wkład i monety, pomoc, posiłki, zgrupowania, terytorium ze strażnicami, sklep z limitami. |
+| Badania (23) | Akademia: Wojsko, Surowce oraz Ekonomia i administracja (30 badań). |
+| Wydarzenia (24) | Obrona Pogranicza (fale), Wyprawa Zakonu (wiwerna), Wojna o Koronę, Szlaki Karawan. Tygodniowy budżet 80 rubinów. |
+| VIP (25) | 15 poziomów według tabeli (łącznie 3 165 000), 500 dziennie, nagrody wyłącznie kosmetyczne. |
+| Sklepy (26, 32–36) | Tryb testowy bez płatności: rubiny, przepustka, energia (30/dzień, 210/tydzień), wyglądy osady. Łupy z potworów według tabel z rozdziału 33. |
+| Arena (35) | Od siedziby 10. Drużyny do 1000 jednostek, 5 prób dziennie plus 3 dokupione na sezon, ligi, tygodniowy sezon, nagrody, sklep żetonów. |
+| Chwała (31) | Pula za walki PvP, podział 70/30, malejące nagrody za powtórki, spadek 0,05% dziennie, 6 tytułów. |
+| Komunikacja (27) | Czat ogólny, sojuszniczy, prywatny i grupy, blokowanie i zgłaszanie, ograniczenie spamu. |
+
+## Balans
+
+Wszystkie wartości oznaczone w koncepcji jako **Otwarte** zostały dobrane roboczo
+i zebrane w jednym pliku: **`js/config.js`**. Wartości przyjęte w dokumencie
+(energia, VIP, sojusz, arena, chwała, łupy) są przeniesione bez zmian.
+Wzory produkcji, pojemności i mieszkańców są w `js/core.js` (`P.eco`).
 
 ## Struktura
 
 ```
-index.html        – układ strony
-css/style.css     – wygląd
-js/i18n.js        – tłumaczenia EN/PL
-js/ads.js         – warstwa reklam (CrazyGames / tryb dev)
-js/data.js        – balans: producenci, ulepszenia, przywileje, trofea
-js/game.js        – logika gry, zapis, offline, render
+index.html      – szkielet strony
+css/style.css   – wygląd (telefon i komputer)
+js/config.js    – balans i dane (budynki, jednostki, badania, tabele)
+js/core.js      – stan gry, czas, gospodarka, budowa, badania, zapis
+js/combat.js    – silnik automatycznych bitew i raporty przyczyn
+js/army.js      – wojsko, lazaret, towarzysze, kuźnia, władca
+js/world.js     – mapa, marsze, przeciwnicy, napady, forty, korona
+js/systems.js   – tablica, zadania, sojusz, arena, VIP, chwała, wydarzenia, sklep, czat
+js/city.js      – rysunek osady (SVG) z etapami budynków
+js/mapview.js   – rysunek mapy świata (canvas)
+js/ui.js        – interfejs: pasek, osada, okna budynków, mapa, marsze
+js/pages.js     – pozostałe ekrany
+js/main.js      – start gry i pętla czasu
 ```
 
-## Pomysły na kolejne wersje
-- Dźwięki i muzyka (z opcją wyciszenia)
-- Codzienna nagroda za logowanie
-- Sezonowe wydarzenia (np. zimowy ul)
-- Drugi poziom prestiżu
-- Tabela wyników
+## Publikacja
+
+Workflow `.github/workflows/pages.yml` publikuje grę na GitHub Pages po każdym
+pushu na `main` (włącz *Settings → Pages → Source: GitHub Actions*). Na Androida
+grę można później zapakować w Capacitor.
