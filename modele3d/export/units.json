@@ -1,0 +1,44 @@
+{
+  "soldier": {
+    "file": "soldier.glb",
+    "animations": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack"
+    },
+    "attack_length_s": 1.0,
+    "attack_event": "hit",
+    "attack_event_time_s": 0.45,
+    "attack_type": "melee",
+    "reach_m": 1.6
+  },
+  "golem": {
+    "file": "golem.glb",
+    "animations": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Throw"
+    },
+    "attack_length_s": 2.0,
+    "attack_event": "release",
+    "attack_event_time_s": 1.24,
+    "attack_type": "projectile",
+    "projectile": "golem_rock.glb",
+    "spawn_bone": "prop.R"
+  },
+  "hybrid": {
+    "file": "hybrid.glb",
+    "animations": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Slam"
+    },
+    "attack_length_s": 1.6,
+    "attack_event": "impact",
+    "attack_event_time_s": 0.832,
+    "attack_type": "melee_aoe",
+    "reach_m": 2.0,
+    "effect": "hybrid_spikes.glb",
+    "effect_note": "kolce w linii przed jednostką, 3 sztuki co 0.8 m, kolejno co 0.08 s"
+  }
+}
