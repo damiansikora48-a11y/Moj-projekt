@@ -1,0 +1,177 @@
+<title>Kuźnia Jednostek</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+/* Layout: warsztat — duża scena 3D po lewej, karta jednostki po prawej; na telefonie jedna kolumna */
+:root {
+  --bg: #eef0ec;
+  --panel: #ffffff;
+  --ink: #23271f;
+  --muted: #646b5c;
+  --line: #d6dacf;
+  --stage: #c9d2bd;
+  --accent: #2f8fb0;
+  --accent-ink: #ffffff;
+  --rune: #1d7fa3;
+  --display: "Rubik", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171a16; --panel: #20241e; --ink: #e9ece4; --muted: #a2a99a; --line: #343a30;
+    --stage: #2b3227; --accent: #49b6d9; --accent-ink: #0d1a1f; --rune: #6fd3f2; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171a16; --panel: #20241e; --ink: #e9ece4; --muted: #a2a99a; --line: #343a30;
+  --stage: #2b3227; --accent: #49b6d9; --accent-ink: #0d1a1f; --rune: #6fd3f2; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 32px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 4vw, 36px); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; background: var(--stage); border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 3; max-width: 100%; }
+model-viewer { width: 100%; height: 100%; --poster-color: transparent; background: radial-gradient(ellipse at 50% 35%, color-mix(in srgb, var(--stage) 70%, #ffffff 30%), var(--stage) 70%); }
+.hud { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; pointer-events: none; }
+.hud > * { pointer-events: auto; }
+.seg { display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button {
+  font: 600 13px/1 var(--body); color: var(--ink); background: transparent; border: 0; border-radius: 999px;
+  padding: 8px 12px; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg button:focus-visible, .unit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+aside { display: grid; gap: 12px; }
+.units { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.unit {
+  text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line);
+  border-radius: 12px; padding: 12px; cursor: pointer; display: grid; gap: 2px;
+}
+.unit[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.unit b { font-family: var(--display); font-size: 18px; font-weight: 700; }
+.unit span { color: var(--muted); font-size: 13px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; }
+.card h2 { font-family: var(--display); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; }
+dt { color: var(--muted); }
+dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 12px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink); }
+.note { color: var(--muted); font-size: 13px; margin: 0; }
+.note code { font-family: var(--mono); font-size: 12px; color: var(--rune); }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Kuźnia Jednostek</h1>
+    <p class="sub">Modele do gry w Godot · styl chunky · wspólny szkielet</p>
+  </header>
+
+  <div class="grid">
+    <div class="stage">
+      <model-viewer id="mv" alt="Model 3D jednostki" camera-controls touch-action="pan-y"
+        autoplay animation-name="Idle_loop" shadow-intensity="1.1" shadow-softness="0.6" exposure="1.05"
+        camera-orbit="30deg 38deg auto" field-of-view="30deg" interaction-prompt="none"></model-viewer>
+      <div class="hud">
+        <div class="seg" role="group" aria-label="Animacja">
+          <button id="a-idle" aria-pressed="true" data-anim="Idle_loop">Idle</button>
+          <button id="a-walk" aria-pressed="false" data-anim="Walk_loop">Walk</button>
+        </div>
+        <div class="seg" role="group" aria-label="Kamera">
+          <button id="c-game" aria-pressed="true" data-cam="game">Kamera gry 52°</button>
+          <button id="c-front" aria-pressed="false" data-cam="front">Przód</button>
+          <button id="c-spin" aria-pressed="false" data-cam="spin">Obrót</button>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="units" role="group" aria-label="Jednostka">
+        <button class="unit" id="u-soldier" aria-pressed="true" data-unit="soldier"><b>Żołnierz</b><span>Piechota · 1,9 m</span></button>
+        <button class="unit" id="u-golem" aria-pressed="false" data-unit="golem"><b>Golem</b><span>Kamienny kolos · 2,3 m</span></button>
+      </div>
+
+      <div class="card">
+        <h2>Dane modelu</h2>
+        <dl>
+          <dt>Plik</dt><dd id="d-file">soldier.glb</dd>
+          <dt>Trójkąty</dt><dd id="d-tris">22 300</dd>
+          <dt>Kości</dt><dd>20</dd>
+          <dt>Materiały</dt><dd id="d-mats">15</dd>
+          <dt>Animacje</dt><dd>Idle_loop, Walk_loop</dd>
+        </dl>
+      </div>
+
+      <div class="card">
+        <h2>Sloty (części wymienne)</h2>
+        <div class="chips" id="slots"></div>
+        <p class="note">Każdy slot to osobny mesh na wspólnym szkielecie. Fuzja jednostek bierze sloty od obu „rodziców”, np. ciało golema i hełm żołnierza.</p>
+      </div>
+
+      <div class="card">
+        <h2>Szkielet (wspólny)</h2>
+        <p class="note"><code>root · hips · spine · chest · neck · head</code>, a dla stron L/R: <code>shoulder · upper_arm · forearm · hand · thigh · shin · foot</code></p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const UNITS = {
+  soldier: { file: 'soldier.glb', path: '../export/soldier.glb', tris: '22 300', mats: 15, slots: ['Head', 'Helmet', 'Torso', 'Cape', 'Arms', 'Legs', 'Weapon', 'Shield'] },
+  golem:   { file: 'golem.glb', path: '../export/golem.glb',   tris: '5 372',  mats: 8,  slots: ['Body', 'Head', 'Arms', 'Legs'] },
+};
+const CAMS = { game: '30deg 38deg auto', front: '20deg 82deg auto' };
+const mv = document.getElementById('mv');
+let spin = false;
+// Wersja opublikowana ma modele osadzone w window.EMBED (base64); lokalnie ładuje pliki z ../export/
+const blobUrls = {};
+function srcFor(key) {
+  const b64 = window.EMBED && window.EMBED[key];
+  if (!b64) return UNITS[key].path;
+  if (!blobUrls[key]) {
+    const bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    blobUrls[key] = URL.createObjectURL(new Blob([bytes], { type: 'model/gltf-binary' }));
+  }
+  return blobUrls[key];
+}
+
+function press(groupSel, el) {
+  document.querySelectorAll(groupSel).forEach(b => b.setAttribute('aria-pressed', String(b === el)));
+}
+function showUnit(key) {
+  const u = UNITS[key];
+  mv.src = srcFor(key);
+  document.getElementById('d-file').textContent = u.file;
+  document.getElementById('d-tris').textContent = u.tris;
+  document.getElementById('d-mats').textContent = u.mats;
+  document.getElementById('slots').innerHTML = u.slots.map(s => `<span class="chip">${s}</span>`).join('');
+}
+document.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => { press('[data-unit]', b); showUnit(b.dataset.unit); }));
+document.querySelectorAll('[data-anim]').forEach(b => b.addEventListener('click', () => {
+  press('[data-anim]', b); mv.animationName = b.dataset.anim; mv.play();
+}));
+document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => {
+  press('[data-cam]', b);
+  const c = b.dataset.cam;
+  spin = c === 'spin';
+  if (spin) { mv.setAttribute('auto-rotate', ''); mv.cameraOrbit = '0deg 70deg auto'; }
+  else { mv.removeAttribute('auto-rotate'); mv.cameraOrbit = CAMS[c]; }
+  mv.jumpCameraToGoal?.();
+}));
+mv.addEventListener('load', () => { mv.animationName = document.querySelector('[data-anim][aria-pressed="true"]').dataset.anim; mv.play(); });
+showUnit('soldier');
+</script>
