@@ -91,13 +91,13 @@ def main():
     if render and len(names) == len(UNITS) and not quick:
         import bpy
         reset_scene()
-        build_unit(UNITS['soldier'], offset=(-1.55, 0.25, 0))
+        build_unit(UNITS['soldier'], offset=(-1.9, 0.3, 0))
         build_unit(UNITS['hybrid'], offset=(0.0, 0.0, 0))
-        build_unit(UNITS['golem'], offset=(1.75, 0.1, 0))
+        build_unit(UNITS['golem'], offset=(2.05, 0.1, 0))
         setup_stage(1400, samples)
         bpy.context.scene.render.resolution_x = 1800
         bpy.context.scene.render.resolution_y = 1000
-        render_view(os.path.join(PREVIEW, 'razem_gra_52st.png'), (0.1, 0, 1.0), 7.6, GAME_PITCH, 20)
+        render_view(os.path.join(PREVIEW, 'razem_gra_52st.png'), (0.1, 0, 0.9), 10.5, GAME_PITCH, 15)
 
 
 if __name__ == '__main__':
