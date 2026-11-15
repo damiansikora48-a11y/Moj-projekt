@@ -54,14 +54,16 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; backgroun
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .seg button:focus-visible, .unit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 aside { display: grid; gap: 12px; }
-.units { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.units { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .unit {
   text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line);
   border-radius: 12px; padding: 12px; cursor: pointer; display: grid; gap: 2px;
 }
 .unit[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .unit b { font-family: var(--display); font-size: 18px; font-weight: 700; }
-.unit span { color: var(--muted); font-size: 13px; }
+.unit span { color: var(--muted); font-size: 12px; }
+.unit b { font-size: 16px; }
+.attack p { margin: 0; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; }
 .card h2 { font-family: var(--display); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; }
 dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; }
@@ -88,6 +90,7 @@ dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric:
         <div class="seg" role="group" aria-label="Animacja">
           <button id="a-idle" aria-pressed="true" data-anim="Idle_loop">Idle</button>
           <button id="a-walk" aria-pressed="false" data-anim="Walk_loop">Walk</button>
+          <button id="a-attack" aria-pressed="false" data-anim="attack">Atak</button>
         </div>
         <div class="seg" role="group" aria-label="Kamera">
           <button id="c-game" aria-pressed="true" data-cam="game">Kamera gry 52°</button>
@@ -101,6 +104,13 @@ dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric:
       <div class="units" role="group" aria-label="Jednostka">
         <button class="unit" id="u-soldier" aria-pressed="true" data-unit="soldier"><b>Żołnierz</b><span>Piechota · 1,9 m</span></button>
         <button class="unit" id="u-golem" aria-pressed="false" data-unit="golem"><b>Golem</b><span>Kamienny kolos · 2,3 m</span></button>
+        <button class="unit" id="u-hybrid" aria-pressed="false" data-unit="hybrid"><b>Kamienny Rycerz</b><span>Fuzja · 2,1 m</span></button>
+      </div>
+
+      <div class="card attack">
+        <h2>Atak</h2>
+        <p><b id="atk-name">Attack</b> · <span id="atk-desc"></span></p>
+        <p class="note" id="atk-event"></p>
       </div>
 
       <div class="card">
@@ -108,9 +118,9 @@ dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric:
         <dl>
           <dt>Plik</dt><dd id="d-file">soldier.glb</dd>
           <dt>Trójkąty</dt><dd id="d-tris">22 300</dd>
-          <dt>Kości</dt><dd>20</dd>
+          <dt>Kości</dt><dd>21</dd>
           <dt>Materiały</dt><dd id="d-mats">15</dd>
-          <dt>Animacje</dt><dd>Idle_loop, Walk_loop</dd>
+          <dt>Animacje</dt><dd id="d-anims">Idle_loop, Walk_loop</dd>
         </dl>
       </div>
 
@@ -122,7 +132,7 @@ dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric:
 
       <div class="card">
         <h2>Szkielet (wspólny)</h2>
-        <p class="note"><code>root · hips · spine · chest · neck · head</code>, a dla stron L/R: <code>shoulder · upper_arm · forearm · hand · thigh · shin · foot</code></p>
+        <p class="note"><code>root · hips · spine · chest · neck · head</code>, a dla stron L/R: <code>shoulder · upper_arm · forearm · hand · thigh · shin · foot</code> oraz <code>prop.R</code> na trzymany przedmiot.</p>
       </div>
     </aside>
   </div>
@@ -130,9 +140,17 @@ dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric:
 
 <script>
 const UNITS = {
-  soldier: { file: 'soldier.glb', path: '../export/soldier.glb', tris: '22 300', mats: 15, slots: ['Head', 'Helmet', 'Torso', 'Cape', 'Arms', 'Legs', 'Weapon', 'Shield'] },
-  golem:   { file: 'golem.glb', path: '../export/golem.glb',   tris: '5 372',  mats: 8,  slots: ['Body', 'Head', 'Arms', 'Legs'] },
+  soldier: { file: 'soldier.glb', path: '../export/soldier.glb', attack: 'Attack', slots: ['Head', 'Helmet', 'Torso', 'Cape', 'Arms', 'Legs', 'Weapon', 'Shield'],
+    desc: 'cięcie mieczem z zamachu, tarcza osłania korpus.' },
+  golem:   { file: 'golem.glb', path: '../export/golem.glb', attack: 'Throw', slots: ['Body', 'Head', 'Arms', 'Legs', 'Rock'],
+    desc: 'wyrywa głaz z ziemi, unosi nad głowę i rzuca. Głaz w locie to osobny model golem_rock.glb.' },
+  hybrid:  { file: 'hybrid.glb', path: '../export/hybrid.glb', attack: 'Slam', slots: ['Body', 'Head', 'Cape', 'Arms', 'Legs', 'Weapon'],
+    desc: 'uderza oburącz Runicznym Ostrzem w ziemię, a przed nim wyrastają kryształowe kolce (hybrid_spikes.glb).' },
 };
+const STATS = window.STATS || {};
+const EVENT_PL = { hit: 'trafienie', release: 'wypuszczenie głazu', impact: 'uderzenie w ziemię' };
+let current = 'soldier';
+function animFor(name) { return name === 'attack' ? UNITS[current].attack : name; }
 const CAMS = { game: '30deg 38deg auto', front: '20deg 82deg auto' };
 const mv = document.getElementById('mv');
 let spin = false;
@@ -153,16 +171,22 @@ function press(groupSel, el) {
   document.querySelectorAll(groupSel).forEach(b => b.setAttribute('aria-pressed', String(b === el)));
 }
 function showUnit(key) {
-  const u = UNITS[key];
+  const u = UNITS[key], st = STATS[key] || {};
+  current = key;
   mv.src = srcFor(key);
   document.getElementById('d-file').textContent = u.file;
-  document.getElementById('d-tris').textContent = u.tris;
-  document.getElementById('d-mats').textContent = u.mats;
+  document.getElementById('d-tris').textContent = st.tris ?? '–';
+  document.getElementById('d-mats').textContent = st.mats ?? '–';
+  document.getElementById('d-anims').textContent = `Idle_loop, Walk_loop, ${u.attack}`;
+  document.getElementById('atk-name').textContent = u.attack;
+  document.getElementById('atk-desc').textContent = u.desc;
+  document.getElementById('atk-event').textContent = st.event_time != null
+    ? `Moment „${EVENT_PL[st.event] || st.event}”: ${st.event_time.toFixed(2)} s z ${st.length.toFixed(2)} s animacji.` : '';
   document.getElementById('slots').innerHTML = u.slots.map(s => `<span class="chip">${s}</span>`).join('');
 }
 document.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => { press('[data-unit]', b); showUnit(b.dataset.unit); }));
 document.querySelectorAll('[data-anim]').forEach(b => b.addEventListener('click', () => {
-  press('[data-anim]', b); mv.animationName = b.dataset.anim; mv.play();
+  press('[data-anim]', b); mv.animationName = animFor(b.dataset.anim); mv.play();
 }));
 document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => {
   press('[data-cam]', b);
@@ -172,6 +196,6 @@ document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click',
   else { mv.removeAttribute('auto-rotate'); mv.cameraOrbit = CAMS[c]; }
   mv.jumpCameraToGoal?.();
 }));
-mv.addEventListener('load', () => { mv.animationName = document.querySelector('[data-anim][aria-pressed="true"]').dataset.anim; mv.play(); });
+mv.addEventListener('load', () => { mv.animationName = animFor(document.querySelector('[data-anim][aria-pressed="true"]').dataset.anim); mv.play(); });
 showUnit('soldier');
 </script>

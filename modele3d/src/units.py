@@ -151,18 +151,25 @@ def cloth_sheet(cols, rows, fn, thickness=0.022):
     return bm
 
 
-def soldier_cape(sl, J):
+def make_cape(width=1.0, L=0.92, y_top=0.19, y_bot=0.3, clasps=True):
+    def build(sl, J):
+        _cape(sl, J, width, L, y_top, y_bot, clasps)
+    return build
+
+
+def _cape(sl, J, width, L, y_top, y_bot, clasps):
     sz = J['sh'].z
-    L = 0.92
 
     def cape(u, v):
         a = u * math.radians(62)
-        rw = lerp(0.2, 0.3, v)
-        y0 = lerp(0.19, 0.3, v ** 1.3)
+        rw = lerp(0.2, 0.3, v) * width
+        y0 = lerp(y_top, y_bot, v ** 1.3)
         x = math.sin(a) * rw
         y = y0 - (1 - math.cos(a)) * 0.13 * (1 - 0.4 * v) + 0.018 * math.sin(u * 3 * math.pi) * v
         return V(x, y, sz + 0.02 - v * L)
     sl.add(cloth_sheet(16, 10, cape), 'cape', 'chest')
+    if not clasps:
+        return
     for sg in (1, -1):
         sl.add(sphere(0.03, 0.02, 0.03, 10, 8), 'gold', 'chest', mtx((sg * 0.19, 0.06, sz + 0.0)))
         sl.add(box(0.06, 0.12, 0.03, 0.01), 'cape', 'chest', mtx((sg * 0.2, 0.12, sz - 0.01), (20, 0, 0)))
@@ -256,16 +263,38 @@ def soldier_shield(sl, J):
     sl.add(box(0.05, 0.16, 0.04, 0.012), 'leather_dark', b, F @ mtx((0, 0, -0.05)))
 
 
+def K(rot=(0, 0, 0), loc=(0, 0, 0), scale=None):
+    return (rot, loc, scale)
+
+
+_SWORD_STANCE = {'thigh.L': K((18, 0, 0)), 'shin.L': K((-14, 0, 0)), 'thigh.R': K((-12, 0, 0)), 'shin.R': K((-6, 0, 0)),
+                 'upper_arm.L': K((38, 0, 0)), 'forearm.L': K((52, 0, 0))}
+
+SOLDIER_ATTACK = {
+    'name': 'Attack', 'frames': 30, 'event': 0.45, 'event_name': 'hit',
+    'keys': [
+        (0.0, {}),
+        (0.3, {**_SWORD_STANCE, 'upper_arm.R': K((115, 0, 0)), 'forearm.R': K((70, 0, 0)), 'hand.R': K((-20, 0, 0)),
+               'chest': K((-6, -28, 0)), 'spine': K((0, -8, 0)), 'head': K((4, 18, 0))}),
+        (0.45, {**_SWORD_STANCE, 'upper_arm.R': K((35, 0, 0)), 'forearm.R': K((5, 0, 0)), 'hand.R': K((-70, 0, 0)),
+                'chest': K((14, 26, 0)), 'spine': K((6, 8, 0)), 'head': K((-10, -16, 0))}),
+        (0.62, {**_SWORD_STANCE, 'upper_arm.R': K((-5, 0, 0)), 'forearm.R': K((0, 0, 0)), 'hand.R': K((-80, 0, 0)),
+                'chest': K((16, 32, 0)), 'spine': K((6, 10, 0)), 'head': K((-10, -20, 0))}),
+        (1.0, {}),
+    ],
+}
+
 SOLDIER = {
     'name': 'Soldier',
     'skeleton': SOLDIER_SKELETON,
     'palette': SOLDIER_PALETTE,
     'slots': [('Head', soldier_head), ('Helmet', soldier_helmet), ('Torso', soldier_torso),
-              ('Cape', soldier_cape), ('Arms', soldier_arms), ('Legs', soldier_legs),
+              ('Cape', make_cape()), ('Arms', soldier_arms), ('Legs', soldier_legs),
               ('Weapon', soldier_weapon), ('Shield', soldier_shield)],
     'anim': dict(walk_frames=32, idle_frames=72, thigh=26, knee=48, knee_base=4, arm=20,
                  **{'arm_scale.R': 0.45, 'arm_scale.L': 0.35, 'forearm_base.R': 22, 'forearm_base.L': 28},
                  twist=5, sway=2, lean=3, bob=0.022, breath=1.6, breath_loc=0.006),
+    'attack': SOLDIER_ATTACK,
 }
 
 
@@ -400,14 +429,67 @@ def _scale(x, y, z):  # noqa: F811
     return Matrix.Diagonal((x, y, z, 1))
 
 
+def golem_rock_parts(sl, bone, M):
+    """Głaz do rzucania (w dłoni golema i jako osobny pocisk)."""
+    from mathutils import Matrix
+    M = M if M is not None else Matrix.Identity(4)
+    sl.add(jitter(ico(0.2, 2), 0.028, 501), 'stone_light', bone, M @ _scale(1.05, 0.95, 0.9))
+    sl.add(rock(0.16, 0.14, 0.12, 502), 'stone_dark', bone, M @ mtx((0.1, 0.06, -0.08), (10, 20, 0)))
+    sl.add(jitter(sphere(0.13, 0.12, 0.04, 10, 6), 0.012, 503), 'moss', bone, M @ mtx((-0.02, 0.02, 0.16), (8, -6, 0)))
+    for loc, rot in (((0.07, -0.12, 0.08), (-50, 0, 20)), ((-0.1, -0.1, 0.02), (-60, 0, -35))):
+        sl.add(cyl(0.035, 0.035, 0.06, 6), 'crystal', bone, M @ mtx(loc, rot) @ mtx((0, 0, 0.03)))
+        sl.add(cyl(0.035, 0.0, 0.05, 6), 'crystal', bone, M @ mtx(loc, rot) @ mtx((0, 0, 0.085)))
+
+
+def golem_rock(sl, J):
+    golem_rock_parts(sl, 'prop.R', mtx(J['prop.R'] + J['hand_dir.R'] * 0.26) @ _scale(1.3, 1.3, 1.3))
+
+
+_H = (0.001, 0.001, 0.001)
+_S = (1, 1, 1)
+GOLEM_ATTACK = {
+    'name': 'Throw', 'frames': 60, 'event': 0.62, 'event_name': 'release',
+    'keys': [
+        (0.0, {'prop.R': K(scale=_H)}),
+        (0.22, {'spine': K((24, 0, 0)), 'chest': K((18, -10, 0)), 'head': K((-22, 0, 0)),
+                'upper_arm.R': K((40, 0, 0)), 'forearm.R': K((20, 0, 0)), 'upper_arm.L': K((25, 0, 0)),
+                'thigh.L': K((22, 0, 0)), 'shin.L': K((-28, 0, 0)), 'thigh.R': K((10, 0, 0)), 'shin.R': K((-16, 0, 0)),
+                'prop.R': K(scale=_H)}),
+        (0.32, {'spine': K((24, 0, 0)), 'chest': K((18, -10, 0)), 'head': K((-22, 0, 0)),
+                'upper_arm.R': K((40, 0, 0)), 'forearm.R': K((20, 0, 0)), 'upper_arm.L': K((25, 0, 0)),
+                'thigh.L': K((22, 0, 0)), 'shin.L': K((-28, 0, 0)), 'thigh.R': K((10, 0, 0)), 'shin.R': K((-16, 0, 0)),
+                'prop.R': K(scale=_S)}),
+        (0.5, {'spine': K((-6, 0, 0)), 'chest': K((-14, -22, 0)), 'head': K((10, 10, 0)),
+               'upper_arm.R': K((165, 0, 0)), 'forearm.R': K((60, 0, 0)), 'upper_arm.L': K((60, 0, 0)),
+               'forearm.L': K((20, 0, 0)), 'thigh.L': K((8, 0, 0)), 'shin.L': K((-6, 0, 0)), 'thigh.R': K((-8, 0, 0)),
+               'prop.R': K(scale=_S)}),
+        (0.6, {'spine': K((12, 0, 0)), 'chest': K((18, 24, 0)), 'head': K((-10, -12, 0)),
+               'upper_arm.R': K((80, 0, 0)), 'forearm.R': K((10, 0, 0)), 'upper_arm.L': K((-15, 0, 0)),
+               'thigh.L': K((22, 0, 0)), 'shin.L': K((-14, 0, 0)), 'thigh.R': K((-14, 0, 0)),
+               'prop.R': K(scale=_S)}),
+        (0.625, {'spine': K((13, 0, 0)), 'chest': K((19, 25, 0)), 'head': K((-10, -12, 0)),
+                 'upper_arm.R': K((72, 0, 0)), 'forearm.R': K((9, 0, 0)), 'upper_arm.L': K((-15, 0, 0)),
+                 'thigh.L': K((22, 0, 0)), 'shin.L': K((-14, 0, 0)), 'thigh.R': K((-14, 0, 0)),
+                 'prop.R': K(scale=_H)}),
+        (0.76, {'spine': K((14, 0, 0)), 'chest': K((22, 28, 0)), 'head': K((-10, -14, 0)),
+                'upper_arm.R': K((35, 0, 0)), 'forearm.R': K((5, 0, 0)), 'upper_arm.L': K((-10, 0, 0)),
+                'thigh.L': K((22, 0, 0)), 'shin.L': K((-14, 0, 0)), 'thigh.R': K((-14, 0, 0)),
+                'prop.R': K(scale=_H)}),
+        (1.0, {'prop.R': K(scale=_H)}),
+    ],
+}
+
 GOLEM = {
     'name': 'Golem',
     'skeleton': GOLEM_SKELETON,
     'palette': GOLEM_PALETTE,
-    'slots': [('Body', golem_body), ('Head', golem_head), ('Arms', golem_arms), ('Legs', golem_legs)],
+    'slots': [('Body', golem_body), ('Head', golem_head), ('Arms', golem_arms), ('Legs', golem_legs),
+              ('Rock', golem_rock)],
     'anim': dict(walk_frames=48, idle_frames=96, thigh=18, knee=32, knee_base=3, arm=16,
                  **{'arm_scale.R': 1.0, 'arm_scale.L': 1.0, 'forearm_base.R': 10, 'forearm_base.L': 10},
-                 twist=7, sway=5, lean=6, bob=0.035, breath=2.2, breath_loc=0.012),
+                 twist=7, sway=5, lean=6, bob=0.035, breath=2.2, breath_loc=0.012,
+                 rest_scale={'prop.R': _H}),
+    'attack': GOLEM_ATTACK,
 }
 
-UNITS = {'soldier': SOLDIER, 'golem': GOLEM}
+

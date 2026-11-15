@@ -212,6 +212,7 @@ for _s in ('L', 'R'):
     BONES += [(f'shoulder.{_s}', 'chest'), (f'upper_arm.{_s}', f'shoulder.{_s}'),
               (f'forearm.{_s}', f'upper_arm.{_s}'), (f'hand.{_s}', f'forearm.{_s}'),
               (f'thigh.{_s}', 'hips'), (f'shin.{_s}', f'thigh.{_s}'), (f'foot.{_s}', f'shin.{_s}')]
+BONES.append(('prop.R', 'hand.R'))  # rekwizyt w prawej dłoni (np. kamień do rzutu)
 
 
 def joints(s):
@@ -242,6 +243,7 @@ def joints(s):
         J['knee' + S] = V(sg * s['hip_w'], 0, knee)
         J['ankle' + S] = V(sg * s['hip_w'], 0, s['ankle'])
         J['toe' + S] = V(sg * s['hip_w'], -s['foot'], 0.02)
+    J['prop.R'] = J['wrist.R'] + J['hand_dir.R'] * s['hand'] * s.get('prop_at', 1.15)
     return J
 
 
@@ -267,6 +269,7 @@ def build_armature(name, J):
         ht['thigh' + S] = (J['hipj' + S], J['knee' + S])
         ht['shin' + S] = (J['knee' + S], J['ankle' + S])
         ht['foot' + S] = (J['ankle' + S], J['toe' + S])
+    ht['prop.R'] = (J['prop.R'], J['prop.R'] + V(0, 0, 0.12))
     ebs = {}
     for bname, parent in BONES:
         eb = arm.edit_bones.new(bname)
@@ -287,8 +290,9 @@ def build_armature(name, J):
 
 # ---------------------------------------------------------------- animacje
 
-def bake_action(arm_obj, name, frames, posefn, step=2):
-    """posefn(t in [0,1]) -> {kość: (rot_xyz_stopnie, loc_xyz)}; t=0 i t=1 identyczne => pętla."""
+def bake_action(arm_obj, name, frames, posefn, step=2, rest_scale=None):
+    """posefn(t in [0,1]) -> {kość: (rot_xyz_stopnie, loc_xyz[, skala])}; t=0 i t=1 identyczne => pętla."""
+    rest_scale = rest_scale or {}
     act = bpy.data.actions.new(name)
     act.use_fake_user = True
     arm_obj.animation_data_create()
@@ -296,11 +300,15 @@ def bake_action(arm_obj, name, frames, posefn, step=2):
     for f in list(range(0, frames, step)) + [frames]:
         pose = posefn(f / frames)
         for pb in arm_obj.pose.bones:
-            r, l = pose.get(pb.name, ((0, 0, 0), (0, 0, 0)))
+            e = pose.get(pb.name, ((0, 0, 0), (0, 0, 0)))
+            r, l = e[0], e[1]
+            sc = e[2] if len(e) > 2 and e[2] is not None else rest_scale.get(pb.name, (1, 1, 1))
             pb.rotation_euler = [math.radians(a) for a in r]
             pb.location = l
+            pb.scale = sc
             pb.keyframe_insert('rotation_euler', frame=f, group=pb.name)
             pb.keyframe_insert('location', frame=f, group=pb.name)
+            pb.keyframe_insert('scale', frame=f, group=pb.name)
     return act
 
 
@@ -312,6 +320,41 @@ def set_action(arm_obj, act, frame=0):
     except AttributeError:
         pass
     bpy.context.scene.frame_set(frame)
+
+
+def keyposes(keys, base):
+    """keys: [(t, {kość: (rot, loc[, skala])})], każda poza nakładana na `base`.
+    Interpolacja smoothstep między kolejnymi pozami kluczowymi."""
+    full = []
+    for t, p in keys:
+        d = dict(base)
+        d.update(p)
+        full.append((t, d))
+    bones = set(b for _, p in full for b in p)
+
+    def norm(e):
+        e = tuple(e) + (None,) * (3 - len(e))
+        return e
+
+    def fn(t):
+        i = 0
+        while i < len(full) - 2 and t > full[i + 1][0]:
+            i += 1
+        (t0, p0), (t1, p1) = full[i], full[i + 1]
+        u = min(1.0, max(0.0, (t - t0) / max(1e-6, t1 - t0)))
+        u = u * u * (3 - 2 * u)
+        out = {}
+        for b in bones:
+            a = norm(p0.get(b, ((0, 0, 0), (0, 0, 0))))
+            c = norm(p1.get(b, ((0, 0, 0), (0, 0, 0))))
+            rot = tuple(x + (y - x) * u for x, y in zip(a[0], c[0]))
+            loc = tuple(x + (y - x) * u for x, y in zip(a[1], c[1]))
+            sc = None
+            if a[2] is not None and c[2] is not None:
+                sc = tuple(x + (y - x) * u for x, y in zip(a[2], c[2]))
+            out[b] = (rot, loc, sc)
+        return out
+    return fn
 
 
 def gait(p):
@@ -366,12 +409,48 @@ def build_unit(unit, offset=(0, 0, 0)):
         sl = Slot(slot_name)
         fn(sl, J)
         meshes.append(sl.build(arm, mats, name))
-    walk, idle = gait(unit['anim'])
-    a_walk = bake_action(arm, 'Walk_loop', unit['anim']['walk_frames'], walk)
-    a_idle = bake_action(arm, 'Idle_loop', unit['anim']['idle_frames'], idle, step=3)
-    set_action(arm, a_idle, 0)
+    an = unit['anim']
+    rs = an.get('rest_scale', {})
+    walk, idle = gait(an)
+    actions = {
+        'walk': bake_action(arm, 'Walk_loop', an['walk_frames'], walk, rest_scale=rs),
+        'idle': bake_action(arm, 'Idle_loop', an['idle_frames'], idle, step=3, rest_scale=rs),
+    }
+    atk = unit.get('attack')
+    if atk:
+        fn = keyposes(atk['keys'], idle(0.0))
+        actions['attack'] = bake_action(arm, atk['name'], atk['frames'], fn, step=1, rest_scale=rs)
+    set_action(arm, actions['idle'], 0)
     arm.location = V(offset)
-    return {'arm': arm, 'meshes': meshes, 'J': J, 'actions': {'walk': a_walk, 'idle': a_idle}}
+    return {'arm': arm, 'meshes': meshes, 'J': J, 'actions': actions}
+
+
+def build_static(name, fn, palette, offset=(0, 0, 0)):
+    """Obiekt bez szkieletu (pocisk, efekt) – fn(slot) buduje geometrię wokół (0,0,0)."""
+    mats = {k: make_material(f'{name}_{k}', *v) for k, v in palette.items()}
+    sl = Slot(name)
+    fn(sl)
+    me = bpy.data.meshes.new(name)
+    bmesh.ops.recalc_face_normals(sl.bm, faces=sl.bm.faces)
+    sl.bm.to_mesh(me)
+    sl.bm.free()
+    for m in sl.mats:
+        me.materials.append(mats[m])
+    me.shade_smooth()
+    me.set_sharp_from_angle(angle=math.radians(38))
+    ob = bpy.data.objects.new(name, me)
+    ob.location = V(offset)
+    bpy.context.scene.collection.objects.link(ob)
+    return ob
+
+
+def export_static(obj, path):
+    for o in bpy.context.scene.objects:
+        o.select_set(False)
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', use_selection=True, export_apply=True,
+                              export_animations=False, export_yup=True, export_materials='EXPORT')
 
 
 def export_glb(built, path):
