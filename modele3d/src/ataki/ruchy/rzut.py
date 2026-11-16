@@ -11,6 +11,7 @@ RUCH = {
     'nazwa': 'Rzut',
     'typ': 'rzut',
     'rekwizyt': True,  # kość prop.R: rekwizyt (np. głaz) ukryty w spoczynku, pokazywany w ataku
+    'kosc_startowa': 'prop.R',  # skąd gra wystrzeliwuje pocisk
     'frames': 60, 'event': 0.62, 'event_name': 'release',
     'keys': [
         (0.0, {'prop.R': K(scale=HIDE)}),

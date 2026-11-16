@@ -113,7 +113,7 @@ class Rejestr:
                 'moment_s': round(ruch['event'] * ruch['frames'] / fps, 3),
                 'zdarzenie': ruch['event_name'],
                 'plik_efektu': f"efekt_{efekt['id']}.glb" if efekt else None,
-                'kosc_startowa': 'prop.R' if typ == 'pocisk' else None,
+                'kosc_startowa': ruch.get('kosc_startowa', 'prop.R') if typ == 'pocisk' else None,
                 'uwagi': efekt.get('uwagi') if efekt else None,
             },
         }

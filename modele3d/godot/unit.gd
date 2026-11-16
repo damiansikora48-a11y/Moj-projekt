@@ -77,6 +77,7 @@ func _spawn_projectile(a: Dictionary, target: Vector3) -> void:
 	get_tree().current_scene.add_child(rock)
 	var bone := skeleton.find_bone(a["kosc_startowa"])
 	rock.global_position = (skeleton.global_transform * skeleton.get_bone_global_pose(bone)).origin
+	rock.look_at(target, Vector3.UP, true)  # przód pocisku (+Z) w stronę celu – np. ogon kuli ognia z tyłu
 	# Prosty lot po łuku; w grze podmień na RigidBody3D albo własny pocisk z kolizją.
 	var start := rock.global_position
 	var t := create_tween()

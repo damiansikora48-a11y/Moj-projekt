@@ -3,6 +3,7 @@
   "jednostki": {
     "zolnierz": { "wersja": 1 },
     "golem": { "wersja": 1 },
-    "kamienny_rycerz": { "wersja": 1 }
+    "kamienny_rycerz": { "wersja": 1 },
+    "mag_ognia": { "wersja": 1 }
   }
 }

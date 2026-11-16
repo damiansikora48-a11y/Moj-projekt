@@ -142,3 +142,27 @@ Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `bal
 | `zolnierz` | Żołnierz | cięcie, wręcz | 0,45 s z 1,00 s |
 | `golem` | Golem | rzut + głaz (pocisk z kości `prop.R`) | 1,24 s z 2,00 s |
 | `kamienny_rycerz` | Kamienny Rycerz (fuzja golem + żołnierz) | uderzenie + kryształy (obszar) | 0,83 s z 1,60 s |
+| `mag_ognia` | Mag ognia | czar + kula ognia (pocisk z lewej dłoni) | 0,66 s z 1,20 s |
+
+### Klocki ataków do wykorzystania
+
+| Ruch (`ataki/ruchy/`) | Opis | Skąd startuje pocisk |
+|---|---|---|
+| `ciecie` | cięcie mieczem z zamachu | – (wręcz) |
+| `rzut` | chwyta rekwizyt z ziemi, rzuca znad głowy | `prop.R` (prawa dłoń) |
+| `uderzenie` | uderzenie oburącz w ziemię | – (wręcz/obszar) |
+| `czar` | skupienie przy piersi, wypchnięcie dłoni | `hand.L` (lewa dłoń) |
+
+| Efekt (`ataki/efekty/`) | Typ | Plik w grze |
+|---|---|---|
+| `glaz` | pocisk (także rekwizyt w dłoni przy `rzut`) | `efekt_glaz.glb` |
+| `krysztaly` | obszar: kolce z ziemi | `efekt_krysztaly.glb` |
+| `kula_ognia` | pocisk | `efekt_kula_ognia.glb` |
+
+### Szkice fuzji (w `szkice/`, nie w grze)
+
+| Para | Co wyszło automatycznie |
+|---|---|
+| `golem+mag_ognia` | ciało golema, głowa i kapelusz maga, kostur; czar wyrzucający **głaz** |
+| `mag_ognia+zolnierz` | zbroja żołnierza, głowa i kapelusz maga, kostur; czar z **kulą ognia** („mag bitewny”) |
+| `golem+zolnierz` | ma fuzję ręczną: Kamienny Rycerz |
