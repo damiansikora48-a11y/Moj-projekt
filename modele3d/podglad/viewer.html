@@ -54,7 +54,7 @@ model-viewer { width: 100%; height: 100%; --poster-color: transparent; backgroun
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
 .seg button:focus-visible, .unit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 aside { display: grid; gap: 12px; }
-.units { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.units { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
 .unit {
   text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line);
   border-radius: 12px; padding: 12px; cursor: pointer; display: grid; gap: 2px;
@@ -62,7 +62,8 @@ aside { display: grid; gap: 12px; }
 .unit[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .unit b { font-family: var(--display); font-size: 18px; font-weight: 700; }
 .unit span { color: var(--muted); font-size: 12px; }
-.unit b { font-size: 16px; }
+.unit b { font-size: 15px; }
+.ver { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .attack p { margin: 0; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; }
 .card h2 { font-family: var(--display); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; }
@@ -88,8 +89,8 @@ dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric:
         camera-orbit="30deg 38deg auto" field-of-view="30deg" interaction-prompt="none"></model-viewer>
       <div class="hud">
         <div class="seg" role="group" aria-label="Animacja">
-          <button id="a-idle" aria-pressed="true" data-anim="Idle_loop">Idle</button>
-          <button id="a-walk" aria-pressed="false" data-anim="Walk_loop">Walk</button>
+          <button id="a-idle" aria-pressed="true" data-anim="idle">Idle</button>
+          <button id="a-walk" aria-pressed="false" data-anim="walk">Walk</button>
           <button id="a-attack" aria-pressed="false" data-anim="attack">Atak</button>
         </div>
         <div class="seg" role="group" aria-label="Kamera">
@@ -101,101 +102,104 @@ dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric:
     </div>
 
     <aside>
-      <div class="units" role="group" aria-label="Jednostka">
-        <button class="unit" id="u-soldier" aria-pressed="true" data-unit="soldier"><b>Żołnierz</b><span>Piechota · 1,9 m</span></button>
-        <button class="unit" id="u-golem" aria-pressed="false" data-unit="golem"><b>Golem</b><span>Kamienny kolos · 2,3 m</span></button>
-        <button class="unit" id="u-hybrid" aria-pressed="false" data-unit="hybrid"><b>Kamienny Rycerz</b><span>Fuzja · 2,1 m</span></button>
+      <div class="units" id="units" role="group" aria-label="Jednostka"></div>
+
+      <div class="card">
+        <h2 id="u-name">Jednostka</h2>
+        <p class="note" id="u-desc"></p>
+        <p class="note" id="u-parents" hidden></p>
       </div>
 
-      <div class="card attack">
+      <div class="card">
         <h2>Atak</h2>
-        <p><b id="atk-name">Attack</b> · <span id="atk-desc"></span></p>
-        <p class="note" id="atk-event"></p>
+        <dl>
+          <dt>Ruch</dt><dd id="atk-move">–</dd>
+          <dt>Efekt</dt><dd id="atk-fx">–</dd>
+          <dt>Typ</dt><dd id="atk-type">–</dd>
+          <dt>Moment</dt><dd id="atk-time">–</dd>
+        </dl>
       </div>
 
       <div class="card">
         <h2>Dane modelu</h2>
         <dl>
-          <dt>Plik</dt><dd id="d-file">soldier.glb</dd>
-          <dt>Trójkąty</dt><dd id="d-tris">22 300</dd>
+          <dt>Plik</dt><dd id="d-file">–</dd>
+          <dt>Wersja</dt><dd id="d-ver">–</dd>
+          <dt>Trójkąty</dt><dd id="d-tris">–</dd>
           <dt>Kości</dt><dd>21</dd>
-          <dt>Materiały</dt><dd id="d-mats">15</dd>
-          <dt>Animacje</dt><dd id="d-anims">Idle_loop, Walk_loop</dd>
         </dl>
-      </div>
-
-      <div class="card">
-        <h2>Sloty (części wymienne)</h2>
         <div class="chips" id="slots"></div>
-        <p class="note">Każdy slot to osobny mesh na wspólnym szkielecie. Fuzja jednostek bierze sloty od obu „rodziców”, np. ciało golema i hełm żołnierza.</p>
-      </div>
-
-      <div class="card">
-        <h2>Szkielet (wspólny)</h2>
-        <p class="note"><code>root · hips · spine · chest · neck · head</code>, a dla stron L/R: <code>shoulder · upper_arm · forearm · hand · thigh · shin · foot</code> oraz <code>prop.R</code> na trzymany przedmiot.</p>
       </div>
     </aside>
   </div>
 </div>
 
 <script>
-const UNITS = {
-  soldier: { file: 'soldier.glb', path: '../export/soldier.glb', attack: 'Attack', slots: ['Head', 'Helmet', 'Torso', 'Cape', 'Arms', 'Legs', 'Weapon', 'Shield'],
-    desc: 'cięcie mieczem z zamachu, tarcza osłania korpus.' },
-  golem:   { file: 'golem.glb', path: '../export/golem.glb', attack: 'Throw', slots: ['Body', 'Head', 'Arms', 'Legs', 'Rock'],
-    desc: 'wyrywa głaz z ziemi, unosi nad głowę i rzuca. Głaz w locie to osobny model golem_rock.glb.' },
-  hybrid:  { file: 'hybrid.glb', path: '../export/hybrid.glb', attack: 'Slam', slots: ['Body', 'Head', 'Cape', 'Arms', 'Legs', 'Weapon'],
-    desc: 'uderza oburącz Runicznym Ostrzem w ziemię, a przed nim wyrastają kryształowe kolce (hybrid_spikes.glb).' },
-};
-const STATS = window.STATS || {};
-const EVENT_PL = { hit: 'trafienie', release: 'wypuszczenie głazu', impact: 'uderzenie w ziemię' };
-let current = 'soldier';
-function animFor(name) { return name === 'attack' ? UNITS[current].attack : name; }
+// Dane wstrzykuje pack_viewer.py: window.UNITS (units.json + statystyki) i window.EMBED (modele base64).
+const UNITS = window.UNITS || {};
+const EVENT_PL = { hit: 'trafienie', release: 'wypuszczenie', impact: 'uderzenie w ziemię' };
+const TYPE_PL = { wrecz: 'wręcz', pocisk: 'pocisk', obszar: 'obszar', rzut: 'rzut' };
 const CAMS = { game: '30deg 38deg auto', front: '20deg 82deg auto' };
 const mv = document.getElementById('mv');
-let spin = false;
-// Wersja opublikowana ma modele osadzone w window.EMBED (base64); lokalnie ładuje pliki z ../export/
 const blobUrls = {};
-function srcFor(key) {
-  const b64 = window.EMBED && window.EMBED[key];
-  if (!b64) return UNITS[key].path;
-  if (!blobUrls[key]) {
+let current = Object.keys(UNITS)[0];
+
+function srcFor(id) {
+  const b64 = window.EMBED && window.EMBED[id];
+  if (!b64) return '../export/' + UNITS[id].plik;
+  if (!blobUrls[id]) {
     const bin = atob(b64), bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    blobUrls[key] = URL.createObjectURL(new Blob([bytes], { type: 'model/gltf-binary' }));
+    blobUrls[id] = URL.createObjectURL(new Blob([bytes], { type: 'model/gltf-binary' }));
   }
-  return blobUrls[key];
+  return blobUrls[id];
 }
-
 function press(groupSel, el) {
   document.querySelectorAll(groupSel).forEach(b => b.setAttribute('aria-pressed', String(b === el)));
 }
-function showUnit(key) {
-  const u = UNITS[key], st = STATS[key] || {};
-  current = key;
-  mv.src = srcFor(key);
-  document.getElementById('d-file').textContent = u.file;
-  document.getElementById('d-tris').textContent = st.tris ?? '–';
-  document.getElementById('d-mats').textContent = st.mats ?? '–';
-  document.getElementById('d-anims').textContent = `Idle_loop, Walk_loop, ${u.attack}`;
-  document.getElementById('atk-name').textContent = u.attack;
-  document.getElementById('atk-desc').textContent = u.desc;
-  document.getElementById('atk-event').textContent = st.event_time != null
-    ? `Moment „${EVENT_PL[st.event] || st.event}”: ${st.event_time.toFixed(2)} s z ${st.length.toFixed(2)} s animacji.` : '';
-  document.getElementById('slots').innerHTML = u.slots.map(s => `<span class="chip">${s}</span>`).join('');
+function animFor(key) { return UNITS[current].animacje[key]; }
+function text(id, v) { document.getElementById(id).textContent = v; }
+
+function showUnit(id) {
+  const u = UNITS[id], a = u.atak;
+  current = id;
+  mv.src = srcFor(id);
+  text('u-name', u.nazwa);
+  text('u-desc', u.opis);
+  const par = document.getElementById('u-parents');
+  par.hidden = !u.rodzice.length;
+  par.textContent = u.rodzice.length ? 'Fuzja: ' + u.rodzice.map(r => UNITS[r] ? UNITS[r].nazwa : r).join(' + ') : '';
+  text('atk-move', a.ruch);
+  text('atk-fx', a.efekt || 'brak');
+  text('atk-type', TYPE_PL[a.typ] || a.typ);
+  text('atk-time', `${EVENT_PL[a.zdarzenie] || a.zdarzenie}: ${a.moment_s.toFixed(2)} s z ${a.dlugosc_s.toFixed(2)} s`);
+  text('d-file', u.plik);
+  text('d-ver', 'v' + u.wersja);
+  text('d-tris', u.trojkaty || '–');
+  document.getElementById('slots').innerHTML = (u.sloty || []).map(s => `<span class="chip">${s}</span>`).join('');
 }
-document.querySelectorAll('[data-unit]').forEach(b => b.addEventListener('click', () => { press('[data-unit]', b); showUnit(b.dataset.unit); }));
+
+const box = document.getElementById('units');
+Object.entries(UNITS).forEach(([id, u], i) => {
+  const b = document.createElement('button');
+  b.className = 'unit'; b.id = 'u-' + id; b.dataset.unit = id;
+  b.setAttribute('aria-pressed', String(i === 0));
+  b.innerHTML = `<b></b><span class="ver"></span>`;
+  b.querySelector('b').textContent = u.nazwa;
+  b.querySelector('.ver').textContent = (u.rodzice.length ? 'fuzja · ' : '') + 'v' + u.wersja;
+  b.addEventListener('click', () => { press('[data-unit]', b); showUnit(id); });
+  box.appendChild(b);
+});
 document.querySelectorAll('[data-anim]').forEach(b => b.addEventListener('click', () => {
   press('[data-anim]', b); mv.animationName = animFor(b.dataset.anim); mv.play();
 }));
 document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => {
   press('[data-cam]', b);
   const c = b.dataset.cam;
-  spin = c === 'spin';
-  if (spin) { mv.setAttribute('auto-rotate', ''); mv.cameraOrbit = '0deg 70deg auto'; }
+  if (c === 'spin') { mv.setAttribute('auto-rotate', ''); mv.cameraOrbit = '0deg 70deg auto'; }
   else { mv.removeAttribute('auto-rotate'); mv.cameraOrbit = CAMS[c]; }
   mv.jumpCameraToGoal?.();
 }));
 mv.addEventListener('load', () => { mv.animationName = animFor(document.querySelector('[data-anim][aria-pressed="true"]').dataset.anim); mv.play(); });
-showUnit('soldier');
+if (current) showUnit(current);
 </script>

@@ -1,21 +1,29 @@
-"""Tworzy samodzielny podgląd (modele osadzone w base64) do publikacji.
-Użycie: python3 pack_viewer.py <plik_wyjściowy.html>"""
-import base64, json, os, struct, sys
+"""PODGLĄD 3D: tworzy samodzielną stronę z osadzonymi modelami (do obejrzenia/udostępnienia).
+
+Użycie:  python3 pack_viewer.py <plik_wyjściowy.html>
+Bierze jednostki z export/units.json (czyli z roster.json) – nowe pojawiają się same.
+"""
+import base64
+import json
+import os
+import struct
+import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-meta = json.load(open(os.path.join(ROOT, 'export', 'units.json'), encoding='utf-8'))
-emb, stats = {}, {}
-for key in ('soldier', 'golem', 'hybrid'):
-    raw = open(os.path.join(ROOT, 'export', f'{key}.glb'), 'rb').read()
-    emb[key] = base64.b64encode(raw).decode()
+EXPORT = os.path.join(ROOT, 'export')
+
+meta = json.load(open(os.path.join(EXPORT, 'units.json'), encoding='utf-8'))
+emb = {}
+for jid, u in meta.items():
+    raw = open(os.path.join(EXPORT, u['plik']), 'rb').read()
+    emb[jid] = base64.b64encode(raw).decode()
     n = struct.unpack('<I', raw[12:16])[0]
     j = json.loads(raw[20:20 + n])
     tris = sum(j['accessors'][p['indices']]['count'] // 3 for m in j['meshes'] for p in m['primitives'])
-    m = meta[key]
-    stats[key] = {'tris': f'{tris:,}'.replace(',', ' '), 'mats': len(j['materials']),
-                  'event': m['attack_event'], 'event_time': m['attack_event_time_s'], 'length': m['attack_length_s']}
+    u['trojkaty'] = f'{tris:,}'.replace(',', ' ')
+    u['sloty'] = [m['name'].rsplit('_', 1)[-1] for m in j['meshes']]
 html = open(os.path.join(ROOT, 'podglad', 'viewer.html'), encoding='utf-8').read()
-tag = ('<script>window.EMBED=' + json.dumps(emb) + ';window.STATS=' + json.dumps(stats) + ';</script>\n')
-i = html.index('<script>\nconst UNITS')
+tag = '<script>window.UNITS=' + json.dumps(meta, ensure_ascii=False) + ';window.EMBED=' + json.dumps(emb) + ';</script>\n'
+i = html.index('<script>\n// Dane wstrzykuje')
 open(sys.argv[1], 'w', encoding='utf-8').write(html[:i] + tag + html[i:])
-print(stats)
+print('OK:', ', '.join(f"{k} ({v['trojkaty']} tr.)" for k, v in meta.items()))

@@ -1,4 +1,9 @@
-"""Wspólne narzędzia do budowy modułowych jednostek (Blender / bpy).
+"""NARZĘDZIA (silnik generatora) – zwykle nie trzeba tu nic zmieniać.
+
+Zawiera: prymitywy (box, cyl, sphere, rock...), szkielet, animacje (chód, pozy kluczowe),
+eksport .glb i render podglądów.
+
+Wspólne narzędzia do budowy modułowych jednostek (Blender / bpy).
 
 Każda jednostka składa się z:
   * szkieletu o WSPÓLNYCH nazwach kości (ten sam układ dla każdej jednostki,
@@ -78,6 +83,25 @@ def seg(p0, p1, x_hint=(1, 0, 0)):
     """Macierz ustawiająca prymityw (oś Z, wycentrowany) między p0 a p1."""
     p0, p1 = V(p0), V(p1)
     return frame((p0 + p1) / 2, p1 - p0, x_hint)
+
+
+SIDES = ((1, '.L'), (-1, '.R'))  # (znak osi X, przyrostek kości): lewa strona postaci to +X
+HIDE = (0.001, 0.001, 0.001)      # skala „ukrytego” rekwizytu w animacji
+SHOW = (1, 1, 1)
+
+
+def lerp(a, b, t):
+    return a + (b - a) * t
+
+
+def scale_m(x, y, z):
+    """Macierz skalowania 4x4."""
+    return Matrix.Diagonal((x, y, z, 1))
+
+
+def K(rot=(0, 0, 0), loc=(0, 0, 0), scale=None):
+    """Poza jednej kości w animacji ataku: obrót (stopnie), przesunięcie, opcjonalnie skala."""
+    return (rot, loc, scale)
 
 
 # ---------------------------------------------------------------- primitives (temp bmesh)

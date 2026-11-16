@@ -1,0 +1,8 @@
+{
+  "_opis": "Lista jednostek, które trafiają do gry. Tylko to, co jest tutaj, jest eksportowane do gry i wydawane. 'wersja' podnosisz o 1 przy każdej zamierzonej zmianie wyglądu lub animacji jednostki.",
+  "jednostki": {
+    "zolnierz": { "wersja": 1 },
+    "golem": { "wersja": 1 },
+    "kamienny_rycerz": { "wersja": 1 }
+  }
+}
