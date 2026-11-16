@@ -70,5 +70,28 @@
       "kosc_startowa": null,
       "uwagi": "3 kępy w linii co 0.8 m, kolejno co 0.08 s"
     }
+  },
+  "mag_ognia": {
+    "nazwa": "Mag ognia",
+    "wersja": 1,
+    "plik": "mag_ognia.glb",
+    "rodzice": [],
+    "opis": "Czarodziej w czerwonej szacie i spiczastym kapeluszu, z kosturem z ognistym kryształem. Ciska kulami ognia.",
+    "animacje": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack"
+    },
+    "atak": {
+      "ruch": "czar",
+      "efekt": "kula_ognia",
+      "typ": "pocisk",
+      "dlugosc_s": 1.2,
+      "moment_s": 0.66,
+      "zdarzenie": "cast",
+      "plik_efektu": "efekt_kula_ognia.glb",
+      "kosc_startowa": "hand.L",
+      "uwagi": null
+    }
   }
 }
