@@ -42,6 +42,7 @@ SOLDIER_PALETTE = {
     'plume': ('#d23a2c', 0.85),
     'wood': ('#8a5a2b', 0.8),
     'eye': ('#151515', 0.3),
+    'eye_white': ('#f3eee4', 0.4),
     'hair': ('#5a3820', 0.85),
     'gem': ('#e0283c', 0.15, 0.0, 0.6),
 }
@@ -53,8 +54,9 @@ def soldier_head(sl, J):
     sl.add(sphere(0.16, 0.155, 0.18, 20, 14), 'skin', 'head', mtx(c))
     sl.add(box(0.045, 0.05, 0.075, 0.016), 'skin', 'head', mtx(c + V(0, -0.157, -0.025), (-8, 0, 0)))
     for sg in (1, -1):
-        sl.add(sphere(0.022, 0.012, 0.024, 10, 8), 'eye', 'head', mtx(c + V(sg * 0.056, -0.145, 0.02)))
-        sl.add(box(0.065, 0.025, 0.02, 0.008), 'hair', 'head', mtx(c + V(sg * 0.056, -0.148, 0.058), (0, sg * 10, 0)))
+        sl.add(sphere(0.032, 0.014, 0.03, 12, 8), 'eye_white', 'head', mtx(c + V(sg * 0.058, -0.143, 0.018)))
+        sl.add(sphere(0.019, 0.012, 0.022, 10, 8), 'eye', 'head', mtx(c + V(sg * 0.054, -0.153, 0.016)))
+        sl.add(box(0.07, 0.026, 0.022, 0.008), 'hair', 'head', mtx(c + V(sg * 0.058, -0.152, 0.05), (0, sg * 10, 0)))
         sl.add(sphere(0.018, 0.04, 0.045, 10, 8), 'skin', 'head', mtx(c + V(sg * 0.158, 0.0, -0.005)))
     sl.add(sphere(0.158, 0.15, 0.13, 16, 10), 'hair', 'head', mtx(c + V(0, 0.03, -0.035)))
     # broda i wąsy
@@ -67,30 +69,30 @@ def soldier_head(sl, J):
 def soldier_helmet(sl, J):
     c = J['neck_top'] + V(0, 0, 0.17)
     dome = cut_below(sphere(1, 1, 1, 24, 16), -0.15)
-    sl.add(dome, 'steel', 'head', mtx(c + V(0, 0.005, 0.045)) @ mtx() @ _scale(0.182, 0.178, 0.19))
+    sl.add(dome, 'steel', 'head', mtx(c + V(0, 0.005, 0.095)) @ _scale(0.182, 0.178, 0.18))
     # opaska z nitami
-    sl.add(cyl(0.188, 0.188, 0.055, 28, 0.01), 'steel_dark', 'head', mtx(c + V(0, 0.005, 0.03)) @ _scale(1, 0.985, 1))
+    sl.add(cyl(0.188, 0.188, 0.055, 28, 0.01), 'steel_dark', 'head', mtx(c + V(0, 0.005, 0.08)) @ _scale(1, 0.985, 1))
     for i in range(14):
         a = math.radians(-90 + 25 + i * (310 / 13))
-        p = c + V(math.cos(a) * 0.192, math.sin(a) * 0.19 + 0.005, 0.03)
+        p = c + V(math.cos(a) * 0.192, math.sin(a) * 0.19 + 0.005, 0.08)
         sl.add(sphere(0.012, u=8, v=6), 'gold', 'head', mtx(p))
     guard = cut_below(cyl(0.2, 0.188, 0.11, 28), -1)
     bmesh.ops.delete(guard, geom=[v for v in guard.verts if v.co.y < -0.06], context='VERTS')
-    sl.add(guard, 'steel', 'head', mtx(c + V(0, 0.01, -0.035)) @ _scale(1, 0.99, 1) @ mtx(rot=(0, 0, 180)))
-    sl.add(cyl(0.205, 0.205, 0.016, 28), 'gold', 'head', mtx(c + V(0, 0.01, -0.092)) @ _scale(0.6, 1, 1) @ mtx((0, 0.06, 0)))
+    sl.add(guard, 'steel', 'head', mtx(c + V(0, 0.01, 0.0)) @ _scale(1, 0.99, 1))
+    sl.add(cyl(0.205, 0.205, 0.016, 28), 'gold', 'head', mtx(c + V(0, 0.07, -0.057)) @ _scale(0.6, 0.7, 1))
     # nosal i osłony policzków
-    sl.add(box(0.036, 0.022, 0.15, 0.009), 'steel', 'head', mtx(c + V(0, -0.186, -0.02)))
+    sl.add(box(0.03, 0.022, 0.1, 0.009), 'steel', 'head', mtx(c + V(0, -0.186, 0.015)))
     for sg in (1, -1):
-        sl.add(box(0.03, 0.12, 0.15, 0.014), 'steel', 'head', mtx(c + V(sg * 0.172, -0.035, -0.07), (0, sg * 8, sg * -10)))
-        sl.add(sphere(0.011, u=8, v=6), 'gold', 'head', mtx(c + V(sg * 0.19, -0.035, -0.02)))
+        sl.add(box(0.03, 0.12, 0.15, 0.014), 'steel', 'head', mtx(c + V(sg * 0.172, -0.02, -0.02), (0, sg * 8, sg * -10)))
+        sl.add(sphere(0.011, u=8, v=6), 'gold', 'head', mtx(c + V(sg * 0.19, -0.02, 0.03)))
     # grzebień i pióropusz
-    sl.add(box(0.04, 0.30, 0.04, 0.012), 'gold', 'head', mtx(c + V(0, 0.01, 0.235), (0, 0, 0)))
+    sl.add(box(0.04, 0.30, 0.04, 0.012), 'gold', 'head', mtx(c + V(0, 0.01, 0.272), (0, 0, 0)))
     R = 0.255
     n = 7
     for i in range(n):
         t = i / (n - 1)
         phi = math.radians(lerp(62, 168, t))
-        p = c + V(0, -R * math.cos(phi), R * math.sin(phi) + 0.03)
+        p = c + V(0, -R * math.cos(phi), R * math.sin(phi) + 0.07)
         size = 0.5 + 0.5 * math.sin(math.pi * (0.25 + 0.75 * t))
         sl.add(sphere(0.045 * size + 0.02, 0.07 * size + 0.03, 0.06 * size + 0.025, 12, 8), 'plume', 'head',
                mtx(p, (math.degrees(phi) - 90, 0, 0)))

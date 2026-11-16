@@ -83,15 +83,15 @@ def hybrid_head(sl, J):
     sl.add(rock(0.27, 0.26, 0.26, 111), 'stone_dark', 'head', mtx(c))
     sl.add(rock(0.24, 0.18, 0.09, 112), 'stone', 'head', mtx(c + V(0, -0.05, -0.14), (10, 0, 0)))
     for sg in (1, -1):
-        sl.add(box(0.075, 0.03, 0.035, 0.008), 'core', 'head', mtx(c + V(sg * 0.066, -0.137, 0.005), (0, sg * -8, 0)))
+        sl.add(box(0.085, 0.032, 0.045, 0.01), 'core', 'head', mtx(c + V(sg * 0.068, -0.138, -0.008), (0, sg * -8, 0)))
     # hełm żołnierza na kamiennej głowie
-    hc = c + V(0, 0.005, 0.06)
+    hc = c + V(0, 0.005, 0.073)
     sl.add(cut_below(sphere(1, 1, 1, 24, 16), -0.15), 'steel', 'head', mtx(hc) @ _scale(0.19, 0.185, 0.19))
-    sl.add(cyl(0.196, 0.196, 0.05, 28, 0.01), 'steel_dark', 'head', mtx(c + V(0, 0.005, 0.045)))
+    sl.add(cyl(0.196, 0.196, 0.05, 28, 0.01), 'steel_dark', 'head', mtx(c + V(0, 0.005, 0.058)))
     for i in range(12):
         a = math.radians(-90 + 28 + i * (304 / 11))
-        sl.add(sphere(0.012, u=8, v=6), 'gold', 'head', mtx(c + V(math.cos(a) * 0.2, math.sin(a) * 0.2 + 0.005, 0.045)))
-    sl.add(box(0.04, 0.025, 0.12, 0.009), 'steel', 'head', mtx(c + V(0, -0.196, 0.0)))
+        sl.add(sphere(0.012, u=8, v=6), 'gold', 'head', mtx(c + V(math.cos(a) * 0.2, math.sin(a) * 0.2 + 0.005, 0.058)))
+    sl.add(box(0.034, 0.025, 0.1, 0.009), 'steel', 'head', mtx(c + V(0, -0.196, 0.0)))
     for sg in (1, -1):
         sl.add(box(0.03, 0.1, 0.1, 0.012), 'steel', 'head', mtx(c + V(sg * 0.18, -0.02, -0.04), (0, sg * 8, sg * -8)))
     # pęknięcie hełmu ze światłem runy
@@ -234,11 +234,12 @@ def spikes_parts(sl):
 
 # ---------------------------------------------------------------- atak „Slam”
 
-_HI = {'upper_arm.R': K((165, 0, 0)), 'forearm.R': K((40, 0, 0)), 'hand.R': K((20, 0, 0)),
-       'upper_arm.L': K((160, 0, 0)), 'forearm.L': K((45, 0, 0)),
+# kąty Z ramion dobrane solverem tak, by lewa dłoń trzymała rękojeść tuż pod prawą (chwyt oburącz)
+_HI = {'upper_arm.R': K((165, 0, -24)), 'forearm.R': K((40, 0, 0)), 'hand.R': K((20, 0, 0)),
+       'upper_arm.L': K((150, 0, 6)), 'forearm.L': K((45, 0, -20)),
        'chest': K((-12, 0, 0)), 'spine': K((-5, 0, 0)), 'head': K((10, 0, 0)), 'thigh.L': K((10, 0, 0))}
-_LO = {'upper_arm.R': K((55, 0, 0)), 'forearm.R': K((5, 0, 0)), 'hand.R': K((-45, 0, 0)),
-       'upper_arm.L': K((50, 0, 0)), 'forearm.L': K((15, 0, 0)),
+_LO = {'upper_arm.R': K((55, 0, 84)), 'forearm.R': K((5, 0, 0)), 'hand.R': K((-45, 0, 0)),
+       'upper_arm.L': K((50, 0, -24)), 'forearm.L': K((15, 0, -60)),
        'chest': K((25, 0, 0)), 'spine': K((12, 0, 0)), 'head': K((-25, 0, 0)),
        'thigh.L': K((28, 0, 0)), 'shin.L': K((-24, 0, 0)), 'thigh.R': K((-16, 0, 0)), 'shin.R': K((-8, 0, 0))}
 
