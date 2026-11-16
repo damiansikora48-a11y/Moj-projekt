@@ -58,7 +58,7 @@ def razem(rej, ids, samples):
     import bpy
     reset_scene()
     jednostki = [rej.wszystkie[i] for i in ids]
-    szer = [max(0.9, wysokosc(j) * 0.75) for j in jednostki]
+    szer = [j['szkielet']['sh_w'] * 2 + 0.75 + (0.5 if 'Offhand' in j['czesci'] else 0) for j in jednostki]
     x = -sum(szer) / 2
     for j, s in zip(jednostki, szer):
         build_unit(rej.do_budowy(j), offset=(x + s / 2, 0, 0))
