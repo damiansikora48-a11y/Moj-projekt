@@ -12,7 +12,7 @@ from kit import V, box, cyl, sphere, ico, rock, cut_below, taper, jitter, mtx, f
 
 SZKIELET = dict(
     ankle=0.14, shin=0.34, thigh=0.36, hip_w=0.30, foot=0.38,
-    spine=0.30, chest=0.62, neck=0.17, head=0.32, head_fwd=0.3,
+    spine=0.30, chest=0.62, neck=0.14, head=0.32, head_fwd=0.3,
     sh_w=0.62, sh_drop=0.14, upper_arm=0.48, forearm=0.52, hand=0.30,
     arm_angle=16, forearm_fwd=14,
 )
@@ -70,6 +70,9 @@ def tulow(sl, J):
 
 def glowa(sl, J):
     c = J['neck_top'] + V(0, 0, 0.12)
+    # kamienny kark łączący tułów z głową (bez niego głowa wisi w powietrzu)
+    sl.add(rock(0.3, 0.28, 0.24, 25), 'stone', 'neck', mtx(J['sh'] + V(0, -0.2, 0.05), (-12, 0, 0)))
+    sl.add(rock(0.24, 0.2, 0.16, 26), 'stone_dark', 'neck', mtx(c + V(0, 0.04, -0.17)))
     sl.add(rock(0.37, 0.33, 0.3, 21), 'stone_dark', 'head', mtx(c))
     sl.add(rock(0.43, 0.14, 0.1, 22), 'stone', 'head', mtx(c + V(0, -0.155, 0.08), (-8, 0, 0)))
     for sg in (1, -1):
