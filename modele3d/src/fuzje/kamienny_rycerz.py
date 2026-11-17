@@ -206,7 +206,8 @@ JEDNOSTKA = {
     },
     'chod': dict(walk_frames=40, idle_frames=84, thigh=22, knee=40, knee_base=3, arm=16,
                  **{'arm_scale.R': 0.4, 'arm_scale.L': 0.9, 'forearm_base.R': 18, 'forearm_base.L': 12},
-                 twist=6, sway=3.5, lean=4, bob=0.028, breath=1.9, breath_loc=0.009),
+                 twist=6, sway=3.5, lean=4, bob=0.028, breath=1.9, breath_loc=0.009,
+                 smierc_dlon=-58),
     'atak': {'ruch': 'uderzenie', 'efekt': 'krysztaly'},
     'tagi': {'material': 'kamien', 'wielkosc': 'duza'},
 }

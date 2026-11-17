@@ -46,6 +46,8 @@ modele3d/
 | kolory jednostki | plik jednostki | `PALETA` |
 | proporcje (wzrost, szerokość barków…) | plik jednostki | `SZKIELET` |
 | tempo i styl chodu | plik jednostki | `JEDNOSTKA['chod']` |
+| sposób upadku przy śmierci | plik jednostki | `smierc` ('tyl' / 'przod') i `smierc_dlon` (kąt dłoni z bronią) w `chod` |
+| przebieg trafienia i śmierci (wspólny dla wszystkich) | `src/kit.py` | `reakcje` |
 | którym atakiem walczy jednostka | plik jednostki | `JEDNOSTKA['atak']` (`ruch` + `efekt`) |
 | przebieg animacji cięcia (zamach, moment trafienia) | `src/ataki/ruchy/ciecie.py` | pozy w `keys`, moment w `event` |
 | wygląd głazu (w dłoni i w locie) | `src/ataki/efekty/glaz.py` | `model_glazu` |
@@ -140,7 +142,7 @@ Szkic nigdy nie trafi do gry sam z siebie. Do gry trafia tylko to, co jest w `ro
 
 Pliki z `wydanie/<wersja>/` (albo roboczo z `export/`) kopiujesz do `res://units/`:
 
-- `<id>.glb`: jednostka z animacjami `Idle_loop`, `Walk_loop` (zapętlone) i `Attack`;
+- `<id>.glb`: jednostka z animacjami `Idle_loop`, `Walk_loop` (zapętlone), `Attack`, `Hit` (reakcja na trafienie, ok. 0,5 s) i `Death` (upadek, kończy się na leżącej postaci);
 - `efekt_<id>.glb`: pociski i efekty ataków;
 - `units.json`: dane dla gry, czyli nazwy plików i animacji, długość ataku, moment trafienia (`moment_s`), typ ataku, plik efektu i kość, z której startuje pocisk.
 

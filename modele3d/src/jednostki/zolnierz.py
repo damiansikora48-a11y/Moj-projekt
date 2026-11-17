@@ -231,7 +231,8 @@ JEDNOSTKA = {
     },
     'chod': dict(walk_frames=32, idle_frames=72, thigh=26, knee=48, knee_base=4, arm=20,
                  **{'arm_scale.R': 0.45, 'arm_scale.L': 0.35, 'forearm_base.R': 22, 'forearm_base.L': 28},
-                 twist=5, sway=2, lean=3, bob=0.022, breath=1.6, breath_loc=0.006),
+                 twist=5, sway=2, lean=3, bob=0.022, breath=1.6, breath_loc=0.006,
+                 smierc_dlon=-105),
     'atak': {'ruch': 'ciecie', 'efekt': None},
     'tagi': {'material': 'metal', 'wielkosc': 'srednia'},
 }

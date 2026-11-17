@@ -421,6 +421,36 @@ def gait(p):
     return walk, idle
 
 
+def reakcje(an, hip_z):
+    """Animacje reakcji wspólne dla wszystkich jednostek: Hit (trafienie) i Death (śmierć).
+    an['smierc'] = 'tyl' (pada na plecy, domyślnie) albo 'przod' (pada na twarz, np. golem)."""
+    przod = an.get('smierc', 'tyl') == 'przod'
+    z = 1 if przod else -1                    # znak obrotu bioder: + do przodu, - do tyłu
+    lez = -(hip_z - 0.12 * hip_z)             # obniżenie bioder do ziemi (w osi kości)
+    hit = [
+        (0.0, {}),
+        (0.22, {'chest': K((-14, 0, 0)), 'spine': K((-6, 0, 0)), 'head': K((-16, 0, 0)),
+                'upper_arm.L': K((22, 0, 6)), 'upper_arm.R': K((22, 0, -6)),
+                'thigh.L': K((8, 0, 0)), 'thigh.R': K((8, 0, 0)), 'shin.L': K((-14, 0, 0)), 'shin.R': K((-14, 0, 0))}),
+        (1.0, {}),
+    ]
+    zachwianie = {'chest': K((12 * z, 0, 0)), 'head': K((18 * z, 0, 0)), 'spine': K((6 * z, 0, 0)),
+                  'thigh.L': K((26, 0, 0)), 'thigh.R': K((20, 0, 0)), 'shin.L': K((-40, 0, 0)), 'shin.R': K((-34, 0, 0)),
+                  'upper_arm.L': K((15, 0, 10)), 'upper_arm.R': K((15, 0, -10)),
+                  'hips': K((0, 0, 0), (0, -0.1 * hip_z, 0))}
+
+    def lezy(kat, wys):
+        return {'hips': K((z * kat, 0, 4), (0, lez + wys, 0)),
+                'chest': K((z * 6, 0, 0)), 'head': K((z * 12, 18, 0)),
+                'thigh.L': K((4, 0, 4)), 'thigh.R': K((-6, 0, -6)), 'shin.L': K((-8, 0, 0)), 'shin.R': K((-14, 0, 0)),
+                # na plecach „do przodu” = do nieba, więc ręce lekko do tyłu, żeby opadły na ziemię
+                'upper_arm.L': K((10 if przod else -12, 0, 35)), 'upper_arm.R': K((10 if przod else -12, 0, -40)),
+                'forearm.L': K((20 if przod else 6, 0, 0)), 'forearm.R': K((25 if przod else 8, 0, 0)),
+                'hand.R': K((an.get('smierc_dlon', 0), 0, 0))}  # kąt dłoni z bronią, by broń legła na ziemi
+    death = [(0.0, {}), (0.25, zachwianie), (0.62, lezy(84, 0.0)), (0.72, lezy(78, 0.05 * hip_z)), (0.86, lezy(85, 0.0)), (1.0, lezy(85, 0.0))]
+    return hit, death
+
+
 # ---------------------------------------------------------------- budowa jednostki
 
 def build_unit(unit, offset=(0, 0, 0)):
@@ -444,6 +474,10 @@ def build_unit(unit, offset=(0, 0, 0)):
     if atk:
         fn = keyposes(atk['keys'], idle(0.0))
         actions['attack'] = bake_action(arm, atk['name'], atk['frames'], fn, step=1, rest_scale=rs)
+    hit, death = reakcje(an, J['hip'].z)
+    wolno = an.get('smierc', 'tyl') == 'przod'
+    actions['hit'] = bake_action(arm, 'Hit', 14, keyposes(hit, idle(0.0)), step=1, rest_scale=rs)
+    actions['death'] = bake_action(arm, 'Death', 54 if wolno else 45, keyposes(death, idle(0.0)), step=1, rest_scale=rs)
     set_action(arm, actions['idle'], 0)
     arm.location = V(offset)
     return {'arm': arm, 'meshes': meshes, 'J': J, 'actions': actions}

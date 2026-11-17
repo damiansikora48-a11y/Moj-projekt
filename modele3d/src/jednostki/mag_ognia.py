@@ -184,7 +184,8 @@ JEDNOSTKA = {
     },
     'chod': dict(walk_frames=34, idle_frames=80, thigh=22, knee=40, knee_base=4, arm=14,
                  **{'arm_scale.R': 0.3, 'arm_scale.L': 0.6, 'forearm_base.R': 24, 'forearm_base.L': 30},
-                 twist=4, sway=2.5, lean=2, bob=0.02, breath=1.8, breath_loc=0.006),
+                 twist=4, sway=2.5, lean=2, bob=0.02, breath=1.8, breath_loc=0.006,
+                 smierc_dlon=35),
     'atak': {'ruch': 'czar', 'efekt': 'kula_ognia'},
     'tagi': {'material': 'tkanina', 'wielkosc': 'srednia', 'zywiol': 'ogien'},
 }

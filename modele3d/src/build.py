@@ -52,6 +52,10 @@ def rendery(rej, j, b, res, samples):
     render_view(os.path.join(PODGLAD, f'{n}_atak_1_zamach.png'), (0, 0, tz * 1.1), d * 1.05, 6, 62)
     set_action(b['arm'], b['actions']['attack'], round(ruch['event'] * ruch['frames']))
     render_view(os.path.join(PODGLAD, f'{n}_atak_2_uderzenie.png'), (0, 0, tz * 1.1), d * 1.05, 6, 62)
+    set_action(b['arm'], b['actions']['hit'], 3)
+    render_view(os.path.join(PODGLAD, f'{n}_trafienie.png'), (0, 0, tz), d, 6, 62)
+    set_action(b['arm'], b['actions']['death'], 60)
+    render_view(os.path.join(PODGLAD, f'{n}_smierc.png'), (0, 0, tz * 0.5), d * 0.95, 30, 50)
 
 
 def razem(rej, ids, samples):

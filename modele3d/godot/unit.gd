@@ -46,13 +46,34 @@ func idle() -> void:
 
 
 func walk() -> void:
-	if not attacking:
+	if not attacking and not dead:
 		anim.play(data["animacje"]["walk"])
+
+
+var dead := false
+
+## Krótka reakcja na trafienie (nie przerywa ataku).
+func take_hit() -> void:
+	if dead or attacking:
+		return
+	anim.play(data["animacje"]["hit"])
+	await anim.animation_finished
+	if not dead and not attacking:
+		idle()
+
+
+## Śmierć: animacja kończy się na leżącej postaci (nie jest zapętlona).
+func die() -> void:
+	if dead:
+		return
+	dead = true
+	attacking = false
+	anim.play(data["animacje"]["death"])
 
 
 ## Atak w stronę punktu `target` (pozycja globalna).
 func attack(target: Vector3) -> void:
-	if attacking:
+	if attacking or dead:
 		return
 	attacking = true
 	var a: Dictionary = data["atak"]

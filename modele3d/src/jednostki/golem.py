@@ -146,7 +146,8 @@ JEDNOSTKA = {
     'czesci': {'Body': tulow, 'Head': glowa, 'Arms': rece, 'Legs': nogi},
     'chod': dict(walk_frames=48, idle_frames=96, thigh=18, knee=32, knee_base=3, arm=16,
                  **{'arm_scale.R': 1.0, 'arm_scale.L': 1.0, 'forearm_base.R': 10, 'forearm_base.L': 10},
-                 twist=7, sway=5, lean=6, bob=0.035, breath=2.2, breath_loc=0.012),
+                 twist=7, sway=5, lean=6, bob=0.035, breath=2.2, breath_loc=0.012,
+                 smierc='przod'),  # pada ciężko na twarz
     'atak': {'ruch': 'rzut', 'efekt': 'glaz'},
     'tagi': {'material': 'kamien', 'wielkosc': 'duza'},
 }

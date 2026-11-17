@@ -18,7 +18,7 @@ ROSTER = os.path.join(ROOT, 'roster.json')
 # Stały słownik slotów (części). Nowa jednostka używa tylko tych nazw.
 # Element (ozdoby żywiołu) i Aura (Przebudzenie) dodaje generator, Prop – ruch z rekwizytem.
 SLOTY = ('Head', 'Headgear', 'Body', 'Back', 'Arms', 'Legs', 'Weapon', 'Offhand', 'Element', 'Aura')
-ANIMACJE = {'idle': 'Idle_loop', 'walk': 'Walk_loop', 'attack': 'Attack'}
+ANIMACJE = {'idle': 'Idle_loop', 'walk': 'Walk_loop', 'attack': 'Attack', 'hit': 'Hit', 'death': 'Death'}
 
 
 def _moduly(pakiet, zmienna):
