@@ -187,15 +187,15 @@ def miecz(sl, J):
         sl.add(cyl(0.025, 0.025, 0.012, 10), 'leather', b, F @ mtx((0, 0, t)))
     sl.add(sphere(0.038, 0.038, 0.034, 12, 8), 'gold', b, F @ mtx((0, 0, -0.115)))
     sl.add(sphere(0.016, 0.012, 0.016, 8, 6), 'gem', b, F @ mtx((0, -0.034, -0.115)))
-    sl.add(box(0.26, 0.045, 0.04, 0.014), 'gold', b, F @ mtx((0, 0, 0.105)))
+    sl.add(box(0.3, 0.055, 0.05, 0.016), 'gold', b, F @ mtx((0, 0, 0.105)))
     for sg in (1, -1):
-        sl.add(sphere(0.026, u=10, v=8), 'gold', b, F @ mtx((sg * 0.135, 0, 0.105)))
+        sl.add(sphere(0.032, u=10, v=8), 'gold', b, F @ mtx((sg * 0.155, 0, 0.105)))
     sl.add(box(0.05, 0.035, 0.05, 0.012), 'gold', b, F @ mtx((0, 0, 0.14)))
-    L = 0.72
-    sl.add(box(0.078, 0.02, L, 0.006), 'steel', b, F @ mtx((0, 0, 0.13 + L / 2)))
-    sl.add(box(0.02, 0.024, L - 0.15, 0.004), 'steel_dark', b, F @ mtx((0, 0, 0.13 + (L - 0.15) / 2 + 0.03)))
-    tip = cyl(0.055, 0.0, 0.14, 4)
-    sl.add(tip, 'steel', b, F @ mtx((0, 0, 0.13 + L + 0.07)) @ scale_m(1.0, 0.26, 1.0) @ mtx(rot=(0, 0, 45)))
+    L = 0.8
+    sl.add(box(0.105, 0.03, L, 0.009), 'steel', b, F @ mtx((0, 0, 0.13 + L / 2)))
+    sl.add(box(0.026, 0.034, L - 0.15, 0.005), 'steel_dark', b, F @ mtx((0, 0, 0.13 + (L - 0.15) / 2 + 0.03)))
+    tip = cyl(0.074, 0.0, 0.17, 4)
+    sl.add(tip, 'steel', b, F @ mtx((0, 0, 0.13 + L + 0.085)) @ scale_m(1.0, 0.3, 1.0) @ mtx(rot=(0, 0, 45)))
 
 
 def tarcza(sl, J):

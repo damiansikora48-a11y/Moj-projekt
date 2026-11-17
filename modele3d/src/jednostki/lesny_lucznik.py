@@ -55,6 +55,10 @@ def glowa(sl, J):
         sl.add(sphere(0.03, 0.014, 0.028, 12, 8), 'eye_white', 'head', mtx(c + V(sg * 0.055, -0.138, 0.02)))
         sl.add(sphere(0.018, 0.012, 0.02, 10, 8), 'eye', 'head', mtx(c + V(sg * 0.051, -0.148, 0.018)))
         sl.add(box(0.055, 0.02, 0.014, 0.006), 'hair', 'head', mtx(c + V(sg * 0.056, -0.147, 0.058), (0, sg * 12, 0)))
+    # włosy pod kapturem (czapka włosów nad czołem + kosmyki przy policzkach)
+    sl.add(cut_below(sphere(0.158, 0.153, 0.15, 18, 12), 0.03), 'hair', 'head', mtx(c + V(0, 0.0, 0.04)))
+    for sg in (1, -1):
+        sl.add(box(0.035, 0.05, 0.12, 0.015), 'hair', 'head', mtx(c + V(sg * 0.115, -0.085, 0.0), (8, 0, sg * -6)))
     # grzywka spod kaptura i mały uśmiech
     for x, rz in ((-0.06, 12), (0.0, 0), (0.06, -12)):  # grzywka: trzy kosmyki
         sl.add(box(0.06, 0.04, 0.035, 0.015), 'hair', 'head', mtx(c + V(x, -0.12, 0.115), (-25, 0, rz)))
@@ -64,18 +68,26 @@ def glowa(sl, J):
 def kaptur(sl, J):
     c = _c(J)
     b = 'head'
-    shell = sphere(1, 1, 1, 24, 16)
     import bmesh
-    bmesh.ops.delete(shell, geom=[v for v in shell.verts if v.co.y < -0.35 and v.co.z > -0.55], context='VERTS')
-    sl.add(shell, 'cloak', b, mtx(c + V(0, 0.015, 0.015)) @ scale_m(0.185, 0.18, 0.2))
+    # otwór na twarz: owal (w jednostkach kuli) – czubek głowy zostaje zakryty
+    OX, OZ0, OZ = 0.68, -0.01, 0.57
+
+    def w_otworze(x, z):
+        return (x / OX) ** 2 + ((z - OZ0) / OZ) ** 2 < 1.0
+    shell = sphere(1, 1, 1, 28, 18)
+    bmesh.ops.delete(shell, geom=[v for v in shell.verts if v.co.y < 0 and w_otworze(v.co.x, v.co.z)], context='VERTS')
+    hc, R = c + V(0, 0.015, 0.015), V(0.185, 0.18, 0.2)
+    sl.add(shell, 'cloak', b, mtx(hc) @ scale_m(*R))
     # czubek kaptura opadający do tyłu
     p0, p1 = c + V(0, 0.13, 0.12), c + V(0, 0.27, -0.02)
     sl.add(cyl(0.07, 0.012, (p1 - p0).length, 10), 'cloak', b, seg(p0, p1))
     # obrzeże twarzy
     rim = []
-    for i in range(15):  # lamówka wokół GÓRY i boków twarzy
-        a = math.radians(-25 + i * (230 / 14))
-        rim.append(c + V(math.cos(a) * 0.158, -0.118 - 0.02 * math.sin(a), math.sin(a) * 0.15 + 0.03))
+    for i in range(25):  # lamówka dokładnie po krawędzi otworu
+        t = 2 * math.pi * i / 24
+        nx, nz = OX * math.cos(t), OZ0 + OZ * math.sin(t)
+        ny = -math.sqrt(max(0.0, 1 - nx * nx - nz * nz))
+        rim.append(hc + V(nx * R.x, ny * R.y, nz * R.z))
     for p, q in zip(rim, rim[1:]):
         sl.add(cyl(0.019, 0.019, (q - p).length + 0.012, 8), 'cloak_dark', b, seg(p, q))
     # kołnierz kaptura opadający na barki

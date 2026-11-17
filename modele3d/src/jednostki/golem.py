@@ -12,7 +12,7 @@ from kit import V, box, cyl, sphere, ico, rock, cut_below, taper, jitter, mtx, f
 
 SZKIELET = dict(
     ankle=0.14, shin=0.34, thigh=0.36, hip_w=0.30, foot=0.38,
-    spine=0.30, chest=0.62, neck=0.10, head=0.32, head_fwd=0.27,
+    spine=0.30, chest=0.62, neck=0.17, head=0.32, head_fwd=0.3,
     sh_w=0.62, sh_drop=0.14, upper_arm=0.48, forearm=0.52, hand=0.30,
     arm_angle=16, forearm_fwd=14,
 )
@@ -70,11 +70,11 @@ def tulow(sl, J):
 
 def glowa(sl, J):
     c = J['neck_top'] + V(0, 0, 0.12)
-    sl.add(rock(0.32, 0.30, 0.27, 21), 'stone_dark', 'head', mtx(c))
-    sl.add(rock(0.38, 0.13, 0.09, 22), 'stone', 'head', mtx(c + V(0, -0.14, 0.07), (-8, 0, 0)))
+    sl.add(rock(0.37, 0.33, 0.3, 21), 'stone_dark', 'head', mtx(c))
+    sl.add(rock(0.43, 0.14, 0.1, 22), 'stone', 'head', mtx(c + V(0, -0.155, 0.08), (-8, 0, 0)))
     for sg in (1, -1):
-        sl.add(box(0.085, 0.03, 0.05, 0.01), 'core', 'head', mtx(c + V(sg * 0.08, -0.158, 0.0), (0, sg * -10, 0)))
-    sl.add(rock(0.28, 0.22, 0.11, 23), 'stone', 'head', mtx(c + V(0, -0.06, -0.14), (10, 0, 0)))
+        sl.add(box(0.1, 0.035, 0.06, 0.012), 'core', 'head', mtx(c + V(sg * 0.09, -0.172, 0.0), (0, sg * -10, 0)))
+    sl.add(rock(0.32, 0.24, 0.12, 23), 'stone', 'head', mtx(c + V(0, -0.07, -0.16), (10, 0, 0)))
     sl.add(jitter(sphere(0.13, 0.12, 0.035, 10, 6), 0.012, 24), 'moss', 'head', mtx(c + V(0.02, 0.03, 0.14)))
     sl.add(cyl(0.035, 0.0, 0.16, 6), 'crystal', 'head', mtx(c + V(-0.1, 0.05, 0.18), (-20, -25, 0)))
 

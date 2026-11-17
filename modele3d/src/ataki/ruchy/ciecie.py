@@ -9,7 +9,7 @@ Konwencja: obrót X dodatni = kończyna do przodu; ujemny shin = zgięcie kolana
 from kit import K
 
 _SWORD_STANCE = {'thigh.L': K((18, 0, 0)), 'shin.L': K((-14, 0, 0)), 'thigh.R': K((-12, 0, 0)), 'shin.R': K((-6, 0, 0)),
-                 'upper_arm.L': K((38, 0, 0)), 'forearm.L': K((52, 0, 0))}
+                 'upper_arm.L': K((18, 0, 12)), 'forearm.L': K((32, 0, 0))}  # tarcza przed sobą, ale poniżej naramiennika
 
 RUCH = {
     'id': 'ciecie',
