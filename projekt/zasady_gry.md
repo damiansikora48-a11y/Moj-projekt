@@ -13,9 +13,9 @@ Dokument zbiera decyzje o rozgrywce. Liczby oznaczone **(propozycja)** są punkt
 5. W **budynku fuzji** łączy dwie gotowe jednostki w silniejszą.
 6. Złoto idzie na fuzje, ulepszenia budynków i naprawę murów, więc gracz musi dalej walczyć.
 
-## 2. Jednostki: rola + żywioł
+## 2. Jednostki podstawowe
 
-Każda jednostka podstawowa ma **rolę** (jak walczy) i **żywioł** (z czego jest, jaką ma moc).
+Każda jednostka ma **rolę** (jak walczy) i **żywioł** (z czego jest, jaką ma moc). To pomaga projektować, ale nie wyznacza fuzji (patrz punkt 3).
 
 | Rola | Miejsce w obronie |
 |---|---|
@@ -24,7 +24,7 @@ Każda jednostka podstawowa ma **rolę** (jak walczy) i **żywioł** (z czego je
 | Mag | na murach, czary z dystansu |
 | Strzelec | na murach, dystans fizyczny |
 
-Żywioły (robocze): **Stal, Kamień, Ogień, Natura**. Żywioł daje przewagę nad określonymi wrogami (np. ogień przeciw wrogom natury), więc warto mieć różne fuzje.
+Żywioły (robocze): **Stal, Kamień, Ogień, Natura**. Żywioł może dawać przewagę nad określonymi wrogami (np. ogień przeciw wrogom natury).
 
 Jednostki podstawowe (stan obecny):
 
@@ -37,23 +37,34 @@ Jednostki podstawowe (stan obecny):
 
 ## 3. Fuzje
 
-### Reguła
-- Fuzja dwóch jednostek daje jednostkę o **roli jednego rodzica i żywiole drugiego**.
-- **Kolejność nie ma znaczenia:** A + B = B + A. Każda para daje **jedną** fuzję. Dla każdej pary ustalamy raz, który rodzic daje rolę.
-- Wynik jest **przewidywalny**: gracz przed fuzją widzi, co dostanie.
+### Zasada: zamknięta lista wyjątkowych fuzji (księga przepisów)
+Nie łączymy wszystkiego ze wszystkim. Fuzje **wymyślamy i wybieramy ręcznie**. Każda to **nowa postać**, a nie przebarwienie rodzica.
 
-Siatka (role × żywioły) pokazuje wszystkie możliwe jednostki. Do gry trafiają tylko wybrane pola, kolejne wchodzą w aktualizacjach.
+Kryteria, które musi spełnić każda fuzja:
+1. **Nowa sylwetka:** z kamery 52° wygląda inaczej niż oboje rodzice.
+2. **Nowa rola w obronie:** robi coś, czego nie umie żadna jednostka podstawowa.
+3. **Każda jednostka podstawowa wchodzi w najwyżej 2 fuzje** (żadnych „pięciu odsłon maga”).
+4. **Nowa jednostka podstawowa dodaje 1–2 fuzje,** a nie fuzje ze wszystkimi.
+5. **Nazwa brzmi mocniej niż rodzice,** bo fuzja jest od nich silniejsza.
 
-| | Stal | Kamień | Ogień | Natura |
-|---|---|---|---|---|
-| **Wojownik** | Żołnierz | **Kamienny Rycerz** ✅ | Płomienny Rycerz | Rycerz Cierni |
-| **Kolos** | Stalowy Kolos | Golem | Magmowy Golem | Kamienny Ent |
-| **Mag** | Mag Bitewny | Geomanta | Mag ognia | Druid |
-| **Strzelec** | Kusznik | Kryształowy Łucznik | Ognisty Łucznik | Leśny Łucznik |
+A + B = B + A: kolejność wybierania jednostek w budynku nie ma znaczenia.
 
-Przy jednej fuzji na parę, 4 jednostki podstawowe dają 6 fuzji. Które pole siatki wypełnia dana para, ustalamy przy projektowaniu tej fuzji.
+Dla gracza: w budynku fuzji jest **księga przepisów**, czyli lista dostępnych fuzji, która rośnie z poziomem budynku. Pary spoza listy się nie łączą.
 
-**Zasada nazw:** fuzja zawsze jest silniejsza od rodziców, więc jej nazwa też musi brzmieć mocniej (dlatego zamiast „Procarza” jest Kryształowy Łucznik). Nazwy pól są w `modele3d/src/siatka.py`.
+Rola i żywioł jednostek (`modele3d/src/siatka.py`, `zywioly/`) to tylko narzędzie projektowe: kolory, ozdoby i efekty. Nie decydują o tym, co powstaje, i nie są pokazywane graczowi.
+
+### Lista fuzji
+
+| Fuzja | Z czego | Rola w obronie | Status |
+|---|---|---|---|
+| **Kamienny Rycerz** | Żołnierz + Golem | ciężki obrońca bramy | ✅ gotowa (+ Przebudzony) |
+| Magmowy Golem | Golem + Mag ognia | niszczyciel oblężeń, płonąca ziemia | propozycja |
+| Strażnik Murów | Żołnierz + Łucznik | ciężki strzelec: kusza i pawęż | propozycja |
+| Golem-Balista | Golem + Łucznik | chodząca wieża, daleki zasięg | propozycja |
+| Łowca Run | Mag ognia + Łucznik | strzały wybuchające czarem | pomysł na później |
+| – | Żołnierz + Mag ognia | brak pomysłu na nową rolę | nie robimy na razie |
+
+Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 
 ### Gotowość do fuzji
 - Jednostka musi zdobyć **wymagane doświadczenie** (np. poziom 5 **(propozycja)**).
@@ -116,8 +127,7 @@ Przy jednej fuzji na parę, 4 jednostki podstawowe dają 6 fuzji. Które pole si
 ---
 
 ## 5. Otwarte pytania
-- [ ] Ostateczna lista żywiołów (Natura czy np. Lód lub Cień?).
-- [ ] Które pola siatki są na premierę (propozycja: 4 podstawowe + 4–6 fuzji)?
+- [ ] Które fuzje z listy wchodzą na premierę (propozycja: 4 podstawowe + 3–4 fuzje)?
 - [ ] Wymagany poziom doświadczenia do fuzji i koszt fuzji w złocie.
 - [ ] Czy rubiny mogą kupić złoto (i z jakim limitem)?
 - [ ] Rodzaje wrogów i ich słabości na żywioły.

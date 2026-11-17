@@ -108,7 +108,7 @@ Instalacja (jednorazowo): `python3.11 -m venv venv && ./venv/bin/pip install bpy
 Rejestr sam znajdzie nowy plik. Jeśli coś jest niezgodne z zasadami (np. nieznany slot albo nieistniejący atak), budowa przerwie się z komunikatem, co poprawić.
 
 ### Nowa fuzja
-Reguła: **rola od jednego rodzica, żywioł od drugiego**, A + B = B + A (jedna fuzja na parę).
+Fuzje są **wybierane ręcznie** (lista w `projekt/zasady_gry.md`): każda musi mieć nową sylwetkę i nową rolę, a każda jednostka podstawowa wchodzi w najwyżej 2 fuzje. Szkice automatyczne to tylko pomoc w szukaniu pomysłów (rola od jednego rodzica, żywioł od drugiego).
 
 1. `python build.py --szkice`: dla każdej pary powstają **dwa** szkice (obie możliwości) i obraz `szkice/siatka.png`. Szkic bierze od rodzica-roli sylwetkę, części, chód i ruch ataku, a od rodzica-żywiołu barwy, przebarwienie materiałów, ozdoby na barkach (slot `Element`) i efekt ataku (tabela `efekty` w pliku żywiołu).
 2. Dla każdej pary wybierz jedną możliwość i zdecyduj, czy idzie do gry.
