@@ -195,6 +195,9 @@ JEDNOSTKA = {
     'nazwa': 'Kamienny Rycerz',
     'opis': 'Golem w zbroi rycerza: hełm z kryształowym grzebieniem, napierśnik popękany runami, Runiczne Ostrze.',
     'rodzice': ('golem', 'zolnierz'),
+    'rola': 'wojownik',          # patrz siatka.py
+    'zywiol': 'kamien',
+    'kotwice': {'bark': 0.2},
     'szkielet': SZKIELET,
     'paleta': PALETA,
     'czesci': {

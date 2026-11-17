@@ -70,6 +70,8 @@ def razem(rej, ids, samples):
 
 
 def szkice(rej, samples, wszystkie=False):
+    """Dla każdej pary jednostek podstawowych: OBIE możliwości (rola od A + żywioł B i odwrotnie).
+    Pary z fuzją ręczną są pomijane (chyba że --wszystkie). Na końcu: zbiorczy obraz siatki."""
     os.makedirs(SZKICE, exist_ok=True)
     ids = sorted(rej.podstawowe)
     for i, a in enumerate(ids):
@@ -77,15 +79,57 @@ def szkice(rej, samples, wszystkie=False):
             if rej.fuzja_reczna(a, b_id) and not wszystkie:
                 print(f'SZKIC pominięty: {a}+{b_id} ma już fuzję ręczną')
                 continue
-            j = auto_fuzja(rej.podstawowe[a], rej.podstawowe[b_id], SLOTY)
-            rej.sprawdz(j)
-            b = zbuduj(rej, j, SZKICE)
-            setup_stage(600, 24)
-            h = wysokosc(j) * 1.08
-            render_view(os.path.join(SZKICE, f"{j['id']}.png"), (0, 0, h * 0.45), h * 1.85, GAME_PITCH, 30)
-            set_action(b['arm'], b['actions']['attack'], round(rej.ruchy[j['atak']['ruch']]['event'] * rej.ruchy[j['atak']['ruch']]['frames']))
-            render_view(os.path.join(SZKICE, f"{j['id']}_atak.png"), (0, 0, h * 0.5), h * 2.2, 6, 62)
-            print('SZKIC', j['id'])
+            for rola_id, zyw_id in ((a, b_id), (b_id, a)):
+                j = auto_fuzja(rej.podstawowe[rola_id], rej.podstawowe[zyw_id], rej.zywioly, rej.ruchy)
+                rej.sprawdz(j)
+                b = zbuduj(rej, j, SZKICE)
+                setup_stage(600, samples)
+                h = wysokosc(j) * 1.08
+                render_view(os.path.join(SZKICE, f"{j['id']}.png"), (0, 0, h * 0.45), h * 1.85, GAME_PITCH, 30)
+                ruch = rej.ruchy[j['atak']['ruch']]
+                klatka = 0.5 if ruch.get('rekwizyt') else ruch['event']
+                set_action(b['arm'], b['actions']['attack'], round(klatka * ruch['frames']))
+                render_view(os.path.join(SZKICE, f"{j['id']}_atak.png"), (0, 0, h * 0.5), h * 2.2, 6, 62)
+                print('SZKIC', j['id'], '=', j['nazwa'])
+    obraz_siatki(rej)
+
+
+def obraz_siatki(rej):
+    """Jeden obraz z całą siatką rola × żywioł: jednostki, fuzje ręczne i szkice."""
+    from PIL import Image, ImageDraw, ImageFont
+    from siatka import ROLE, ZYWIOLY, nazwa_pola
+    kom, top, left = 300, 60, 150
+    img = Image.new('RGB', (left + kom * len(ZYWIOLY), top + kom * len(ROLE)), (238, 240, 236))
+    d = ImageDraw.Draw(img)
+    try:
+        f = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 18)
+        fs = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
+    except OSError:
+        f = fs = ImageFont.load_default()
+    for c, z in enumerate(ZYWIOLY):
+        d.text((left + c * kom + 10, 20), rej.zywioly[z]['nazwa'].upper(), fill=(35, 39, 31), font=f)
+    for r, rola in enumerate(ROLE):
+        d.text((10, top + r * kom + kom // 2 - 10), ROLE[rola].upper(), fill=(35, 39, 31), font=f)
+        for c, z in enumerate(ZYWIOLY):
+            x, y = left + c * kom, top + r * kom
+            plik, etykieta, kolor = None, nazwa_pola(rola, z), (120, 125, 115)
+            for j in list(rej.podstawowe.values()) + list(rej.fuzje.values()):
+                if j['rola'] == rola and j['zywiol'] == z:
+                    plik = os.path.join(PODGLAD, f"{j['id']}_gra_52st.png")
+                    kolor = (47, 143, 176) if j['id'] in rej.fuzje else (35, 39, 31)
+                    etykieta = j['nazwa'] + (' (fuzja)' if j['id'] in rej.fuzje else '')
+            if plik is None:
+                for fn in sorted(os.listdir(SZKICE)):
+                    if fn.endswith(f'__{rola}_{z}.png'):
+                        plik, etykieta, kolor = os.path.join(SZKICE, fn), 'szkic: ' + nazwa_pola(rola, z), (190, 110, 30)
+            d.rectangle([x + 4, y + 4, x + kom - 4, y + kom - 4], outline=kolor, width=3)
+            if plik and os.path.exists(plik):
+                im = Image.open(plik).convert('RGB').resize((kom - 12, kom - 40))
+                img.paste(im, (x + 6, y + 6))
+            d.text((x + 10, y + kom - 30), etykieta, fill=kolor, font=fs)
+    out = os.path.join(SZKICE, 'siatka.png')
+    img.save(out)
+    print('SIATKA', out)
 
 
 def main():
@@ -102,6 +146,9 @@ def main():
     roster = rej.roster()
     if '--szkice' in flagi:
         szkice(rej, 24, '--wszystkie' in flagi)
+        return
+    if '--siatka' in flagi:
+        obraz_siatki(rej)
         return
 
     ids = wybrane or list(roster['jednostki'])

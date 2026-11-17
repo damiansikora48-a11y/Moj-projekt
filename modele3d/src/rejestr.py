@@ -9,13 +9,15 @@ import os
 import pkgutil
 
 from kit import HIDE
+from siatka import ROLE, ZYWIOLY
 
 SRC = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(SRC)
 ROSTER = os.path.join(ROOT, 'roster.json')
 
 # Stały słownik slotów (części). Nowa jednostka używa tylko tych nazw.
-SLOTY = ('Head', 'Headgear', 'Body', 'Back', 'Arms', 'Legs', 'Weapon', 'Offhand')
+# Element (ozdoby żywiołu) i Aura (Przebudzenie) dodaje generator, Prop – ruch z rekwizytem.
+SLOTY = ('Head', 'Headgear', 'Body', 'Back', 'Arms', 'Legs', 'Weapon', 'Offhand', 'Element', 'Aura')
 ANIMACJE = {'idle': 'Idle_loop', 'walk': 'Walk_loop', 'attack': 'Attack'}
 
 
@@ -36,11 +38,26 @@ def _moduly(pakiet, zmienna):
 
 class Rejestr:
     def __init__(self):
+        from fuzja import przebudz
         self.ruchy = _moduly('ataki.ruchy', 'RUCH')
         self.efekty = _moduly('ataki.efekty', 'EFEKT')
+        self.zywioly = _moduly('zywioly', 'ZYWIOL')
         self.podstawowe = _moduly('jednostki', 'JEDNOSTKA')
         self.fuzje = _moduly('fuzje', 'JEDNOSTKA')
-        self.wszystkie = {**self.podstawowe, **self.fuzje}
+        # każda fuzja ręczna ma automatycznie wersję Przebudzoną: <id>_przebudzony
+        self.przebudzone = {}
+        for f in self.fuzje.values():
+            v = przebudz(f)
+            self.przebudzone[v['id']] = v
+        self.wszystkie = {**self.podstawowe, **self.fuzje, **self.przebudzone}
+        for z in self.zywioly.values():
+            if z['id'] not in ZYWIOLY:
+                raise ValueError(f"{z['_plik']}: żywioł '{z['id']}' nie jest w siatka.ZYWIOLY")
+            for r_id, e in z['efekty'].items():
+                if r_id not in self.ruchy:
+                    raise ValueError(f"{z['_plik']}: nieznany ruch '{r_id}' w 'efekty'")
+                if e not in self.efekty:
+                    raise ValueError(f"{z['_plik']}: brak efektu '{e}' w ataki/efekty/")
         for j in self.wszystkie.values():
             self.sprawdz(j)
 
@@ -58,6 +75,10 @@ class Rejestr:
         for r in j.get('rodzice', ()):
             if r not in self.podstawowe:
                 raise ValueError(f"{gdzie}: rodzic '{r}' nie jest jednostką podstawową")
+        if j.get('rola') not in ROLE:
+            raise ValueError(f"{gdzie}: brak lub zła 'rola' (dozwolone: {', '.join(ROLE)})")
+        if j.get('zywiol') not in ZYWIOLY:
+            raise ValueError(f"{gdzie}: brak lub zły 'zywiol' (dozwolone: {', '.join(ZYWIOLY)})")
 
     # ------------------------------------------------------------ roster
     def roster(self):
@@ -103,6 +124,10 @@ class Rejestr:
             'wersja': wersja,
             'plik': f"{j['id']}.glb",
             'rodzice': list(j.get('rodzice', ())),
+            'rola': j['rola'],
+            'zywiol': j['zywiol'],
+            'przebudzony': bool(j.get('przebudzony')),
+            'baza': j.get('baza'),
             'opis': j.get('opis', ''),
             'animacje': dict(ANIMACJE),
             'atak': {

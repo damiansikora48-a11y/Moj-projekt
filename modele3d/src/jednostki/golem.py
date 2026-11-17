@@ -138,6 +138,9 @@ JEDNOSTKA = {
     'id': 'golem',
     'nazwa': 'Golem',
     'opis': 'Kamienny kolos z mchem, kryształami i świecącymi runami.',
+    'rola': 'kolos',          # patrz siatka.py
+    'zywiol': 'kamien',
+    'kotwice': {'bark': 0.34},  # ozdoby żywiołu nad głazami barkowymi
     'szkielet': SZKIELET,
     'paleta': PALETA,
     'czesci': {'Body': tulow, 'Head': glowa, 'Arms': rece, 'Legs': nogi},

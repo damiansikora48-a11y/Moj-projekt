@@ -33,7 +33,7 @@ Jednostki podstawowe (stan obecny):
 | Żołnierz | Wojownik | Stal |
 | Golem | Kolos | Kamień |
 | Mag ognia | Mag | Ogień |
-| *(planowana)* Leśny Łucznik | Strzelec | Natura |
+| Leśny Łucznik | Strzelec | Natura |
 
 ## 3. Fuzje
 
@@ -49,9 +49,11 @@ Siatka (role × żywioły) pokazuje wszystkie możliwe jednostki. Do gry trafiaj
 | **Wojownik** | Żołnierz | **Kamienny Rycerz** ✅ | Płomienny Rycerz | Rycerz Cierni |
 | **Kolos** | Stalowy Kolos | Golem | Magmowy Golem | Kamienny Ent |
 | **Mag** | Mag Bitewny | Geomanta | Mag ognia | Druid |
-| **Strzelec** | Kusznik | Procarz | Ognisty Łucznik | Leśny Łucznik |
+| **Strzelec** | Kusznik | Kryształowy Łucznik | Ognisty Łucznik | Leśny Łucznik |
 
 Przy jednej fuzji na parę, 4 jednostki podstawowe dają 6 fuzji. Które pole siatki wypełnia dana para, ustalamy przy projektowaniu tej fuzji.
+
+**Zasada nazw:** fuzja zawsze jest silniejsza od rodziców, więc jej nazwa też musi brzmieć mocniej (dlatego zamiast „Procarza” jest Kryształowy Łucznik). Nazwy pól są w `modele3d/src/siatka.py`.
 
 ### Gotowość do fuzji
 - Jednostka musi zdobyć **wymagane doświadczenie** (np. poziom 5 **(propozycja)**).

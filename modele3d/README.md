@@ -14,22 +14,26 @@ modele3d/
 ├── src/                   ← KOD
 │   ├── jednostki/         ← jednostki podstawowe: 1 plik = 1 jednostka
 │   │   ├── zolnierz.py
-│   │   └── golem.py
+│   │   ├── golem.py
+│   │   ├── mag_ognia.py
+│   │   └── lesny_lucznik.py
 │   ├── fuzje/             ← fuzje dopracowane ręcznie: 1 plik = 1 fuzja
 │   │   └── kamienny_rycerz.py
 │   ├── ataki/
 │   │   ├── ruchy/         ← animacje ataku: ciecie.py, rzut.py, uderzenie.py
 │   │   └── efekty/        ← pociski i efekty: glaz.py, krysztaly.py
+│   ├── zywioly/           ← przepisy żywiołów: stal.py, kamien.py, ogien.py, natura.py
 │   ├── czesci/            ← części używane przez kilka jednostek (np. peleryna)
+│   ├── siatka.py          ← role, żywioły i nazwy pól siatki fuzji
 │   ├── build.py           ← JEDYNY skrypt, który uruchamiasz
 │   ├── kit.py             ← silnik generatora (zwykle nie ruszasz)
 │   ├── rejestr.py         ← sam znajduje jednostki i pilnuje zasad (nie ruszasz)
-│   ├── fuzja.py           ← narzędzia fuzji + fuzje automatyczne (szkice)
+│   ├── fuzja.py           ← narzędzia fuzji, szkice automatyczne, Przebudzenie
 │   ├── wydania.py         ← zamrażanie wydań i wykrywanie zmian (nie ruszasz)
 │   └── pack_viewer.py     ← tworzy stronę z podglądem 3D
 ├── export/                ← WYNIK budowy (robocze): .glb jednostek, efekty, units.json
 ├── podglad/               ← rendery: z kamery gry 52°, przód, tył, chód, fazy ataku
-├── szkice/                ← fuzje automatyczne (NIE idą do gry)
+├── szkice/                ← fuzje automatyczne (NIE idą do gry) + siatka.png: cała siatka na 1 obrazku
 ├── wydanie/               ← ZAMROŻONE wydania gry: wydanie/1.0/, wydanie/1.1/ … + ZMIANY.md
 └── godot/unit.gd          ← jeden skrypt Godota dla wszystkich jednostek
 ```
@@ -47,6 +51,9 @@ modele3d/
 | wygląd głazu (w dłoni i w locie) | `src/ataki/efekty/glaz.py` | `model_glazu` |
 | wygląd Kamiennego Rycerza | `src/fuzje/kamienny_rycerz.py` | `tulow`, `glowa`, `rece`… |
 | pelerynę (u wszystkich, którzy ją noszą) | `src/czesci/tkaniny.py` | `peleryna` |
+| jak wygląda żywioł w fuzjach (barwy, ozdoby, efekty) | `src/zywioly/<żywioł>.py` | `barwy`, `zamiany`, `ozdoby`, `efekty` |
+| nazwę pola siatki (np. Kryształowy Łucznik) | `src/siatka.py` | `NAZWY` |
+| wygląd Przebudzenia (aureola, złocenie) | `src/fuzja.py` | `przebudz`, `_aura` |
 | które jednostki są w grze | `roster.json` | lista `jednostki` |
 
 Każdy plik ma na górze krótki opis, co zawiera.
@@ -61,6 +68,8 @@ JEDNOSTKA = {
     'paleta': PALETA,              # kolory: (kolor, szorstkość, metaliczność, świecenie)
     'czesci': {'Head': glowa, ...},# slot -> funkcja budująca część
     'chod': dict(...),             # chód i oddech (amplitudy w stopniach)
+    'rola': 'wojownik',            # wojownik / kolos / mag / strzelec (siatka.py)
+    'zywiol': 'stal',              # stal / kamien / ogien / natura
     'atak': {'ruch': 'ciecie', 'efekt': None},
 }
 ```
@@ -79,7 +88,8 @@ Uruchamiane z folderu `modele3d/src`:
 | `python build.py golem` | buduje jedną jednostkę (może być spoza rostera, np. nowa w trakcie pracy) |
 | `python build.py golem --szybko` | … i robi szybkie rendery podglądu |
 | `python build.py --podglad` | wszystko + rendery w pełnej jakości (kilkanaście minut) |
-| `python build.py --szkice` | fuzje automatyczne wszystkich par jednostek podstawowych do `szkice/` |
+| `python build.py --szkice` | szkice fuzji: dla każdej pary OBIE możliwości (rola od A + żywioł B i odwrotnie) + `szkice/siatka.png` |
+| `python build.py --siatka` | tylko odśwież obraz siatki z istniejących renderów |
 | `python build.py --sprawdz` | co się zmieniło względem ostatniego wydania? |
 | `python build.py --wydaj 1.0` | zamraża wydanie gry w `wydanie/1.0/` |
 | `python3 pack_viewer.py podglad.html` | strona z interaktywnym podglądem 3D wszystkich jednostek |
@@ -98,10 +108,13 @@ Instalacja (jednorazowo): `python3.11 -m venv venv && ./venv/bin/pip install bpy
 Rejestr sam znajdzie nowy plik. Jeśli coś jest niezgodne z zasadami (np. nieznany slot albo nieistniejący atak), budowa przerwie się z komunikatem, co poprawić.
 
 ### Nowa fuzja
-1. `python build.py --szkice`: dla każdej pary jednostek podstawowych powstaje szkic fuzji automatycznej w `szkice/` (model + 2 rendery). Szkic bierze sylwetkę od większego rodzica, a głowę i broń od mniejszego. Atak to ruch mniejszego i efekt większego.
-2. Wybierz pary, które chcesz w grze.
+Reguła: **rola od jednego rodzica, żywioł od drugiego**, A + B = B + A (jedna fuzja na parę).
+
+1. `python build.py --szkice`: dla każdej pary powstają **dwa** szkice (obie możliwości) i obraz `szkice/siatka.png`. Szkic bierze od rodzica-roli sylwetkę, części, chód i ruch ataku, a od rodzica-żywiołu barwy, przebarwienie materiałów, ozdoby na barkach (slot `Element`) i efekt ataku (tabela `efekty` w pliku żywiołu).
+2. Dla każdej pary wybierz jedną możliwość i zdecyduj, czy idzie do gry.
 3. Dla każdej zrób plik w `src/fuzje/`. Wzorem jest `kamienny_rycerz.py`: proporcje i kolory liczą się z rodziców (`polacz_szkielet`, `polacz_palete`), a części mieszane i atak projektujesz sam. Wpisz `'rodzice': ('a', 'b')`.
 4. Dopisz fuzję do `roster.json`.
+5. **Przebudzenie** (rzadki wynik) powstaje samo: każda fuzja ręczna ma wariant `<id>_przebudzony` (złocone metale, mocniejsze świecenie, aureola, krąg run). Dopisz go do `roster.json` razem z fuzją.
 
 Szkic nigdy nie trafi do gry sam z siebie. Do gry trafia tylko to, co jest w `roster.json`.
 
@@ -143,6 +156,8 @@ Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `bal
 | `golem` | Golem | rzut + głaz (pocisk z kości `prop.R`) | 1,24 s z 2,00 s |
 | `kamienny_rycerz` | Kamienny Rycerz (fuzja golem + żołnierz) | uderzenie + kryształy (obszar) | 0,83 s z 1,60 s |
 | `mag_ognia` | Mag ognia | czar + kula ognia (pocisk z lewej dłoni) | 0,66 s z 1,20 s |
+| `lesny_lucznik` | Leśny Łucznik | strzał + strzała (pocisk z `prop.R`) | 0,83 s z 1,33 s |
+| `kamienny_rycerz_przebudzony` | Przebudzony Kamienny Rycerz (rzadki wariant) | jak Kamienny Rycerz | 0,83 s z 1,60 s |
 
 ### Klocki ataków do wykorzystania
 
@@ -152,17 +167,13 @@ Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `bal
 | `rzut` | chwyta rekwizyt z ziemi, rzuca znad głowy | `prop.R` (prawa dłoń) |
 | `uderzenie` | uderzenie oburącz w ziemię | – (wręcz/obszar) |
 | `czar` | skupienie przy piersi, wypchnięcie dłoni | `hand.L` (lewa dłoń) |
+| `strzal` | nałożenie strzały, naciągnięcie łuku, strzał | `prop.R` (strzała w prawej dłoni) |
 
 | Efekt (`ataki/efekty/`) | Typ | Plik w grze |
 |---|---|---|
 | `glaz` | pocisk (także rekwizyt w dłoni przy `rzut`) | `efekt_glaz.glb` |
 | `krysztaly` | obszar: kolce z ziemi | `efekt_krysztaly.glb` |
-| `kula_ognia` | pocisk | `efekt_kula_ognia.glb` |
+| `kula_ognia` | pocisk (też w dłoni przy `rzut`) | `efekt_kula_ognia.glb` |
+| `strzala` | pocisk (też na cięciwie przy `strzal`) | `efekt_strzala.glb` |
 
-### Szkice fuzji (w `szkice/`, nie w grze)
-
-| Para | Co wyszło automatycznie |
-|---|---|
-| `golem+mag_ognia` | ciało golema, głowa i kapelusz maga, kostur; czar wyrzucający **głaz** |
-| `mag_ognia+zolnierz` | zbroja żołnierza, głowa i kapelusz maga, kostur; czar z **kulą ognia** („mag bitewny”) |
-| `golem+zolnierz` | ma fuzję ręczną: Kamienny Rycerz |
+Aktualne szkice wszystkich pól siatki: `szkice/siatka.png`.

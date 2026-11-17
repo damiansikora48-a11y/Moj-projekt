@@ -5,6 +5,8 @@ model – świecący rdzeń z językami ognia i ogonem; przód pocisku to -Y w B
 """
 import math
 
+from mathutils import Matrix
+
 from kit import V, cyl, ico, jitter, mtx, frame, seg, scale_m
 
 PALETA = {
@@ -14,17 +16,23 @@ PALETA = {
 }
 
 
-def model_kuli(sl):
-    sl.add(ico(0.12, 2), 'fire_core', 'root')
+def model_kuli(sl, kosc='root', M=None):
+    M = M if M is not None else Matrix.Identity(4)
+    sl.add(ico(0.12, 2), 'fire_core', kosc, M)
     for i in range(10):
         a = 2 * math.pi * i / 10
         d = V(math.cos(a) * 0.8, 0.45, math.sin(a) * 0.8).normalized()  # na zewnątrz i lekko do tyłu
         F = frame(d * 0.08, d, (0, 1, 0))
         L = 0.1 + 0.05 * (i % 3)
-        sl.add(cyl(0.05, 0.0, L, 6), 'fire', 'root', F @ mtx((0, 0, L / 2)))
+        sl.add(cyl(0.05, 0.0, L, 6), 'fire', kosc, M @ F @ mtx((0, 0, L / 2)))
     for i, (x, z, L) in enumerate(((0, 0, 0.42), (0.05, 0.04, 0.3), (-0.05, -0.03, 0.32), (0.02, -0.06, 0.26))):
         base = V(x * 0.5, 0.06, z * 0.5)
-        sl.add(cyl(0.07 - 0.012 * i, 0.0, L, 6), 'ember' if i else 'fire', 'root', seg(base, base + V(x, L, z)))
+        sl.add(cyl(0.07 - 0.012 * i, 0.0, L, 6), 'ember' if i else 'fire', kosc, M @ seg(base, base + V(x, L, z)))
+
+
+def w_dloni(sl, J):
+    """Kula ognia trzymana w dłoni (kość prop.R) – przy ruchu z rekwizytem, np. rzut."""
+    model_kuli(sl, 'prop.R', mtx(J['prop.R'] + J['hand_dir.R'] * 0.26) @ scale_m(1.6, 1.6, 1.6))
 
 
 EFEKT = {
@@ -33,5 +41,5 @@ EFEKT = {
     'typ': 'pocisk',
     'paleta': PALETA,
     'model': model_kuli,
-    'w_dloni': None,
+    'w_dloni': w_dloni,
 }

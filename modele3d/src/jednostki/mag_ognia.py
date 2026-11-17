@@ -174,6 +174,8 @@ JEDNOSTKA = {
     'id': 'mag_ognia',
     'nazwa': 'Mag ognia',
     'opis': 'Czarodziej w czerwonej szacie i spiczastym kapeluszu, z kosturem z ognistym kryształem. Ciska kulami ognia.',
+    'rola': 'mag',          # patrz siatka.py
+    'zywiol': 'ogien',
     'szkielet': SZKIELET,
     'paleta': PALETA,
     'czesci': {

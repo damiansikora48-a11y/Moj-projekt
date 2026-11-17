@@ -221,6 +221,8 @@ JEDNOSTKA = {
     'id': 'zolnierz',
     'nazwa': 'Żołnierz',
     'opis': 'Piechota w zbroi płytowej z mieczem, okrągłą tarczą i peleryną.',
+    'rola': 'wojownik',          # patrz siatka.py
+    'zywiol': 'stal',
     'szkielet': SZKIELET,
     'paleta': PALETA,
     'czesci': {  # slot -> funkcja budująca część (nazwy slotów: patrz README)

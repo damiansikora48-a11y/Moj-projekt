@@ -1,17 +1,21 @@
-"""FUZJE: narzędzia do łączenia dwóch jednostek + fuzja automatyczna (szkic).
+"""FUZJE: narzędzia do łączenia jednostek, szkice automatyczne i Przebudzenie.
 
-Fuzja ręczna (plik w fuzje/) używa polacz_szkielet i polacz_palete, a części projektuje sama.
-Fuzja automatyczna (auto_fuzja) składa szkic z gotowych części rodziców według prostych reguł:
-  * proporcje: średnia obu rodziców
-  * Body, Arms, Legs  – od WIĘKSZEGO rodzica (on daje sylwetkę)
-  * Head, Headgear, Back, Weapon, Offhand – od MNIEJSZEGO (on daje „charakter” i broń)
-  * atak: RUCH mniejszego rodzica + EFEKT większego (jeśli go nie ma – efekt mniejszego)
-Szkice trafiają do szkice/ i NIE wchodzą do gry, dopóki nie zrobisz z nich fuzji ręcznej
-i nie dopiszesz jej do roster.json.
+Reguła (patrz siatka.py i projekt/zasady_gry.md): ROLA od jednego rodzica, ŻYWIOŁ od drugiego.
+
+Szkic automatyczny (auto_fuzja):
+  od rodzica-ROLI     – proporcje, wszystkie części, chód i RUCH ataku (części pasują idealnie)
+  od rodzica-ŻYWIOŁU  – przepis żywiołu z zywioly/: barwy, przebarwienie materiałów,
+                        świecenie, ozdoby na barkach (slot Element) i EFEKT ataku
+Fuzja ręczna (plik w fuzje/) używa polacz_szkielet / polacz_palete i własnych części.
+
+Przebudzenie (przebudz): wariant dowolnej fuzji – złocone metale, mocniejsze świecenie,
+aureola za głową i krąg run pod stopami (slot Aura). Robi się automatycznie.
 """
-from kit import lerp
+import math
 
-SYLWETKA = ('Body', 'Arms', 'Legs')
+from kit import lerp, V, box, cyl, ico, mtx, frame
+
+PODSTAWOWE_SLOTY = ('Head', 'Headgear', 'Body', 'Back', 'Arms', 'Legs', 'Weapon', 'Offhand')
 
 
 def polacz_szkielet(a, b, t, **korekty):
@@ -39,31 +43,133 @@ def id_fuzji(id_a, id_b):
     return '+'.join(sorted((id_a, id_b)))
 
 
-def auto_fuzja(a, b, sloty):
-    duzy, maly = (a, b) if wysokosc(a) >= wysokosc(b) else (b, a)
-    czesci = {}
-    for slot in sloty:
-        zrodlo, zapas = (duzy, maly) if slot in SYLWETKA else (maly, duzy)
-        fn = zrodlo['czesci'].get(slot) or zapas['czesci'].get(slot)
-        if fn:
-            czesci[slot] = fn
-    chod = {}
-    for k in set(a['chod']) | set(b['chod']):
-        va, vb = a['chod'].get(k), b['chod'].get(k)
-        if isinstance(va, (int, float)) and isinstance(vb, (int, float)):
-            chod[k] = round(lerp(va, vb, 0.5)) if k.endswith('_frames') else lerp(va, vb, 0.5)
+# ------------------------------------------------------------------ kolory
+
+def _hex_rgb(h):
+    h = h.lstrip('#')
+    return [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+
+
+def _rgb_hex(c):
+    return '#' + ''.join(f'{max(0, min(255, round(x))):02x}' for x in c)
+
+
+def zmieszaj(h1, h2, t):
+    a, b = _hex_rgb(h1), _hex_rgb(h2)
+    return _rgb_hex([x + (y - x) * t for x, y in zip(a, b)])
+
+
+def swieci(m):
+    return len(m) > 3 and m[3] > 0
+
+
+def przebarw(paleta, zywiol):
+    """Paleta jednostki w barwach żywiołu (zwraca nową paletę)."""
+    out = {}
+    kolor_sw, moc_sw = zywiol['swiecenie']
+    for k, m in paleta.items():
+        if k in zywiol['zamiany']:
+            out[k] = zywiol['zamiany'][k]
+        elif k in zywiol['barwy']:
+            out[k] = (zywiol['barwy'][k],) + tuple(m[1:])
+        elif swieci(m):
+            out[k] = (zmieszaj(m[0], kolor_sw, 0.85), m[1], m[2] if len(m) > 2 else 0.0, max(m[3], moc_sw * 0.7))
         else:
-            chod[k] = va if va is not None else vb
-    efekt = duzy['atak']['efekt'] or maly['atak']['efekt']
+            out[k] = m
+    for k, m in zywiol['paleta'].items():
+        out.setdefault(k, m)
+    return out
+
+
+# ------------------------------------------------------------------ szkic automatyczny
+
+def auto_fuzja(rola_j, zywiol_j, zywioly, ruchy):
+    """Szkic: rola i części od `rola_j`, żywioł (kolory, ozdoby, efekt) od `zywiol_j`."""
+    from siatka import nazwa_pola
+    zyw = zywioly[zywiol_j['zywiol']]
+    efekt = zyw['efekty'].get(rola_j['atak']['ruch'], rola_j['atak']['efekt'])
+    s = wysokosc(rola_j) / 1.8
+    bark = rola_j.get('kotwice', {}).get('bark', 0.12) * 1.0
+    czesci = {k: v for k, v in rola_j['czesci'].items() if k in PODSTAWOWE_SLOTY}
+    czesci['Element'] = lambda sl, J, _z=zyw, _s=s, _b=bark: _z['ozdoby'](sl, J, _s, _b)
+    rola, zyw_id = rola_j['rola'], zywiol_j['zywiol']
     return {
-        'id': id_fuzji(a['id'], b['id']),
-        'nazwa': f"Szkic: {a['nazwa']} + {b['nazwa']}",
-        'opis': f"Fuzja automatyczna. Sylwetka: {duzy['nazwa']}, głowa i broń: {maly['nazwa']}.",
-        'rodzice': tuple(sorted((a['id'], b['id']))),
-        'szkielet': polacz_szkielet(a['szkielet'], b['szkielet'], 0.5),
-        'paleta': polacz_palete(a['paleta'], b['paleta']),
+        'id': f"{id_fuzji(rola_j['id'], zywiol_j['id'])}__{rola}_{zyw_id}",
+        'nazwa': f"Szkic: {nazwa_pola(rola, zyw_id)}",
+        'opis': f"Szkic automatyczny. Rola i sylwetka: {rola_j['nazwa']}, żywioł: {zywiol_j['nazwa']}.",
+        'rodzice': tuple(sorted((rola_j['id'], zywiol_j['id']))),
+        'rola': rola,
+        'zywiol': zyw_id,
+        'szkielet': dict(rola_j['szkielet']),
+        'paleta': przebarw(rola_j['paleta'], zyw),
         'czesci': czesci,
-        'chod': chod,
-        'atak': {'ruch': maly['atak']['ruch'], 'efekt': efekt},
+        'chod': dict(rola_j['chod']),
+        'atak': {'ruch': rola_j['atak']['ruch'], 'efekt': efekt},
+        'kotwice': rola_j.get('kotwice', {}),
         'tagi': {'szkic': True},
     }
+
+
+# ------------------------------------------------------------------ Przebudzenie
+
+ZLOTO = '#e8c25a'
+
+
+def _aura(sl, J, s):
+    # aureola za głową: pierścień z drobnych bloczków (płaszczyzna XZ, za potylicą)
+    c = J['head_top'] + V(0, 0.16 * s, -0.12 * s)
+    n = 20
+    r = 0.2 * s
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        p = c + V(math.cos(a) * r, 0, math.sin(a) * r)
+        sl.add(box(0.045 * s, 0.018 * s, 0.03 * s, 0.004), 'aura', 'head', frame(p, V(-math.sin(a), 0, math.cos(a)), (0, 1, 0)))
+    for i in range(4):
+        a = 2 * math.pi * i / 4 + math.pi / 4
+        p = c + V(math.cos(a) * r * 1.25, 0, math.sin(a) * r * 1.25)
+        sl.add(ico(0.022 * s, 1), 'aura', 'head', mtx(p))
+    # krąg run pod stopami
+    n = 28
+    r = 0.62 * s
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        p = V(math.cos(a) * r, math.sin(a) * r, 0.006)
+        dl = (0.09 if i % 4 == 0 else 0.05) * s
+        sl.add(box(dl, 0.022 * s, 0.006), 'aura_soft', 'root', frame(p, V(0, 0, 1), (-math.sin(a), math.cos(a), 0)))
+    sl.add(cyl(r * 0.82, r * 0.82, 0.004, 32), 'aura_glow', 'root', mtx((0, 0, 0.003)))
+    # unoszące się odłamki nad barkami
+    for sg in (1, -1):
+        p = J['shoulder' + ('.L' if sg > 0 else '.R')] + V(sg * 0.12 * s, 0.1 * s, 0.32 * s)
+        sl.add(cyl(0.03 * s, 0.0, 0.09 * s, 4), 'aura', 'chest', mtx(p))
+        sl.add(cyl(0.0, 0.03 * s, 0.06 * s, 4), 'aura', 'chest', mtx(p - V(0, 0, 0.075 * s)))
+
+
+def przebudz(j):
+    """Wersja Przebudzona jednostki (rzadki wynik fuzji)."""
+    pal = {}
+    for k, m in j['paleta'].items():
+        metal = m[2] if len(m) > 2 else 0.0
+        if swieci(m):
+            pal[k] = (m[0], m[1], metal, m[3] * 1.8)
+        elif metal >= 0.6:
+            pal[k] = (zmieszaj(m[0], ZLOTO, 0.45), m[1] * 0.85, metal)
+        else:
+            pal[k] = m
+    pal['aura'] = ('#ffd76a', 0.3, 0.0, 6.0)
+    pal['aura_soft'] = ('#ffe39a', 0.3, 0.0, 3.0)
+    pal['aura_glow'] = ('#ffcf5a', 0.3, 0.0, 0.6)
+    s = wysokosc(j) / 1.8
+    czesci = dict(j['czesci'])
+    czesci['Aura'] = lambda sl, J, _s=s: _aura(sl, J, _s)
+    v = dict(j)
+    v.update({
+        'id': j['id'] + '_przebudzony',
+        'nazwa': 'Przebudzony ' + j['nazwa'].replace('Szkic: ', ''),
+        'opis': 'Rzadki wynik fuzji: ' + j.get('opis', ''),
+        'paleta': pal,
+        'czesci': czesci,
+        'przebudzony': True,
+        'baza': j['id'],
+    })
+    v.pop('_plik', None)
+    return v
