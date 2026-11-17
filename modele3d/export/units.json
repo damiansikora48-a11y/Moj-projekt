@@ -12,7 +12,9 @@
     "animacje": {
       "idle": "Idle_loop",
       "walk": "Walk_loop",
-      "attack": "Attack"
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
     },
     "atak": {
       "ruch": "ciecie",
@@ -39,7 +41,9 @@
     "animacje": {
       "idle": "Idle_loop",
       "walk": "Walk_loop",
-      "attack": "Attack"
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
     },
     "atak": {
       "ruch": "rzut",
@@ -69,7 +73,9 @@
     "animacje": {
       "idle": "Idle_loop",
       "walk": "Walk_loop",
-      "attack": "Attack"
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
     },
     "atak": {
       "ruch": "uderzenie",
@@ -96,7 +102,9 @@
     "animacje": {
       "idle": "Idle_loop",
       "walk": "Walk_loop",
-      "attack": "Attack"
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
     },
     "atak": {
       "ruch": "czar",
@@ -123,7 +131,9 @@
     "animacje": {
       "idle": "Idle_loop",
       "walk": "Walk_loop",
-      "attack": "Attack"
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
     },
     "atak": {
       "ruch": "strzal",
@@ -153,7 +163,9 @@
     "animacje": {
       "idle": "Idle_loop",
       "walk": "Walk_loop",
-      "attack": "Attack"
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
     },
     "atak": {
       "ruch": "uderzenie",
