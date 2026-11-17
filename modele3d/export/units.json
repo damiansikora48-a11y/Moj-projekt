@@ -4,6 +4,10 @@
     "wersja": 1,
     "plik": "zolnierz.glb",
     "rodzice": [],
+    "rola": "wojownik",
+    "zywiol": "stal",
+    "przebudzony": false,
+    "baza": null,
     "opis": "Piechota w zbroi płytowej z mieczem, okrągłą tarczą i peleryną.",
     "animacje": {
       "idle": "Idle_loop",
@@ -27,6 +31,10 @@
     "wersja": 1,
     "plik": "golem.glb",
     "rodzice": [],
+    "rola": "kolos",
+    "zywiol": "kamien",
+    "przebudzony": false,
+    "baza": null,
     "opis": "Kamienny kolos z mchem, kryształami i świecącymi runami.",
     "animacje": {
       "idle": "Idle_loop",
@@ -53,6 +61,10 @@
       "golem",
       "zolnierz"
     ],
+    "rola": "wojownik",
+    "zywiol": "kamien",
+    "przebudzony": false,
+    "baza": null,
     "opis": "Golem w zbroi rycerza: hełm z kryształowym grzebieniem, napierśnik popękany runami, Runiczne Ostrze.",
     "animacje": {
       "idle": "Idle_loop",
@@ -76,6 +88,10 @@
     "wersja": 1,
     "plik": "mag_ognia.glb",
     "rodzice": [],
+    "rola": "mag",
+    "zywiol": "ogien",
+    "przebudzony": false,
+    "baza": null,
     "opis": "Czarodziej w czerwonej szacie i spiczastym kapeluszu, z kosturem z ognistym kryształem. Ciska kulami ognia.",
     "animacje": {
       "idle": "Idle_loop",
