@@ -75,7 +75,7 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 - Ulepszanie kosztuje złoto i czas.
 
 ### Przebudzenie (rzadki wynik)
-- Każda fuzja ma szansę dać **wersję Przebudzoną** tej samej jednostki: złote zdobienia, aura, mocniejszy atak lub dodatkowa zdolność.
+- Każda fuzja ma szansę dać **wersję Przebudzoną** tej samej jednostki: złocona zbroja, mocniejsze świecenie i **własny, wyjątkowy dodatek** tej fuzji (np. Kamienny Rycerz: kolce z czerwonymi końcami na barkach i nogach), do tego mocniejszy atak lub dodatkowa zdolność. Bez poświat na ziemi, bo gracze kojarzą je z zaznaczeniem jednostki.
 - Rzadki wynik nigdy nie jest gorszy od zwykłego. Gracz nie traci na losowaniu.
 - Szansa jest **zawsze pokazana** przed fuzją.
 

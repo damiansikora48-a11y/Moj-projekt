@@ -145,7 +145,14 @@ def _aura(sl, J, s):
 
 
 def przebudz(j):
-    """Wersja Przebudzona jednostki (rzadki wynik fuzji)."""
+    """Wersja Przebudzona jednostki (rzadki wynik fuzji).
+
+    Wspólne dla wszystkich: złocone metale i mocniejsze świecenie.
+    Każda fuzja może dodać własne, wyjątkowe dodatki w swoim pliku:
+        'przebudzenie': {'czesci': {'Aura': funkcja}, 'paleta': {...}, 'poswiata': False}
+    poswiata=True (domyślnie) dodaje ogólną aureolę i krąg run – gdy fuzja nie ma własnego pomysłu.
+    """
+    cfg = j.get('przebudzenie', {})
     pal = {}
     for k, m in j['paleta'].items():
         metal = m[2] if len(m) > 2 else 0.0
@@ -155,12 +162,15 @@ def przebudz(j):
             pal[k] = (zmieszaj(m[0], ZLOTO, 0.45), m[1] * 0.85, metal)
         else:
             pal[k] = m
-    pal['aura'] = ('#ffd76a', 0.3, 0.0, 6.0)
-    pal['aura_soft'] = ('#ffe39a', 0.3, 0.0, 3.0)
-    pal['aura_glow'] = ('#ffcf5a', 0.3, 0.0, 0.6)
+    pal.update(cfg.get('paleta', {}))
     s = wysokosc(j) / 1.8
     czesci = dict(j['czesci'])
-    czesci['Aura'] = lambda sl, J, _s=s: _aura(sl, J, _s)
+    if cfg.get('poswiata', True):
+        pal['aura'] = ('#ffd76a', 0.3, 0.0, 6.0)
+        pal['aura_soft'] = ('#ffe39a', 0.3, 0.0, 3.0)
+        pal['aura_glow'] = ('#ffcf5a', 0.3, 0.0, 0.6)
+        czesci['Aura'] = lambda sl, J, _s=s: _aura(sl, J, _s)
+    czesci.update(cfg.get('czesci', {}))
     v = dict(j)
     v.update({
         'id': j['id'] + '_przebudzony',

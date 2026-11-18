@@ -190,6 +190,26 @@ def runiczne_ostrze(sl, J):
     sl.add(tip, 'crystal', b, F @ mtx((0, 0, 0.21 + L + 0.1)) @ scale_m(1.0, 0.42, 1.0))
 
 
+def kolce_przebudzenia(sl, J):
+    """Przebudzenie: kamienne kolce z czerwonymi końcami na barkach, mniejsze na kolanach i goleniach."""
+    def kolec(p, d, dl, r, kosc):
+        d = d.normalized()
+        F = frame(p, d, (0, 0, 1) if abs(d.z) < 0.9 else (1, 0, 0))
+        sl.add(cyl(r, r * 0.45, dl * 0.6, 6), 'stone_dark', kosc, F @ mtx((0, 0, dl * 0.3)))
+        sl.add(cyl(r * 0.45, 0.0, dl * 0.4, 6), 'spike_red', kosc, F @ mtx((0, 0, dl * 0.8)))
+
+    for sg, S in SIDES:
+        sh = J['shoulder' + S]
+        c = sh + V(sg * 0.04, 0.02, 0.06)
+        r = 0.16 if sg < 0 else 0.2  # prawy bark: stalowy naramiennik, lewy: głaz
+        for d, dl in ((V(sg * 0.35, 0.05, 1.0), 0.34), (V(sg * 1.0, 0.1, 0.45), 0.28), (V(sg * 0.55, 0.7, 0.6), 0.25)):
+            kolec(c + d.normalized() * r * 0.8, d, dl, 0.07, 'shoulder' + S)
+        kn, an = J['knee' + S], J['ankle' + S]
+        kolec(kn + V(0, -0.15, 0.01), V(0, -0.8, 0.6), 0.16, 0.045, 'shin' + S)
+        for t in (0.35, 0.62):
+            kolec(lerp(kn, an, t) + V(sg * 0.12, 0.0, 0), V(sg * 1.0, 0.15, 0.35), 0.12, 0.035, 'shin' + S)
+
+
 JEDNOSTKA = {
     'id': 'kamienny_rycerz',
     'nazwa': 'Kamienny Rycerz',
@@ -209,5 +229,11 @@ JEDNOSTKA = {
                  twist=6, sway=3.5, lean=4, bob=0.028, breath=1.9, breath_loc=0.009,
                  smierc_dlon=-58),
     'atak': {'ruch': 'uderzenie', 'efekt': 'krysztaly'},
+    # wyjątkowe Przebudzenie tej fuzji: kolce zamiast ogólnej aureoli i kręgu run
+    'przebudzenie': {
+        'poswiata': False,
+        'paleta': {'spike_red': ('#e0202a', 0.35, 0.0, 3.0)},
+        'czesci': {'Aura': kolce_przebudzenia},
+    },
     'tagi': {'material': 'kamien', 'wielkosc': 'duza'},
 }
