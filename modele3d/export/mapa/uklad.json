@@ -1,21 +1,72 @@
 {
-  "_opis": "Układ miasta dla Godota. Pozycje w układzie Godota (x, y w górę, z), metry. Plik elementu: wstaw poziom w miejsce {poziom}. Przód miasta (brama) jest od strony +Z.",
-  "poziomy": {
+  "_opis": "Układ miasta dla Godota. Pozycje w układzie Godota (x, y w górę, z), metry. Poziom ulepszenia (1–15) -> etap wyglądu w \"poziomy\"; w nazwie pliku wstaw etap w miejsce {etap}. Przód miasta (brama) jest od strony +Z.",
+  "etapy": {
     "1": {
       "nazwa": "Palisada",
-      "opis": "pale z zaostrzonymi końcami, drewniany pomost"
+      "opis": "pale z zaostrzonymi końcami, bez pomostu – brak miejsc dla obrońców"
     },
     "2": {
-      "nazwa": "Wzmocniona palisada",
-      "opis": "grubsze podwójne pale, okucia, kamienny fundament, pomost z barierką"
+      "nazwa": "Mur drewniany",
+      "opis": "grubsze podwójne pale, okucia, kamienny fundament, pomost – mało obrońców"
     },
     "3": {
-      "nazwa": "Mur kamienny",
-      "opis": "mur z kamiennych bloków z blankami"
+      "nazwa": "Słaby mur kamienny",
+      "opis": "nieobrobione kamienie, drewniane blanki i pomost"
     },
     "4": {
+      "nazwa": "Lepszy mur kamienny",
+      "opis": "mur z ciosanych bloków z kamiennymi blankami"
+    },
+    "5": {
       "nazwa": "Warownia",
       "opis": "grubszy i wyższy mur, przypory, sztandary, runy, kosze z ogniem"
+    }
+  },
+  "poziomy": {
+    "1": {
+      "etap": 1
+    },
+    "2": {
+      "etap": 1
+    },
+    "3": {
+      "etap": 1
+    },
+    "4": {
+      "etap": 2
+    },
+    "5": {
+      "etap": 2
+    },
+    "6": {
+      "etap": 2
+    },
+    "7": {
+      "etap": 3
+    },
+    "8": {
+      "etap": 3
+    },
+    "9": {
+      "etap": 3
+    },
+    "10": {
+      "etap": 4
+    },
+    "11": {
+      "etap": 4
+    },
+    "12": {
+      "etap": 4
+    },
+    "13": {
+      "etap": 5
+    },
+    "14": {
+      "etap": 5
+    },
+    "15": {
+      "etap": 5
     }
   },
   "teren": {
@@ -23,7 +74,7 @@
   },
   "mury": {
     "lewy": {
-      "plik": "mur_bok_{poziom}.glb",
+      "plik": "mur_bok_etap{etap}.glb",
       "pozycja": [
         -18.0,
         0.0,
@@ -31,15 +82,16 @@
       ],
       "obrot_y_stopnie": -90,
       "dlugosc_m": 28.0,
-      "miejsca_obroncow": {
-        "1": 3,
-        "2": 4,
-        "3": 5,
-        "4": 6
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 2,
+        "3": 3,
+        "4": 5,
+        "5": 6
       }
     },
     "przod": {
-      "plik": "mur_front_{poziom}.glb",
+      "plik": "mur_front_etap{etap}.glb",
       "pozycja": [
         0.0,
         0.0,
@@ -47,15 +99,16 @@
       ],
       "obrot_y_stopnie": 0,
       "dlugosc_m": 36.0,
-      "miejsca_obroncow": {
-        "1": 4,
-        "2": 5,
-        "3": 6,
-        "4": 8
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 3,
+        "3": 4,
+        "4": 6,
+        "5": 8
       }
     },
     "prawy": {
-      "plik": "mur_bok_{poziom}.glb",
+      "plik": "mur_bok_etap{etap}.glb",
       "pozycja": [
         18.0,
         0.0,
@@ -63,32 +116,34 @@
       ],
       "obrot_y_stopnie": 90,
       "dlugosc_m": 28.0,
-      "miejsca_obroncow": {
-        "1": 3,
-        "2": 4,
-        "3": 5,
-        "4": 6
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 2,
+        "3": 3,
+        "4": 5,
+        "5": 6
       }
     }
   },
   "brama": {
-    "plik": "brama_{poziom}.glb",
+    "plik": "brama_etap{etap}.glb",
     "pozycja": [
       0.0,
       0.0,
       14.0
     ],
     "obrot_y_stopnie": 0,
-    "miejsca_obroncow": {
+    "miejsca_obroncow_na_etap": {
       "1": 0,
       "2": 2,
-      "3": 3,
-      "4": 3
+      "3": 2,
+      "4": 3,
+      "5": 3
     }
   },
   "narozniki": [
     {
-      "plik": "naroznik_{poziom}.glb",
+      "plik": "naroznik_etap{etap}.glb",
       "pozycja": [
         -18.0,
         0.0,
@@ -101,7 +156,7 @@
       ]
     },
     {
-      "plik": "naroznik_{poziom}.glb",
+      "plik": "naroznik_etap{etap}.glb",
       "pozycja": [
         18.0,
         0.0,
@@ -271,12 +326,12 @@
       "od": [
         28.0,
         0,
-        -8.0
+        -0.0
       ],
       "do": [
         48.0,
         0,
-        12.0
+        18.0
       ]
     }
   },
