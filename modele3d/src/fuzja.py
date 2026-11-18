@@ -149,7 +149,8 @@ def przebudz(j):
 
     Wspólne dla wszystkich: złocone metale i mocniejsze świecenie.
     Każda fuzja może dodać własne, wyjątkowe dodatki w swoim pliku:
-        'przebudzenie': {'czesci': {'Aura': funkcja}, 'paleta': {...}, 'poswiata': False}
+        'przebudzenie': {'czesci': {'Aura': funkcja}, 'paleta': {...}, 'poswiata': False,
+                         'atak': {'efekt': ..., 'status': {'id': 'podpalenie', 'czas_s': 4.0}}}
     poswiata=True (domyślnie) dodaje ogólną aureolę i krąg run – gdy fuzja nie ma własnego pomysłu.
     """
     cfg = j.get('przebudzenie', {})
@@ -180,6 +181,7 @@ def przebudz(j):
         'czesci': czesci,
         'przebudzony': True,
         'baza': j['id'],
+        'atak': {**j['atak'], **cfg.get('atak', {})},
     })
     v.pop('_plik', None)
     return v

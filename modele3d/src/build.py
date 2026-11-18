@@ -175,6 +175,8 @@ def main():
         print('EXPORT', jid)
         if j['atak']['efekt']:
             efekty.add(j['atak']['efekt'])
+        if j['atak'].get('status'):
+            efekty.add(j['atak']['status']['id'])
         if podglad:
             rendery(rej, j, b, res, samples)
     # 2) efekty ataków (pociski, kolce...)
@@ -197,8 +199,8 @@ def main():
         ost, raport = wydania.porownaj(EXPORT, roster)
         wydania.wypisz(ost, raport)
     if wersja_wydania:
-        pliki_efektow = sorted({f"efekt_{rej.wszystkie[j]['atak']['efekt']}.glb"
-                                for j in roster['jednostki'] if rej.wszystkie[j]['atak']['efekt']})
+        pliki_efektow = sorted({f"efekt_{e}.glb" for j in roster['jednostki']
+                                for e in (rej.wszystkie[j]['atak']['efekt'], (rej.wszystkie[j]['atak'].get('status') or {}).get('id')) if e})
         wydania.wydaj(wersja_wydania, EXPORT, roster, pliki_efektow)
 
 

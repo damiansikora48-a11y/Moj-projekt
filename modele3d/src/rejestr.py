@@ -72,6 +72,9 @@ class Rejestr:
             raise ValueError(f"{gdzie}: brak ruchu ataku '{ruch}' w ataki/ruchy/")
         if efekt is not None and efekt not in self.efekty:
             raise ValueError(f"{gdzie}: brak efektu '{efekt}' w ataki/efekty/")
+        st = j['atak'].get('status')
+        if st is not None and st['id'] not in self.efekty:
+            raise ValueError(f"{gdzie}: brak efektu statusu '{st['id']}' w ataki/efekty/")
         for r in j.get('rodzice', ()):
             if r not in self.podstawowe:
                 raise ValueError(f"{gdzie}: rodzic '{r}' nie jest jednostką podstawową")
@@ -140,5 +143,9 @@ class Rejestr:
                 'plik_efektu': f"efekt_{efekt['id']}.glb" if efekt else None,
                 'kosc_startowa': ruch.get('kosc_startowa', 'prop.R') if typ == 'pocisk' else None,
                 'uwagi': efekt.get('uwagi') if efekt else None,
+                # status nakładany na trafionych wrogów (np. podpalenie) – None, gdy brak
+                'status': ({'typ': j['atak']['status']['id'], 'czas_s': j['atak']['status']['czas_s'],
+                            'plik_efektu': f"efekt_{j['atak']['status']['id']}.glb"}
+                           if j['atak'].get('status') else None),
             },
         }

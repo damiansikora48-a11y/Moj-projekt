@@ -234,6 +234,8 @@ JEDNOSTKA = {
         'poswiata': False,
         'paleta': {'spike_crystal': ('#7fd6ef', 0.12, 0.0, 1.2), 'spike_red': ('#d80000', 0.3, 0.0, 1.4)},
         'czesci': {'Aura': kolce_przebudzenia},
+        # atak: płonące kolce + podpalenie trafionych wrogów (czas: propozycja, do balansu)
+        'atak': {'efekt': 'krysztaly_plonace', 'status': {'id': 'podpalenie', 'czas_s': 4.0}},
     },
     'tagi': {'material': 'kamien', 'wielkosc': 'duza'},
 }

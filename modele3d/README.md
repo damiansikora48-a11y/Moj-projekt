@@ -147,6 +147,8 @@ Pliki z `wydanie/<wersja>/` (albo roboczo z `export/`) kopiujesz do `res://units
 - `efekt_<id>.glb`: pociski i efekty ataków;
 - `units.json`: dane dla gry, czyli nazwy plików i animacji, długość ataku, moment trafienia (`moment_s`), typ ataku, plik efektu i kość, z której startuje pocisk.
 
+**Statusy ataku:** jeśli atak nakłada status (np. podpalenie), `units.json` ma w `atak.status` jego typ, czas (`czas_s`) i plik efektu. W Godocie wywołujesz `apply_status(wróg)` dla każdego trafionego wroga, a obrażenia od statusu liczy gra.
+
 `godot/unit.gd` to jeden skrypt dla wszystkich jednostek. Ustawiasz w nim tylko `unit_id`, a resztę czyta z `units.json`, więc **nowa jednostka nie wymaga nowego kodu w grze**. Skrypt nie był jeszcze uruchamiany w edytorze Godota; sprawdź go przy pierwszym imporcie.
 
 Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `balans.json`. Balans zmieniasz wtedy bez ruszania modeli.
@@ -178,5 +180,7 @@ Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `bal
 | `krysztaly` | obszar: kolce z ziemi | `efekt_krysztaly.glb` |
 | `kula_ognia` | pocisk (też w dłoni przy `rzut`) | `efekt_kula_ognia.glb` |
 | `strzala` | pocisk (też na cięciwie przy `strzal`) | `efekt_strzala.glb` |
+| `krysztaly_plonace` | obszar: kolce z rozżarzonymi końcami i płomieniami (Przebudzony Kamienny Rycerz) | `efekt_krysztaly_plonace.glb` |
+| `podpalenie` | status: płomienie przyczepiane do płonącego wroga | `efekt_podpalenie.glb` |
 
 Aktualne szkice wszystkich pól siatki: `szkice/siatka.png`.
