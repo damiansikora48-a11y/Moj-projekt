@@ -175,14 +175,14 @@
       "pozycja": [
         0.0,
         0.0,
-        -8.5
+        -9.6
       ],
       "rozmiar_m": [
-        9.0,
-        6.0
+        10.0,
+        6.8
       ],
-      "budynek": null,
-      "uwagi": "największa – np. główna siedziba"
+      "budynek": "budynek_glowny",
+      "uwagi": "największa, tyłem do skalnej ściany góry – budynek główny"
     },
     {
       "id": "D2",
