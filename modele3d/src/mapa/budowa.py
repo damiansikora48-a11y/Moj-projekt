@@ -197,5 +197,6 @@ def podglady(katalog):
         _postaw(o, (x0, 0), 0)
         o, _ = _obiekt(f'n{poz}', ELEMENTY['naroznik'](poz), M.PALETA)
         _postaw(o, (x0 - 9.5, 0), 0)
+    o, _ = _obiekt('trawa', lambda sl: sl.add(__import__('kit').box(130, 40, 0.02), 'grass', 'root', mtx((0, 4, -0.01))), T.PALETA)
     _studio(1800, 800, 48)
-    render_view(os.path.join(katalog, 'mapa_poziomy_murow.png'), (0, 0, 3), 78, 28, 12, lens=35)
+    render_view(os.path.join(katalog, 'mapa_poziomy_murow.png'), (-1, 0, 3), 100, 22, 0, lens=35)
