@@ -8,6 +8,7 @@ Pliki:
   brama_etap<1-5>.glb, naroznik_etap<1-5>.glb
 Poziomy ulepszeń (1–15) wskazują etap wyglądu – mapowanie w uklad.json ('poziomy').
   uklad.json                         – gdzie co postawić w Godot + działki + strefy ataku
+  budynek_glowny_poz<01-20>.glb     – budynek główny (stawiany na skalnej półce działki D1)
 Każdy element muru/bramy/wieży ma puste węzły 'obronca_01'… = miejsca dla obrońców.
 """
 import json
@@ -20,6 +21,7 @@ from kit import V, Slot, make_material, reset_scene, setup_stage, render_view, b
 from mapa import uklad as U
 from mapa import mury as M
 from mapa import teren as T
+from mapa import budynek_glowny as BG
 
 EXPORT = None  # ustawiane w zbuduj()
 
@@ -103,6 +105,10 @@ def uklad_json(liczba_miejsc):
         out['dzialki'].append({'id': d['id'], 'pozycja': U.do_godota(*d['srodek']), 'rozmiar_m': list(d['rozmiar']),
                                'budynek': d['budynek'], 'uwagi': d['uwagi']})
     out['plac'] = {'pozycja': U.do_godota(*U.PLAC['srodek']), 'promien_m': U.PLAC['promien']}
+    d1 = next(d for d in U.DZIALKI if d['id'] == U.BUDYNEK_GLOWNY['dzialka'])
+    out['budynek_glowny'] = {'plik': 'budynek_glowny_poz{poziom:02}.glb', 'poziomy': U.BUDYNEK_GLOWNY['poziomy'],
+                             'pozycja': U.do_godota(*d1['srodek'], d1['podwyzszenie']), 'obrot_y_stopnie': 0,
+                             'zmiany': {str(k): v for k, v in BG.ZMIANY.items()}}
     for k, (x0, x1, y0, y1) in U.STREFY_ATAKU.items():
         a, b = U.do_godota(x0, y0), U.do_godota(x1, y1)
         out['strefy_ataku'][k] = {'od': [min(a[0], b[0]), 0, min(a[2], b[2])], 'do': [max(a[0], b[0]), 0, max(a[2], b[2])]}
@@ -120,6 +126,11 @@ def zbuduj(export_dir, podglad_dir, podglad=False):
             _eksport(ob, os.path.join(katalog, f'{el}_etap{poz}.glb'))
             liczba[(el, poz)] = len(miejsca)
             print('EXPORT mapa', el, 'etap', poz, f'({len(miejsca)} miejsc)')
+    for p in range(1, U.BUDYNEK_GLOWNY['poziomy'] + 1):
+        reset_scene()
+        ob, _ = _obiekt(f'budynek_glowny_poz{p:02}', lambda sl, p=p: BG.budynek(sl, p), BG.PALETA)
+        _eksport(ob, os.path.join(katalog, f'budynek_glowny_poz{p:02}.glb'))
+    print('EXPORT mapa budynek_glowny 1-20')
     reset_scene()
     ob, _ = _obiekt('teren', T.teren, T.PALETA, normalne=False)
     _eksport(ob, os.path.join(katalog, 'teren.glb'))
@@ -127,12 +138,13 @@ def zbuduj(export_dir, podglad_dir, podglad=False):
     with open(os.path.join(katalog, 'uklad.json'), 'w', encoding='utf-8') as f:
         json.dump(uklad_json(liczba), f, indent=2, ensure_ascii=False)
     if podglad:
+        podglad_budynku(podglad_dir)
         podglady(podglad_dir)
 
 
 # ------------------------------------------------------------------ podglądy
 
-def _scena(poziomy, brama_poz, jednostki=None):
+def _scena(poziomy, brama_poz, jednostki=None, budynek=None):
     """Składa całe miasto: poziomy = {'lewy': p, 'przod': p, 'prawy': p}."""
     reset_scene()
     ob, _ = _obiekt('teren', T.teren, T.PALETA, normalne=False)
@@ -156,6 +168,10 @@ def _scena(poziomy, brama_poz, jednostki=None):
         poz = max(poziomy[s] for s in nz['sasiedzi'])
         o, _ = _obiekt('naroznik', ELEMENTY['naroznik'](poz), M.PALETA)
         _postaw(o, nz['srodek'], 0)
+    if budynek:
+        d1 = next(d for d in U.DZIALKI if d['id'] == U.BUDYNEK_GLOWNY['dzialka'])
+        o, _ = _obiekt('budynek', lambda sl: BG.budynek(sl, budynek), BG.PALETA)
+        o.location = (d1['srodek'][0], d1['srodek'][1], d1['podwyzszenie'])
 
 
 def _studio(res_x, res_y, samples):
@@ -173,7 +189,7 @@ def podglady(katalog):
     rej = Rejestr()
     jd = {k: rej.do_budowy(rej.wszystkie[k]) for k in ('zolnierz', 'lesny_lucznik', 'mag_ognia', 'golem', 'kamienny_rycerz')}
     # 1) miasto na starcie (wszystko poziom 1)
-    _scena({'lewy': 1, 'przod': 1, 'prawy': 1}, 1)
+    _scena({'lewy': 1, 'przod': 1, 'prawy': 1}, 1, budynek=1)
     _studio(1600, 1000, 48)
     render_view(os.path.join(katalog, 'mapa_start_52st.png'), (0, -4, 4), 92, 52, 0, lens=35)
     render_view(os.path.join(katalog, 'mapa_okolica.png'), (0, -30, 8), 150, 30, 0, lens=35)
@@ -182,7 +198,7 @@ def podglady(katalog):
             'lewy': [jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik']],
             'prawy': [jd['mag_ognia'], jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik'], jd['mag_ognia'], jd['lesny_lucznik']],
             'brama': [jd['zolnierz'], jd['lesny_lucznik'], jd['zolnierz']]}
-    _scena({'lewy': 3, 'przod': 4, 'prawy': 5}, 5, jedn)
+    _scena({'lewy': 3, 'przod': 4, 'prawy': 5}, 5, jedn, budynek=20)
     b = build_unit(jd['kamienny_rycerz'])
     b['arm'].location = (-2.5, U.PRZOD_Y - 4.5, 0)
     b = build_unit(jd['golem'])
@@ -190,6 +206,7 @@ def podglady(katalog):
     _studio(1600, 1000, 48)
     render_view(os.path.join(katalog, 'mapa_rozbudowana_52st.png'), (0, -4, 4), 92, 52, 0, lens=35)
     render_view(os.path.join(katalog, 'mapa_mury_z_bliska.png'), (2, U.PRZOD_Y, 3), 34, 40, 25, lens=35)
+    render_view(os.path.join(katalog, 'mapa_budynek_glowny.png'), (0, 8.5, 4), 30, 35, 15, lens=35)
     # 3) wszystkie poziomy murów obok siebie (fragment muru z bramą i wieżą)
     reset_scene()
     for i, poz in enumerate(sorted(U.ETAPY)):
@@ -203,3 +220,39 @@ def podglady(katalog):
     o, _ = _obiekt('trawa', lambda sl: sl.add(__import__('kit').box(160, 40, 0.02), 'grass', 'root', mtx((0, 4, -0.01))), T.PALETA)
     _studio(1800, 700, 48)
     render_view(os.path.join(katalog, 'mapa_poziomy_murow.png'), (-1, 0, 3), 122, 22, 0, lens=35)
+
+
+def podglad_budynku(katalog, samples=24):
+    """Wszystkie 20 poziomów budynku głównego na jednym obrazku (z podpisami)."""
+    from PIL import Image, ImageDraw, ImageFont
+    import bmesh as _b
+    kafle = []
+    for p in range(1, U.BUDYNEK_GLOWNY['poziomy'] + 1):
+        reset_scene()
+        _obiekt('budynek', lambda sl, p=p: BG.budynek(sl, p), BG.PALETA)
+        def polka(sl):
+            from kit import box as _box
+            sl.add(_box(14.0, 8.5, 1.6, 0.05), 'mtn', 'root', mtx((0, 0, -0.8)))
+            sl.add(_box(13.8, 8.3, 0.1, 0.02), 'grass', 'root', mtx((0, 0, -0.04)))
+            sl.add(_box(60, 60, 0.02), 'grass_dark', 'root', mtx((0, 0, -1.61)))
+        _obiekt('polka', polka, T.PALETA)
+        _studio(520, 440, samples)
+        sciezka = os.path.join(katalog, f'_bg_{p:02}.png')
+        daleko = p >= 13
+        render_view(sciezka, (0, 0.6, 4.4 if daleko else 3.2), 30 if daleko else 24, 33, 28, lens=35)
+        kafle.append(sciezka)
+    W, H = 520, 440
+    img = Image.new('RGB', (W * 5, (H + 56) * 4), (238, 240, 236))
+    d = ImageDraw.Draw(img)
+    try:
+        f = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 20)
+        fs = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
+    except OSError:
+        f = fs = ImageFont.load_default()
+    for i, k in enumerate(kafle):
+        x, y = (i % 5) * W, (i // 5) * (H + 56)
+        img.paste(Image.open(k).convert('RGB'), (x, y))
+        d.text((x + 10, y + H + 4), f'Poziom {i + 1}', fill=(35, 39, 31), font=f)
+        d.text((x + 10, y + H + 30), BG.ZMIANY[i + 1][:62], fill=(90, 95, 85), font=fs)
+        os.remove(k)
+    img.save(os.path.join(katalog, 'budynek_glowny_poziomy.png'))

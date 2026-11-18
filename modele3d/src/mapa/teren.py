@@ -194,6 +194,36 @@ def _szczegoly_gory(sl, rng):
                mtx(p.to_tuple(), (rng.uniform(-10, 10), rng.uniform(-10, 10), rng.uniform(0, 90))))
 
 
+def _podwyzszenie(sl, x, y, w, g, h):
+    """Skalna półka pod budynek główny: skalne ściany, trawa na górze, kamienne schody z przodu."""
+    rng = random.Random(77)
+    sl.add(box(w - 0.4, g - 0.4, h, 0.05), 'mtn', 'root', mtx((x, y, h / 2)))
+    sl.add(jitter(box(w - 0.2, g - 0.2, 0.14, 0.04), 0.03, 78), 'grass', 'root', mtx((x, y, h + 0.02)))
+    # skalne bloki na krawędziach (półka wygląda na naturalną skałę)
+    for bok in range(4):
+        dl = w if bok < 2 else g
+        n = int(dl / 1.6)
+        for i in range(n):
+            t = (i + 0.5) / n - 0.5
+            if bok == 0 and abs(t * dl) < 2.0:
+                continue  # miejsce na schody (przód)
+            px, py = ((x + t * dl, y - g / 2) if bok == 0 else (x + t * dl, y + g / 2) if bok == 1
+                      else (x - w / 2, y + t * dl) if bok == 2 else (x + w / 2, y + t * dl))
+            s = rng.uniform(1.4, 1.9)
+            sl.add(rock(s, 1.2, h + rng.uniform(0.0, 0.35), 3000 + bok * 50 + i, rough=0.1), rng.choice(('mtn', 'mtn_dark', 'stone_dark')),
+                   'root', mtx((px, py, (h + 0.2) / 2 - 0.05), (0, 0, 0 if bok < 2 else 90)))
+    # schody na wprost placu
+    kroki = 6
+    for k in range(kroki):
+        sl.add(box(3.6, 0.5, h * (k + 1) / kroki, 0.03), 'stone', 'root',
+               mtx((x, y - g / 2 - 0.25 - (kroki - 1 - k) * 0.45, h * (k + 1) / kroki / 2)))
+    for sg in (1, -1):
+        sl.add(rock(0.6, 3.0, h * 0.8, 3100 + sg, rough=0.08), 'stone_dark', 'root',
+               mtx((x + sg * 2.1, y - g / 2 - 1.3, h * 0.4), (14, 0, 0)))
+    # kamienna ścieżka na półce od schodów do budynku
+    sl.add(box(2.4, 2.6, 0.06, 0.02), 'paving', 'root', mtx((x, y - g / 2 + 1.4, h + 0.1)))
+
+
 def teren(sl):
     rng = random.Random(2024)
     # --- ziemia (łąki)
@@ -252,6 +282,8 @@ def teren(sl):
     plac = V(*U.PLAC['srodek'], 0)
     pas(V(0, U.PRZOD_Y, 0.04), plac, 3.0, 'dirt')
     for d in U.DZIALKI:
+        if d.get('podwyzszenie'):
+            continue  # do podwyższenia prowadzą schody prosto z placu
         c = V(*d['srodek'], 0.04)
         pas(V(plac.x, plac.y, 0.04), c, 1.6, 'dirt')
     # --- plac ze studnią
@@ -264,6 +296,9 @@ def teren(sl):
     # --- działki pod budynki: utwardzony grunt + kamienne narożniki
     for d in U.DZIALKI:
         (x, y), (w, g) = d['srodek'], d['rozmiar']
+        if d.get('podwyzszenie'):
+            _podwyzszenie(sl, x, y, w, g, d['podwyzszenie'])
+            continue
         sl.add(box(w, g, 0.12, 0.03), 'plot', 'root', mtx((x, y, 0.06)))
         for sx in (-1, 1):
             for sy in (-1, 1):
@@ -281,5 +316,5 @@ def teren(sl):
     for i in range(6):
         sl.add(sphere(0.35, 0.3, 0.2, 10, 6), 'foam', 'root', mtx((sx + (i - 2.5) * 0.3, sy + r * 0.55, 0.12)))
     # --- kilka drzew w mieście (przy murach i stawie)
-    for (x, y) in ((-15.5, -10.0), (15.5, -10.0), (-15.5, 4.5), (15.5, 4.5), (-6.0, 12.3), (6.0, 12.3), (14.5, 11.5)):
+    for (x, y) in ((-15.5, -10.0), (15.5, -10.0), (-15.5, 4.5), (15.5, 4.5), (-8.3, 12.3), (8.5, 12.4), (14.5, 11.5)):
         drzewo(sl, V(x, y, 0), 1.0, rng)

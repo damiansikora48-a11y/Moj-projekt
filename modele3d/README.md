@@ -172,7 +172,8 @@ Brama zmienia wygląd na tych samych progach. Wieże na przednich narożnikach p
 | wymiary miasta, położenie murów, działki pod budynki, strefy ataku | `src/mapa/uklad.py` |
 | wygląd murów, bramy i wież w każdym etapie, liczbę miejsc dla obrońców | `src/mapa/mury.py` |
 | liczbę poziomów ulepszeń i to, przy którym poziomie zmienia się wygląd | `src/mapa/uklad.py` |
-| teren: góra (wodospad, jezioro, rzeka, półki skalne, głazy), łąki, lasy, staw, plac, drogi | `src/mapa/teren.py` |
+| teren: góra (wodospad, jezioro, rzeka, półki skalne, głazy), łąki, lasy, staw, plac, drogi, skalna półka pod budynek główny | `src/mapa/teren.py` |
+| budynek główny: co zmienia każdy z 20 poziomów | `src/mapa/budynek_glowny.py` (lista `ZMIANY` i warunki `p >= N`) |
 
 Polecenie: `python build.py --mapa` (eksport) albo `python build.py --mapa --podglad` (eksport + rendery).
 
@@ -182,6 +183,8 @@ Pliki w `export/mapa/`:
 - `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D9; D1 przy skalnej ścianie góry to budynek główny, reszta wolna), plac ze studnią na środku i **strefy ataku** przed każdym murem.
 
 W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
+
+**Budynek główny** stoi na skalnej półce (podwyższeniu 1,6 m) przy ścianie góry, ze schodami na plac; wokół zostaje wolne miejsce. Ma **20 poziomów** i każdy coś zmienia: 1–5 drewniana chata, 6–10 duży drewniany dom, 11–15 kamienna sala, 16–20 okazała rezydencja (pliki `budynek_glowny_poz01…20.glb`, podgląd wszystkich: `podglad/budynek_glowny_poziomy.png`). W Godocie: `ustaw_poziom_budynku(12)`.
 
 **Nowy budynek w przyszłości:** wpisz go w `DZIALKI` w `src/mapa/uklad.py` (zajmij wolną działkę albo dodaj nową).
 

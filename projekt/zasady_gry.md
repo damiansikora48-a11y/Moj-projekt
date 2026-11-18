@@ -105,7 +105,7 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
   - 13–15 Warownia (6).
 - Brama zmienia wygląd na tych samych progach.
 - **Atakujący wybiera stronę ataku** (lewa, przód, prawa). Przed każdym murem jest wolna łąka na rozstawienie wojsk.
-- **Budynki w środku stoją na stałych działkach** (D1–D9). **Budynek główny** stoi na największej działce D1, tyłem do skalnej ściany góry. Na środku miasta jest plac ze studnią. Co stoi na pozostałych działkach, ustalamy razem; część zostaje wolna na przyszłe budynki.
+- **Budynki w środku stoją na stałych działkach** (D1–D9). **Budynek główny** stoi na skalnej półce (podwyższeniu) D1 przy ścianie góry, ze schodami na plac i wolnym miejscem wokół. Ma **20 poziomów** i każdy poziom coś widocznie zmienia: od małej drewnianej chaty po okazałą kamienną rezydencję ze zdobieniami. Na środku miasta jest plac ze studnią. Co stoi na pozostałych działkach, ustalamy razem; część zostaje wolna na przyszłe budynki.
 - Klimat: dużo zieleni (łąki, lasy, staw z wodospadem), a góra ma trawiaste zbocza, półki skalne z sosnami, głazy, śnieżny szczyt i duży wodospad po prawej z jeziorem i rzeką.
 
 ## 5. Ekonomia

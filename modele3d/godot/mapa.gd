@@ -17,6 +17,7 @@ extends Node3D
 var uklad: Dictionary
 var poziom_murow := {"lewy": 1, "przod": 1, "prawy": 1}
 var poziom_bramy := 1
+var poziom_budynku := 1
 var _wezly := {}   # klucz elementu -> instancja sceny
 
 
@@ -28,6 +29,7 @@ func _ready() -> void:
 		_postaw("mur_" + strona, uklad["mury"][strona], poziom_murow[strona])
 	_postaw("brama", uklad["brama"], poziom_bramy)
 	_odswiez_narozniki()
+	ustaw_poziom_budynku(poziom_budynku)
 
 
 func _postaw(klucz: String, opis: Dictionary, poziom: int) -> Node3D:
@@ -64,6 +66,20 @@ func ustaw_poziom_muru(strona: String, poziom: int) -> void:
 func ustaw_poziom_bramy(poziom: int) -> void:
 	poziom_bramy = poziom
 	_postaw("brama", uklad["brama"], poziom)
+
+
+## Budynek główny na skalnej półce: poziom 1–20, każdy poziom coś zmienia (opis: uklad.json "zmiany").
+func ustaw_poziom_budynku(poziom: int) -> void:
+	poziom_budynku = poziom
+	var b: Dictionary = uklad["budynek_glowny"]
+	if _wezly.has("budynek_glowny"):
+		_wezly["budynek_glowny"].queue_free()
+	var plik: String = "budynek_glowny_poz%02d.glb" % poziom
+	var n: Node3D = (load(mapa_dir + "/" + plik) as PackedScene).instantiate()
+	var p: Array = b["pozycja"]
+	n.position = Vector3(p[0], p[1], p[2])
+	add_child(n)
+	_wezly["budynek_glowny"] = n
 
 
 ## Pozycje (globalne) miejsc dla obrońców na danym elemencie: "lewy", "przod", "prawy", "brama".

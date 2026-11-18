@@ -43,17 +43,20 @@ NAROZNIKI = [
 # --- działki pod budynki (środek x, y; rozmiar szer x gł). 'budynek': None = wolna.
 PLAC = {'srodek': (0.0, 0.5), 'promien': 4.5}  # plac centralny ze studnią (nie do zabudowy)
 DZIALKI = [
-    {'id': 'D1', 'srodek': (0.0, 9.6), 'rozmiar': (10.0, 6.8), 'budynek': 'budynek_glowny',
-     'uwagi': 'największa, tyłem do skalnej ściany góry – budynek główny'},
+    {'id': 'D1', 'srodek': (0.0, 8.75), 'rozmiar': (14.0, 8.5), 'budynek': 'budynek_glowny',
+     'uwagi': 'skalna półka (podwyższenie) przy ścianie góry ze schodami – budynek główny z wolnym miejscem wokół',
+     'podwyzszenie': 1.6},
     {'id': 'D2', 'srodek': (-10.5, -6.5), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
     {'id': 'D3', 'srodek': (-10.5, 1.0), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D4', 'srodek': (-9.0, 7.5), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'obok stawu z wodospadem'},
+    {'id': 'D4', 'srodek': (-9.75, 7.5), 'rozmiar': (4.5, 4.0), 'budynek': None, 'uwagi': 'obok stawu z wodospadem'},
     {'id': 'D5', 'srodek': (10.5, -6.5), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
     {'id': 'D6', 'srodek': (10.5, 1.0), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D7', 'srodek': (10.5, 8.0), 'rozmiar': (6.0, 5.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D7', 'srodek': (10.75, 8.0), 'rozmiar': (5.5, 5.0), 'budynek': None, 'uwagi': ''},
     {'id': 'D8', 'srodek': (-4.5, -8.5), 'rozmiar': (4.0, 3.5), 'budynek': None, 'uwagi': 'mała, przy bramie'},
     {'id': 'D9', 'srodek': (4.5, -8.5), 'rozmiar': (4.0, 3.5), 'budynek': None, 'uwagi': 'mała, przy bramie'},
 ]
+# budynek główny: 20 poziomów, każdy coś zmienia (mapa/budynek_glowny.py)
+BUDYNEK_GLOWNY = {'dzialka': 'D1', 'poziomy': 20}
 STAW = {'srodek': (-14.0, 11.2), 'promien': 1.8}
 # duży wodospad na górze (po prawej, za murem) i jezioro z rzeką
 JEZIORO = {'srodek': (41.0, 4.0), 'promien': 3.6}
