@@ -67,6 +67,24 @@ def _bloki(sl, rng, a, b, y, gl, z0, z1, wys_rzedu=0.7, mat=('stone', 'stone_dar
         r += 1
 
 
+def _wieza(sl, rng, r0, r1, z0, z1, cx=0.0, cy=0.0, wys_rzedu=0.7, mat=('stone', 'stone_dark', 'stone_light')):
+    """Okrągła wieża z kamiennych bloków ułożonych w rzędach (przesuniętych jak w murze).
+    r0 – promień na dole, r1 – na górze (zwężenie)."""
+    sl.add(cyl(r0 * 0.88, r1 * 0.88, z1 - z0, 14), 'stone_dark', 'root', mtx((cx, cy, (z0 + z1) / 2)))
+    z, rzad = z0, 0
+    while z < z1 - 0.05:
+        h = min(wys_rzedu, z1 - z)
+        r = r0 + (r1 - r0) * ((z + h / 2 - z0) / (z1 - z0))
+        n = max(6, int(2 * math.pi * r / 1.15))
+        dl = 2 * math.pi * r / n
+        for i in range(n):
+            a = 2 * math.pi * (i + 0.5 * (rzad % 2)) / n
+            sl.add(rock(dl - 0.06, 0.62, h - 0.03, rng.randint(0, 9999), rough=0.04, bevel=0.12), rng.choice(mat), 'root',
+                   mtx((cx + math.cos(a) * (r - 0.3), cy + math.sin(a) * (r - 0.3), z + h / 2), (0, 0, math.degrees(a) + 90)))
+        z += h
+        rzad += 1
+
+
 # ------------------------------------------------------------------ odcinek muru
 
 def _odcinek(sl, poz, a, b, rng):
@@ -236,7 +254,7 @@ def brama(sl, poz):
     elif poz == 5:
         rng = random.Random(44)
         for sg in (1, -1):
-            sl.add(taper(cyl(2.3, 2.3, 8.0, 16), bottom=1.15, top=1.0), 'stone', 'root', mtx((sg * 4.7, 0.3, 4.0)))
+            _wieza(sl, rng, 2.65, 2.3, 0.0, 8.0, cx=sg * 4.7, cy=0.3, wys_rzedu=0.75)
             sl.add(cyl(2.4, 2.4, 0.3, 16), 'stone_dark', 'root', mtx((sg * 4.7, 0.3, 8.1)))
             sl.add(cyl(2.6, 0.0, 3.0, 16), 'roof', 'root', mtx((sg * 4.7, 0.3, 9.7)))
             sl.add(cyl(0.05, 0.05, 1.4, 6), 'iron', 'root', mtx((sg * 4.7, 0.3, 11.8)))
@@ -286,9 +304,7 @@ def naroznik(sl, poz):
         return [('obronca_01', (0.0, 0.0, 4.3))]
     if poz == 3:  # mała wieża z polnego kamienia z drewnianym daszkiem
         rng = random.Random(31)
-        sl.add(cyl(2.0, 2.15, 4.8, 12), 'stone_dark', 'root', mtx((0, 0, 2.4)))
-        for z in (1.2, 2.6, 4.0):
-            sl.add(cyl(2.12, 2.12, 0.12, 12), 'stone', 'root', mtx((0, 0, z)))
+        _wieza(sl, rng, 2.2, 2.05, 0.0, 4.8, wys_rzedu=0.9, mat=('stone_dark', 'stone', 'stone_dark'))
         sl.add(cyl(2.25, 2.25, 0.16, 12), 'wood_light', 'root', mtx((0, 0, 4.88)))
         for i in range(6):
             a = 2 * math.pi * i / 6
@@ -296,16 +312,14 @@ def naroznik(sl, poz):
         sl.add(cyl(2.6, 0.0, 1.6, 6), 'wood_dark', 'root', mtx((0, 0, 7.3)))
         return [('obronca_01', (0.0, 0.0, 4.98))]
     if poz == 4:
-        sl.add(cyl(2.4, 2.4, 6.2, 18), 'stone', 'root', mtx((0, 0, 3.1)))
-        for z in (1.5, 3.2, 4.9):
-            sl.add(cyl(2.45, 2.45, 0.15, 18), 'stone_dark', 'root', mtx((0, 0, z)))
+        _wieza(sl, random.Random(41), 2.45, 2.4, 0.0, 6.2)
         sl.add(cyl(2.55, 2.55, 0.2, 18), 'stone_light', 'root', mtx((0, 0, 6.3)))
         for i in range(10):
             a = 2 * math.pi * i / 10
             sl.add(box(0.75, 0.5, 0.85, 0.06), 'stone', 'root', mtx((math.cos(a) * 2.25, math.sin(a) * 2.25, 6.8), (0, 0, math.degrees(a) + 90)))
         return [('obronca_01', (-0.8, 0.0, 6.42)), ('obronca_02', (0.8, 0.0, 6.42))]
     # poz 5
-    sl.add(taper(cyl(2.8, 2.8, 7.5, 18), bottom=1.12, top=1.0), 'stone', 'root', mtx((0, 0, 3.75)))
+    _wieza(sl, random.Random(51), 3.15, 2.8, 0.0, 7.5, wys_rzedu=0.75)
     sl.add(cyl(3.0, 3.0, 0.25, 18), 'stone_light', 'root', mtx((0, 0, 7.6)))
     for i in range(4):
         a = 2 * math.pi * i / 4 + math.pi / 4

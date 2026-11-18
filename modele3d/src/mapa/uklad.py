@@ -43,7 +43,8 @@ NAROZNIKI = [
 # --- działki pod budynki (środek x, y; rozmiar szer x gł). 'budynek': None = wolna.
 PLAC = {'srodek': (0.0, 0.5), 'promien': 4.5}  # plac centralny ze studnią (nie do zabudowy)
 DZIALKI = [
-    {'id': 'D1', 'srodek': (0.0, 8.5), 'rozmiar': (9.0, 6.0), 'budynek': None, 'uwagi': 'największa – np. główna siedziba'},
+    {'id': 'D1', 'srodek': (0.0, 9.6), 'rozmiar': (10.0, 6.8), 'budynek': 'budynek_glowny',
+     'uwagi': 'największa, tyłem do skalnej ściany góry – budynek główny'},
     {'id': 'D2', 'srodek': (-10.5, -6.5), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
     {'id': 'D3', 'srodek': (-10.5, 1.0), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
     {'id': 'D4', 'srodek': (-9.0, 7.5), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'obok stawu z wodospadem'},
