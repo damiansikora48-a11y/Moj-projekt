@@ -23,7 +23,8 @@ PALETA = {
     'wood': ('#8a5a2b', 0.85), 'wood_dark': ('#5e3b1c', 0.9), 'wood_light': ('#b07a42', 0.85),
     'iron': ('#4d545c', 0.45, 0.8),
     'stone': ('#9a948a', 0.92), 'stone_dark': ('#6d665e', 0.95), 'stone_light': ('#b9b2a5', 0.9),
-    'roof': ('#2f5fb8', 0.75), 'banner': ('#2f5fb8', 0.8), 'gold': ('#e0ac3c', 0.3, 0.9),
+    'roof': ('#2f5fb8', 0.75), 'roof_dark': ('#234a94', 0.75), 'banner': ('#2f5fb8', 0.8), 'gold': ('#e0ac3c', 0.3, 0.9),
+    'shingle': ('#7a4e2a', 0.9), 'shingle_dark': ('#5a3820', 0.9),
     'rune': ('#2fd0ff', 0.4, 0.0, 4.0),
     'fire': ('#ff5200', 0.4, 0.0, 2.2), 'fire_core': ('#ffae00', 0.3, 0.0, 3.0),
 }
@@ -83,6 +84,24 @@ def _wieza(sl, rng, r0, r1, z0, z1, cx=0.0, cy=0.0, wys_rzedu=0.7, mat=('stone',
                    mtx((cx + math.cos(a) * (r - 0.3), cy + math.sin(a) * (r - 0.3), z + h / 2), (0, 0, math.degrees(a) + 90)))
         z += h
         rzad += 1
+
+
+DACHOWKI = ('roof', 'roof_dark')
+GONT = ('shingle', 'shingle_dark')
+
+
+def _dach(sl, cx, cy, z0, r, h, mat=DACHOWKI, boki=16, rzedy=6, obrot=0.0, iglica=True):
+    """Dach z rzędów dachówek/gontu: pierścienie lekko na siebie nachodzą (dwa odcienie na zmianę),
+    okap na dole i złota iglica na szczycie. z0 – wysokość okapu, h – wysokość dachu."""
+    dz = h / rzedy
+    for k in range(rzedy):
+        t0, t1 = k / rzedy, (k + 1) / rzedy
+        rb, rt = r * (1 - t0) + 0.1, r * (1 - t1) * 0.92
+        sl.add(cyl(rb, rt, dz * 1.18, boki), mat[k % 2], 'root', mtx((cx, cy, z0 + dz * (k + 0.5)), (0, 0, obrot)))
+    sl.add(cyl(r + 0.12, r + 0.12, 0.12, boki), 'wood_dark', 'root', mtx((cx, cy, z0 - 0.02), (0, 0, obrot)))
+    if iglica:
+        sl.add(sphere(0.13, u=10, v=8), 'gold', 'root', mtx((cx, cy, z0 + h + 0.05)))
+        sl.add(cyl(0.06, 0.0, 0.45, 8), 'gold', 'root', mtx((cx, cy, z0 + h + 0.35)))
 
 
 # ------------------------------------------------------------------ odcinek muru
@@ -223,7 +242,7 @@ def brama(sl, poz):
             sl.add(cyl(0.46, 0.46, 0.15, 10), 'iron', 'root', mtx((sg * 3.3, 0.3, 3.5)))
         sl.add(box(7.6, 2.4, 0.22, 0.04), 'wood_light', 'root', mtx((0, 0.6, 4.1)))
         sl.add(box(7.6, 0.1, 0.9, 0.03), 'wood', 'root', mtx((0, -0.55, 4.6)))
-        sl.add(cyl(4.6, 0.6, 1.6, 4), 'wood_dark', 'root', mtx((0, 0.6, 5.9), (0, 0, 45)) @ mtx() )
+        _dach(sl, 0, 0.6, 5.1, 4.4, 1.9, GONT, boki=4, rzedy=4, obrot=45, iglica=False)
         for sg in (1, -1):
             for y in (-0.4, 1.6):
                 sl.add(cyl(0.1, 0.1, 1.2, 6), 'wood_dark', 'root', mtx((sg * 3.5, y, 4.8)))
@@ -256,7 +275,7 @@ def brama(sl, poz):
         for sg in (1, -1):
             _wieza(sl, rng, 2.65, 2.3, 0.0, 8.0, cx=sg * 4.7, cy=0.3, wys_rzedu=0.75)
             sl.add(cyl(2.4, 2.4, 0.3, 16), 'stone_dark', 'root', mtx((sg * 4.7, 0.3, 8.1)))
-            sl.add(cyl(2.6, 0.0, 3.0, 16), 'roof', 'root', mtx((sg * 4.7, 0.3, 9.7)))
+            _dach(sl, sg * 4.7, 0.3, 8.2, 2.6, 3.0, boki=16, rzedy=6)
             sl.add(cyl(0.05, 0.05, 1.4, 6), 'iron', 'root', mtx((sg * 4.7, 0.3, 11.8)))
             sl.add(box(0.7, 0.04, 0.45, 0.01), 'banner', 'root', mtx((sg * 4.7 + 0.37, 0.3, 12.2)))
             sl.add(box(0.36, 0.06, 0.36, 0.02), 'rune', 'root', mtx((sg * 4.7, -2.0, 4.2), (0, 45, 0)))
@@ -300,7 +319,7 @@ def naroznik(sl, poz):
         for x in (-1.3, 1.3):
             for y in (-1.3, 1.3):
                 sl.add(cyl(0.08, 0.08, 1.6, 6), 'wood_dark', 'root', mtx((x, y, 5.1)))
-        sl.add(cyl(2.3, 0.0, 1.5, 4), 'wood_dark', 'root', mtx((0, 0, 6.6), (0, 0, 45)))
+        _dach(sl, 0, 0, 5.85, 2.2, 1.6, GONT, boki=4, rzedy=4, obrot=45, iglica=False)
         return [('obronca_01', (0.0, 0.0, 4.3))]
     if poz == 3:  # mała wieża z polnego kamienia z drewnianym daszkiem
         rng = random.Random(31)
@@ -309,7 +328,7 @@ def naroznik(sl, poz):
         for i in range(6):
             a = 2 * math.pi * i / 6
             sl.add(cyl(0.09, 0.09, 1.6, 6), 'wood_dark', 'root', mtx((math.cos(a) * 1.9, math.sin(a) * 1.9, 5.7)))
-        sl.add(cyl(2.6, 0.0, 1.6, 6), 'wood_dark', 'root', mtx((0, 0, 7.3)))
+        _dach(sl, 0, 0, 6.5, 2.5, 1.7, GONT, boki=8, rzedy=4, iglica=False)
         return [('obronca_01', (0.0, 0.0, 4.98))]
     if poz == 4:
         _wieza(sl, random.Random(41), 2.45, 2.4, 0.0, 6.2)
@@ -325,7 +344,7 @@ def naroznik(sl, poz):
         a = 2 * math.pi * i / 4 + math.pi / 4
         sl.add(box(0.4, 0.4, 2.4, 0.04), 'stone_dark', 'root', mtx((math.cos(a) * 2.4, math.sin(a) * 2.4, 8.9)))
         sl.add(box(0.36, 0.06, 0.36, 0.02), 'rune', 'root', mtx((math.cos(a) * 2.95, math.sin(a) * 2.95, 3.5), (0, 45, math.degrees(a) + 90)))
-    sl.add(cyl(3.3, 0.0, 3.2, 18), 'roof', 'root', mtx((0, 0, 11.7)))
+    _dach(sl, 0, 0, 10.1, 3.3, 3.3, boki=18, rzedy=7)
     sl.add(cyl(0.05, 0.05, 1.6, 6), 'iron', 'root', mtx((0, 0, 14.0)))
     sl.add(box(0.9, 0.04, 0.55, 0.01), 'banner', 'root', mtx((0.47, 0, 14.4)))
     return [('obronca_01', (-0.9, 0.0, 7.75)), ('obronca_02', (0.9, 0.0, 7.75))]
