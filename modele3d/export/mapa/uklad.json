@@ -1,0 +1,291 @@
+{
+  "_opis": "Układ miasta dla Godota. Pozycje w układzie Godota (x, y w górę, z), metry. Plik elementu: wstaw poziom w miejsce {poziom}. Przód miasta (brama) jest od strony +Z.",
+  "poziomy": {
+    "1": {
+      "nazwa": "Palisada",
+      "opis": "pale z zaostrzonymi końcami, drewniany pomost"
+    },
+    "2": {
+      "nazwa": "Wzmocniona palisada",
+      "opis": "grubsze podwójne pale, okucia, kamienny fundament, pomost z barierką"
+    },
+    "3": {
+      "nazwa": "Mur kamienny",
+      "opis": "mur z kamiennych bloków z blankami"
+    },
+    "4": {
+      "nazwa": "Warownia",
+      "opis": "grubszy i wyższy mur, przypory, sztandary, runy, kosze z ogniem"
+    }
+  },
+  "teren": {
+    "plik": "teren.glb"
+  },
+  "mury": {
+    "lewy": {
+      "plik": "mur_bok_{poziom}.glb",
+      "pozycja": [
+        -18.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": -90,
+      "dlugosc_m": 28.0,
+      "miejsca_obroncow": {
+        "1": 3,
+        "2": 4,
+        "3": 5,
+        "4": 6
+      }
+    },
+    "przod": {
+      "plik": "mur_front_{poziom}.glb",
+      "pozycja": [
+        0.0,
+        0.0,
+        14.0
+      ],
+      "obrot_y_stopnie": 0,
+      "dlugosc_m": 36.0,
+      "miejsca_obroncow": {
+        "1": 4,
+        "2": 5,
+        "3": 6,
+        "4": 8
+      }
+    },
+    "prawy": {
+      "plik": "mur_bok_{poziom}.glb",
+      "pozycja": [
+        18.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": 90,
+      "dlugosc_m": 28.0,
+      "miejsca_obroncow": {
+        "1": 3,
+        "2": 4,
+        "3": 5,
+        "4": 6
+      }
+    }
+  },
+  "brama": {
+    "plik": "brama_{poziom}.glb",
+    "pozycja": [
+      0.0,
+      0.0,
+      14.0
+    ],
+    "obrot_y_stopnie": 0,
+    "miejsca_obroncow": {
+      "1": 0,
+      "2": 2,
+      "3": 3,
+      "4": 3
+    }
+  },
+  "narozniki": [
+    {
+      "plik": "naroznik_{poziom}.glb",
+      "pozycja": [
+        -18.0,
+        0.0,
+        14.0
+      ],
+      "obrot_y_stopnie": 0,
+      "poziom_jak_wyzszy_z": [
+        "lewy",
+        "przod"
+      ]
+    },
+    {
+      "plik": "naroznik_{poziom}.glb",
+      "pozycja": [
+        18.0,
+        0.0,
+        14.0
+      ],
+      "obrot_y_stopnie": 0,
+      "poziom_jak_wyzszy_z": [
+        "prawy",
+        "przod"
+      ]
+    }
+  ],
+  "dzialki": [
+    {
+      "id": "D1",
+      "pozycja": [
+        0.0,
+        0.0,
+        -8.5
+      ],
+      "rozmiar_m": [
+        9.0,
+        6.0
+      ],
+      "budynek": null,
+      "uwagi": "największa – np. główna siedziba"
+    },
+    {
+      "id": "D2",
+      "pozycja": [
+        -10.5,
+        0.0,
+        6.5
+      ],
+      "rozmiar_m": [
+        6.0,
+        6.0
+      ],
+      "budynek": null,
+      "uwagi": ""
+    },
+    {
+      "id": "D3",
+      "pozycja": [
+        -10.5,
+        0.0,
+        -1.0
+      ],
+      "rozmiar_m": [
+        6.0,
+        6.0
+      ],
+      "budynek": null,
+      "uwagi": ""
+    },
+    {
+      "id": "D4",
+      "pozycja": [
+        -9.0,
+        0.0,
+        -7.5
+      ],
+      "rozmiar_m": [
+        5.0,
+        4.0
+      ],
+      "budynek": null,
+      "uwagi": "obok stawu z wodospadem"
+    },
+    {
+      "id": "D5",
+      "pozycja": [
+        10.5,
+        0.0,
+        6.5
+      ],
+      "rozmiar_m": [
+        6.0,
+        6.0
+      ],
+      "budynek": null,
+      "uwagi": ""
+    },
+    {
+      "id": "D6",
+      "pozycja": [
+        10.5,
+        0.0,
+        -1.0
+      ],
+      "rozmiar_m": [
+        6.0,
+        6.0
+      ],
+      "budynek": null,
+      "uwagi": ""
+    },
+    {
+      "id": "D7",
+      "pozycja": [
+        10.5,
+        0.0,
+        -8.0
+      ],
+      "rozmiar_m": [
+        6.0,
+        5.0
+      ],
+      "budynek": null,
+      "uwagi": ""
+    },
+    {
+      "id": "D8",
+      "pozycja": [
+        -4.5,
+        0.0,
+        8.5
+      ],
+      "rozmiar_m": [
+        4.0,
+        3.5
+      ],
+      "budynek": null,
+      "uwagi": "mała, przy bramie"
+    },
+    {
+      "id": "D9",
+      "pozycja": [
+        4.5,
+        0.0,
+        8.5
+      ],
+      "rozmiar_m": [
+        4.0,
+        3.5
+      ],
+      "budynek": null,
+      "uwagi": "mała, przy bramie"
+    }
+  ],
+  "strefy_ataku": {
+    "przod": {
+      "od": [
+        -20.0,
+        0,
+        24.0
+      ],
+      "do": [
+        20.0,
+        0,
+        42.0
+      ]
+    },
+    "lewy": {
+      "od": [
+        -48.0,
+        0,
+        -8.0
+      ],
+      "do": [
+        -28.0,
+        0,
+        12.0
+      ]
+    },
+    "prawy": {
+      "od": [
+        28.0,
+        0,
+        -8.0
+      ],
+      "do": [
+        48.0,
+        0,
+        12.0
+      ]
+    }
+  },
+  "plac": {
+    "pozycja": [
+      0.0,
+      0.0,
+      -0.5
+    ],
+    "promien_m": 4.5
+  }
+}
