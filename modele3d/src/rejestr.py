@@ -144,7 +144,10 @@ class Rejestr:
                 'kosc_startowa': ruch.get('kosc_startowa', 'prop.R') if typ == 'pocisk' else None,
                 'uwagi': efekt.get('uwagi') if efekt else None,
                 # status nakładany na trafionych wrogów (np. podpalenie) – None, gdy brak
-                'status': ({'typ': j['atak']['status']['id'], 'czas_s': j['atak']['status']['czas_s'],
+                # czas_s: liczba albo (min, max) – gra losuje czas z zakresu przy każdym trafieniu
+                'status': ({'typ': j['atak']['status']['id'],
+                            'czas_min_s': (lambda c: c[0] if isinstance(c, (tuple, list)) else c)(j['atak']['status']['czas_s']),
+                            'czas_max_s': (lambda c: c[1] if isinstance(c, (tuple, list)) else c)(j['atak']['status']['czas_s']),
                             'plik_efektu': f"efekt_{j['atak']['status']['id']}.glb"}
                            if j['atak'].get('status') else None),
             },

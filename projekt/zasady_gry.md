@@ -57,7 +57,7 @@ Rola i żywioł jednostek (`modele3d/src/siatka.py`, `zywioly/`) to tylko narzę
 
 | Fuzja | Z czego | Rola w obronie | Status |
 |---|---|---|---|
-| **Kamienny Rycerz** | Żołnierz + Golem | ciężki obrońca bramy | ✅ gotowa; Przebudzony: kryształowe kolce z czerwonymi końcami, atak z płonącymi kolcami i **podpaleniem** wrogów na 4 s **(propozycja)** |
+| **Kamienny Rycerz** | Żołnierz + Golem | ciężki obrońca bramy | ✅ gotowa; Przebudzony: kryształowe kolce z czerwonymi końcami, atak z płonącymi kolcami i **podpaleniem** wrogów na 4–6 s (losowo przy każdym trafieniu) |
 | Magmowy Golem | Golem + Mag ognia | niszczyciel oblężeń, płonąca ziemia | propozycja |
 | Strażnik Murów | Żołnierz + Łucznik | ciężki strzelec: kusza i pawęż | propozycja |
 | Golem-Balista | Golem + Łucznik | chodząca wieża, daleki zasięg | propozycja |

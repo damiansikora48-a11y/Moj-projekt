@@ -147,7 +147,7 @@ Pliki z `wydanie/<wersja>/` (albo roboczo z `export/`) kopiujesz do `res://units
 - `efekt_<id>.glb`: pociski i efekty ataków;
 - `units.json`: dane dla gry, czyli nazwy plików i animacji, długość ataku, moment trafienia (`moment_s`), typ ataku, plik efektu i kość, z której startuje pocisk.
 
-**Statusy ataku:** jeśli atak nakłada status (np. podpalenie), `units.json` ma w `atak.status` jego typ, czas (`czas_s`) i plik efektu. W Godocie wywołujesz `apply_status(wróg)` dla każdego trafionego wroga, a obrażenia od statusu liczy gra.
+**Statusy ataku:** jeśli atak nakłada status (np. podpalenie), `units.json` ma w `atak.status` jego typ, zakres czasu (`czas_min_s`–`czas_max_s`, gra losuje z niego przy każdym trafieniu) i plik efektu. W Godocie wywołujesz `apply_status(wróg)` dla każdego trafionego wroga, a obrażenia od statusu liczy gra.
 
 `godot/unit.gd` to jeden skrypt dla wszystkich jednostek. Ustawiasz w nim tylko `unit_id`, a resztę czyta z `units.json`, więc **nowa jednostka nie wymaga nowego kodu w grze**. Skrypt nie był jeszcze uruchamiany w edytorze Godota; sprawdź go przy pierwszym imporcie.
 

@@ -184,7 +184,8 @@
       "uwagi": "3 kępy w linii co 0.8 m, kolejno co 0.08 s; trafieni wrogowie płoną (status w atak.status)",
       "status": {
         "typ": "podpalenie",
-        "czas_s": 4.0,
+        "czas_min_s": 4.0,
+        "czas_max_s": 6.0,
         "plik_efektu": "efekt_podpalenie.glb"
       }
     }

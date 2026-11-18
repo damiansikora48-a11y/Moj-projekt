@@ -73,7 +73,7 @@ func die() -> void:
 
 ## Nakłada na trafionego wroga status z ataku tej jednostki (np. podpalenie).
 ## Wywołuj z gry dla każdego wroga trafionego w chwili `attack_event`.
-## Zwraca czas trwania statusu w sekundach (0, gdy atak nie ma statusu).
+## Zwraca wylosowany czas trwania statusu w sekundach (0, gdy atak nie ma statusu).
 ## Obrażenia od statusu (np. ognia co sekundę) liczy gra – tu tylko efekt wizualny.
 func apply_status(target: Node3D) -> float:
 	var st = data["atak"].get("status")
@@ -82,7 +82,7 @@ func apply_status(target: Node3D) -> float:
 	var fx: Node3D = (load(units_dir + "/" + st["plik_efektu"]) as PackedScene).instantiate()
 	target.add_child(fx)
 	fx.position = Vector3.ZERO
-	var czas: float = st["czas_s"]
+	var czas: float = randf_range(st["czas_min_s"], st["czas_max_s"])  # np. 4–6 s
 	get_tree().create_timer(czas).timeout.connect(fx.queue_free)
 	return czas
 
