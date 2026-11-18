@@ -8,6 +8,7 @@
   python build.py --szkice --wszystkie ... także par, które mają fuzję ręczną (do porównania)
   python build.py --sprawdz            co się zmieniło względem ostatniego wydania?
   python build.py --wydaj 1.0          zamroź wydanie gry                         -> wydanie/1.0/
+  python build.py --mapa [--podglad]   mapa: teren, mury, brama, wieże + uklad.json -> export/mapa/
 
 Wymaga modułu `bpy` (Blender jako biblioteka Pythona 3.11), patrz README.
 """
@@ -150,6 +151,10 @@ def main():
     roster = rej.roster()
     if '--szkice' in flagi:
         szkice(rej, 24, '--wszystkie' in flagi)
+        return
+    if '--mapa' in flagi:
+        from mapa import budowa as mapa_budowa
+        mapa_budowa.zbuduj(EXPORT, PODGLAD, podglad='--podglad' in flagi)
         return
     if '--siatka' in flagi:
         obraz_siatki(rej)

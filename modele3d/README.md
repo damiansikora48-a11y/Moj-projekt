@@ -153,7 +153,28 @@ Pliki z `wydanie/<wersja>/` (albo roboczo z `export/`) kopiujesz do `res://units
 
 Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `balans.json`. Balans zmieniasz wtedy bez ruszania modeli.
 
-## 6. Jednostki (stan obecny)
+## 6. Mapa miasta
+
+Miasto pod wysoką górą, z murami z 3 stron (lewy, przedni z bramą, prawy). Każdy mur i brama ulepszają się **osobno**, w 4 poziomach: Palisada → Wzmocniona palisada → Mur kamienny → Warownia. Wieże na przednich narożnikach przyjmują poziom wyższego z dwóch sąsiednich murów.
+
+| Chcę zmienić… | Plik |
+|---|---|
+| wymiary miasta, położenie murów, działki pod budynki, strefy ataku | `src/mapa/uklad.py` |
+| wygląd murów, bramy i wież na każdym poziomie, liczbę miejsc dla obrońców | `src/mapa/mury.py` |
+| teren: góra, łąki, lasy, staw z wodospadem, plac, drogi | `src/mapa/teren.py` |
+
+Polecenie: `python build.py --mapa` (eksport) albo `python build.py --mapa --podglad` (eksport + rendery).
+
+Pliki w `export/mapa/`:
+- `teren.glb`, `mur_bok_<1-4>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_<1-4>.glb`, `brama_<1-4>.glb`, `naroznik_<1-4>.glb`;
+- w każdym murze, bramie i wieży są puste węzły `obronca_01`, `obronca_02`… czyli **miejsca dla obrońców**. Wyższy poziom ma więcej miejsc;
+- `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), liczba miejsc obrońców na poziom, **działki pod budynki** (D1–D9, wszystkie na razie wolne), plac i **strefy ataku** przed każdym murem.
+
+W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 3)`, `ustaw_poziom_bramy(2)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
+
+**Nowy budynek w przyszłości:** wpisz go w `DZIALKI` w `src/mapa/uklad.py` (zajmij wolną działkę albo dodaj nową).
+
+## 7. Jednostki (stan obecny)
 
 | id | Nazwa | Atak (ruch + efekt) | Moment trafienia |
 |---|---|---|---|
