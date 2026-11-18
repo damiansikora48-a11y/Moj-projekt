@@ -1,0 +1,182 @@
+{
+  "zolnierz": {
+    "nazwa": "Żołnierz",
+    "wersja": 1,
+    "plik": "zolnierz.glb",
+    "rodzice": [],
+    "rola": "wojownik",
+    "zywiol": "stal",
+    "przebudzony": false,
+    "baza": null,
+    "opis": "Piechota w zbroi płytowej z mieczem, okrągłą tarczą i peleryną.",
+    "animacje": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
+    },
+    "atak": {
+      "ruch": "ciecie",
+      "efekt": null,
+      "typ": "wrecz",
+      "dlugosc_s": 1.0,
+      "moment_s": 0.45,
+      "zdarzenie": "hit",
+      "plik_efektu": null,
+      "kosc_startowa": null,
+      "uwagi": null
+    }
+  },
+  "golem": {
+    "nazwa": "Golem",
+    "wersja": 1,
+    "plik": "golem.glb",
+    "rodzice": [],
+    "rola": "kolos",
+    "zywiol": "kamien",
+    "przebudzony": false,
+    "baza": null,
+    "opis": "Kamienny kolos z mchem, kryształami i świecącymi runami.",
+    "animacje": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
+    },
+    "atak": {
+      "ruch": "rzut",
+      "efekt": "glaz",
+      "typ": "pocisk",
+      "dlugosc_s": 2.0,
+      "moment_s": 1.24,
+      "zdarzenie": "release",
+      "plik_efektu": "efekt_glaz.glb",
+      "kosc_startowa": "prop.R",
+      "uwagi": null
+    }
+  },
+  "kamienny_rycerz": {
+    "nazwa": "Kamienny Rycerz",
+    "wersja": 1,
+    "plik": "kamienny_rycerz.glb",
+    "rodzice": [
+      "golem",
+      "zolnierz"
+    ],
+    "rola": "wojownik",
+    "zywiol": "kamien",
+    "przebudzony": false,
+    "baza": null,
+    "opis": "Golem w zbroi rycerza: hełm z kryształowym grzebieniem, napierśnik popękany runami, Runiczne Ostrze.",
+    "animacje": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
+    },
+    "atak": {
+      "ruch": "uderzenie",
+      "efekt": "krysztaly",
+      "typ": "obszar",
+      "dlugosc_s": 1.6,
+      "moment_s": 0.832,
+      "zdarzenie": "impact",
+      "plik_efektu": "efekt_krysztaly.glb",
+      "kosc_startowa": null,
+      "uwagi": "3 kępy w linii co 0.8 m, kolejno co 0.08 s"
+    }
+  },
+  "mag_ognia": {
+    "nazwa": "Mag ognia",
+    "wersja": 1,
+    "plik": "mag_ognia.glb",
+    "rodzice": [],
+    "rola": "mag",
+    "zywiol": "ogien",
+    "przebudzony": false,
+    "baza": null,
+    "opis": "Czarodziej w czerwonej szacie i spiczastym kapeluszu, z kosturem z ognistym kryształem. Ciska kulami ognia.",
+    "animacje": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
+    },
+    "atak": {
+      "ruch": "czar",
+      "efekt": "kula_ognia",
+      "typ": "pocisk",
+      "dlugosc_s": 1.2,
+      "moment_s": 0.66,
+      "zdarzenie": "cast",
+      "plik_efektu": "efekt_kula_ognia.glb",
+      "kosc_startowa": "hand.L",
+      "uwagi": null
+    }
+  },
+  "lesny_lucznik": {
+    "nazwa": "Leśny Łucznik",
+    "wersja": 1,
+    "plik": "lesny_lucznik.glb",
+    "rodzice": [],
+    "rola": "strzelec",
+    "zywiol": "natura",
+    "przebudzony": false,
+    "baza": null,
+    "opis": "Strzelec w zielonym kapturze, z łukiem refleksyjnym i kołczanem. Strzela z murów.",
+    "animacje": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
+    },
+    "atak": {
+      "ruch": "strzal",
+      "efekt": "strzala",
+      "typ": "pocisk",
+      "dlugosc_s": 1.333,
+      "moment_s": 0.827,
+      "zdarzenie": "release",
+      "plik_efektu": "efekt_strzala.glb",
+      "kosc_startowa": "prop.R",
+      "uwagi": null
+    }
+  },
+  "kamienny_rycerz_przebudzony": {
+    "nazwa": "Przebudzony Kamienny Rycerz",
+    "wersja": 1,
+    "plik": "kamienny_rycerz_przebudzony.glb",
+    "rodzice": [
+      "golem",
+      "zolnierz"
+    ],
+    "rola": "wojownik",
+    "zywiol": "kamien",
+    "przebudzony": true,
+    "baza": "kamienny_rycerz",
+    "opis": "Rzadki wynik fuzji: Golem w zbroi rycerza: hełm z kryształowym grzebieniem, napierśnik popękany runami, Runiczne Ostrze.",
+    "animacje": {
+      "idle": "Idle_loop",
+      "walk": "Walk_loop",
+      "attack": "Attack",
+      "hit": "Hit",
+      "death": "Death"
+    },
+    "atak": {
+      "ruch": "uderzenie",
+      "efekt": "krysztaly",
+      "typ": "obszar",
+      "dlugosc_s": 1.6,
+      "moment_s": 0.832,
+      "zdarzenie": "impact",
+      "plik_efektu": "efekt_krysztaly.glb",
+      "kosc_startowa": null,
+      "uwagi": "3 kępy w linii co 0.8 m, kolejno co 0.08 s"
+    }
+  }
+}
