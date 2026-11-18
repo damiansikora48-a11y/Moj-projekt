@@ -117,7 +117,7 @@ Fuzje są **wybierane ręcznie** (lista w `projekt/zasady_gry.md`): każda musi 
 2. Dla każdej pary wybierz jedną możliwość i zdecyduj, czy idzie do gry.
 3. Dla każdej zrób plik w `src/fuzje/`. Wzorem jest `kamienny_rycerz.py`: proporcje i kolory liczą się z rodziców (`polacz_szkielet`, `polacz_palete`), a części mieszane i atak projektujesz sam. Wpisz `'rodzice': ('a', 'b')`.
 4. Dopisz fuzję do `roster.json`.
-5. **Przebudzenie** (rzadki wynik) powstaje samo: każda fuzja ręczna ma wariant `<id>_przebudzony` (złocone metale, mocniejsze świecenie). Wyjątkowe dodatki fuzja ustawia w swoim pliku w `'przebudzenie'`: części (slot `Aura`), kolory i to, czy pokazać ogólną aureolę z kręgiem run (`'poswiata'`). Kamienny Rycerz ma kolce z czerwonymi końcami zamiast poświaty. Dopisz wariant do `roster.json` razem z fuzją.
+5. **Przebudzenie** (rzadki wynik) powstaje samo: każda fuzja ręczna ma wariant `<id>_przebudzony` (złocone metale, mocniejsze świecenie). Wyjątkowe dodatki fuzja ustawia w swoim pliku w `'przebudzenie'`: części (slot `Aura`), kolory i to, czy pokazać ogólną aureolę z kręgiem run (`'poswiata'`). Kamienny Rycerz ma kryształowe kolce ze świecącymi czerwonymi końcami zamiast poświaty. Dopisz wariant do `roster.json` razem z fuzją.
 
 Szkic nigdy nie trafi do gry sam z siebie. Do gry trafia tylko to, co jest w `roster.json`.
 

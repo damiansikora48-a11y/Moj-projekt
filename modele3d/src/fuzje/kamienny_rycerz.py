@@ -191,11 +191,11 @@ def runiczne_ostrze(sl, J):
 
 
 def kolce_przebudzenia(sl, J):
-    """Przebudzenie: kamienne kolce z czerwonymi końcami na barkach, mniejsze na kolanach i goleniach."""
+    """Przebudzenie: kryształowe kolce ze świecącymi czerwonymi końcami na barkach, mniejsze na kolanach i goleniach."""
     def kolec(p, d, dl, r, kosc):
         d = d.normalized()
         F = frame(p, d, (0, 0, 1) if abs(d.z) < 0.9 else (1, 0, 0))
-        sl.add(cyl(r, r * 0.45, dl * 0.6, 6), 'stone_dark', kosc, F @ mtx((0, 0, dl * 0.3)))
+        sl.add(cyl(r, r * 0.45, dl * 0.6, 6), 'spike_crystal', kosc, F @ mtx((0, 0, dl * 0.3)))
         sl.add(cyl(r * 0.45, 0.0, dl * 0.4, 6), 'spike_red', kosc, F @ mtx((0, 0, dl * 0.8)))
 
     for sg, S in SIDES:
@@ -229,10 +229,10 @@ JEDNOSTKA = {
                  twist=6, sway=3.5, lean=4, bob=0.028, breath=1.9, breath_loc=0.009,
                  smierc_dlon=-58),
     'atak': {'ruch': 'uderzenie', 'efekt': 'krysztaly'},
-    # wyjątkowe Przebudzenie tej fuzji: kolce zamiast ogólnej aureoli i kręgu run
+    # wyjątkowe Przebudzenie tej fuzji: kryształowe kolce z czerwonymi końcami zamiast aureoli i kręgu run
     'przebudzenie': {
         'poswiata': False,
-        'paleta': {'spike_red': ('#e0202a', 0.35, 0.0, 3.0)},
+        'paleta': {'spike_crystal': ('#7fd6ef', 0.12, 0.0, 1.2), 'spike_red': ('#d80000', 0.3, 0.0, 1.4)},
         'czesci': {'Aura': kolce_przebudzenia},
     },
     'tagi': {'material': 'kamien', 'wielkosc': 'duza'},
