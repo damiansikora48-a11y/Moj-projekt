@@ -1,5 +1,7 @@
 # Składa miasto z elementów w modele3d/export/mapa/ według uklad.json:
-# teren, 3 mury (lewy, przod, prawy), brama i 2 wieże narożne – każdy element w swoim poziomie.
+# teren, 3 mury (lewy, przod, prawy), brama i 2 wieże narożne – każdy element w swoim poziomie
+# ulepszenia (1–15). Poziom wskazuje etap wyglądu (uklad.json: "poziomy"); wygląd zmienia się co 3 poziomy.
+# Na etapie 1 (palisada, poziomy 1–3) mury nie mają miejsc dla obrońców.
 #
 # Użycie: węzeł Node3D z tym skryptem; pliki z export/mapa/ skopiuj do `mapa_dir`.
 #   ustaw_poziom_muru("przod", 3)      # ulepszenie muru przedniego do poziomu 3
@@ -31,7 +33,8 @@ func _ready() -> void:
 func _postaw(klucz: String, opis: Dictionary, poziom: int) -> Node3D:
 	if _wezly.has(klucz):
 		_wezly[klucz].queue_free()
-	var plik: String = opis["plik"].replace("{poziom}", str(poziom))
+	var etap: int = uklad["poziomy"][str(poziom)]["etap"]
+	var plik: String = opis["plik"].replace("{etap}", str(etap))
 	var n: Node3D = (load(mapa_dir + "/" + plik) as PackedScene).instantiate()
 	var p: Array = opis["pozycja"]
 	n.position = Vector3(p[0], p[1], p[2])
@@ -51,7 +54,7 @@ func _odswiez_narozniki() -> void:
 		i += 1
 
 
-## Ulepszenie (lub zmiana) poziomu jednego muru: "lewy", "przod" albo "prawy".
+## Ulepszenie (lub zmiana) poziomu jednego muru: "lewy", "przod" albo "prawy" (poziom 1–15).
 func ustaw_poziom_muru(strona: String, poziom: int) -> void:
 	poziom_murow[strona] = poziom
 	_postaw("mur_" + strona, uklad["mury"][strona], poziom)

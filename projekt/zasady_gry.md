@@ -97,11 +97,16 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 
 - Miasto stoi pod wysoką kamienną górą (z tyłu). Mury są z 3 stron: **lewy, przedni (z bramą), prawy**.
 - **Każdy mur ulepsza się osobno.** **Brama** na środku muru przedniego ulepsza się osobno.
-- Poziomy (robocze): 1 Palisada, 2 Wzmocniona palisada (mocniejsze drewno), 3 Mur kamienny, 4 Warownia. Kolejne można dodać.
-- Na murach są **miejsca dla obrońców**. Wyższy poziom daje więcej miejsc (mur boczny: 3 / 4 / 5 / 6).
+- **15 poziomów ulepszeń** dla każdego muru i dla bramy. Wygląd zmienia się co 3 poziomy:
+  - 1–3 Palisada: **brak obrońców na murach** (nie ma pomostu),
+  - 4–6 Mur drewniany: mało miejsc dla obrońców (2 na boku),
+  - 7–9 Słaby mur kamienny (3),
+  - 10–12 Lepszy mur kamienny (5),
+  - 13–15 Warownia (6).
+- Brama zmienia wygląd na tych samych progach.
 - **Atakujący wybiera stronę ataku** (lewa, przód, prawa). Przed każdym murem jest wolna łąka na rozstawienie wojsk.
 - **Budynki w środku stoją na stałych działkach** (D1–D9). Co gdzie stoi, ustalamy razem. Część działek zostaje wolna na przyszłe budynki.
-- Klimat: dużo zieleni (łąki, lasy, staw z wodospadem), a góra ma trawiaste zbocza, sosny i śnieżny szczyt.
+- Klimat: dużo zieleni (łąki, lasy, staw z wodospadem), a góra ma trawiaste zbocza, półki skalne z sosnami, głazy, śnieżny szczyt i duży wodospad po prawej z jeziorem i rzeką.
 
 ## 5. Ekonomia
 
@@ -141,5 +146,5 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 - [ ] Wymagany poziom doświadczenia do fuzji i koszt fuzji w złocie.
 - [ ] Czy rubiny mogą kupić złoto (i z jakim limitem)?
 - [ ] Rodzaje wrogów i ich słabości na żywioły.
-- [ ] Ostateczna liczba poziomów murów i bramy (teraz 4) oraz koszty ulepszeń.
+- [ ] Koszty ulepszeń murów i bramy na każdym z 15 poziomów (oraz co poza wyglądem daje każdy poziom, np. wytrzymałość).
 - [ ] Co stoi na której działce (D1–D9).

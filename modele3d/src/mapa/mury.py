@@ -1,4 +1,9 @@
-"""MAPA – MURY, BRAMA I WIEŻE NAROŻNE (każdy w 4 poziomach ulepszenia).
+"""MAPA – MURY, BRAMA I WIEŻE NAROŻNE w 5 ETAPACH WYGLĄDU.
+
+Gra ma 15 poziomów ulepszeń; wygląd zmienia się co 3 poziomy (etap = (poziom + 2) // 3),
+patrz mapa/uklad.py (POZIOMY, ETAPY). Tu jest wygląd każdego ETAPU:
+  1 Palisada (bez pomostu – brak obrońców), 2 Mur drewniany (mało obrońców),
+  3 Słaby mur kamienny, 4 Lepszy mur kamienny, 5 Warownia.
 
 Układ elementu: mur biegnie wzdłuż osi X (środek w 0,0), strona ZEWNĘTRZNA (wróg) to -Y,
 wewnętrzna (miasto, pomost dla obrońców) to +Y. Ziemia: z = 0.
@@ -6,7 +11,8 @@ wewnętrzna (miasto, pomost dla obrońców) to +Y. Ziemia: z = 0.
 Każda funkcja zwraca listę MIEJSC DLA OBROŃCÓW: [(nazwa, (x, y, z)), ...] – eksportowane jako
 puste węzły 'obronca_01'... w pliku .glb, Godot stawia na nich jednostki.
 
-Nowy poziom: dopisz gałąź `elif poz == 5:` w funkcjach poniżej i wpis w uklad.POZIOMY.
+Nowy etap wyglądu: dopisz gałąź `elif poz == 6:` w funkcjach poniżej i wpis w uklad.ETAPY.
+(W kodzie zmienna `poz` oznacza ETAP wyglądu.)
 """
 import math
 import random
@@ -22,12 +28,14 @@ PALETA = {
     'fire': ('#ff5200', 0.4, 0.0, 2.2), 'fire_core': ('#ffae00', 0.3, 0.0, 3.0),
 }
 
-# wysokość pomostu (gdzie stoją obrońcy) i liczba miejsc na 28 m muru – dla każdego poziomu
-POMOST = {1: 2.0, 2: 2.6, 3: 4.2, 4: 5.0}
-OBRONCY_NA_28M = {1: 3, 2: 4, 3: 5, 4: 6}
+# wysokość pomostu (gdzie stoją obrońcy) i liczba miejsc na 28 m muru – dla każdego ETAPU
+POMOST = {1: 0.0, 2: 2.6, 3: 3.6, 4: 4.2, 5: 5.0}
+OBRONCY_NA_28M = {1: 0, 2: 2, 3: 3, 4: 5, 5: 6}
 
 
 def _miejsca(poz, L, brama_szer, y):
+    if OBRONCY_NA_28M[poz] == 0:
+        return []
     n = max(1, round(OBRONCY_NA_28M[poz] * L / 28.0))
     out = []
     odcinki = [(-L / 2, -brama_szer / 2 - 1.0), (brama_szer / 2 + 1.0, L / 2)] if brama_szer else [(-L / 2, L / 2)]
@@ -63,7 +71,7 @@ def _bloki(sl, rng, a, b, y, gl, z0, z1, wys_rzedu=0.7, mat=('stone', 'stone_dar
 
 def _odcinek(sl, poz, a, b, rng):
     L, m = b - a, (a + b) / 2
-    if poz == 1:  # palisada
+    if poz == 1:  # palisada (bez pomostu – obrońcy nie mają gdzie stanąć)
         n = max(1, int(L / 0.44))
         for i in range(n):
             x = a + (i + 0.5) * L / n
@@ -72,12 +80,11 @@ def _odcinek(sl, poz, a, b, rng):
             sl.add(cyl(r, 0.0, 0.45, 8), 'wood_light', 'root', mtx((x, 0, h + 0.22)))
         for z in (1.0, 2.4):
             sl.add(box(L, 0.12, 0.18, 0.03), 'wood_dark', 'root', mtx((m, 0.24, z)))
-        sl.add(box(L, 1.3, 0.1, 0.02), 'wood_light', 'root', mtx((m, 0.95, 2.0)))
-        x = a + 0.3
-        while x < b:
-            for y in (0.4, 1.5):
-                sl.add(cyl(0.09, 0.09, 2.0, 6), 'wood_dark', 'root', mtx((x, y, 1.0)))
-            x += 3.0
+        x = a + 2.0
+        while x < b - 1.0:  # podpórki od strony miasta
+            p0, p1 = V(x, 1.6, 0), V(x, 0.3, 2.2)
+            sl.add(cyl(0.1, 0.1, (p1 - p0).length, 6), 'wood_dark', 'root', seg(p0, p1))
+            x += 4.0
     elif poz == 2:  # wzmocniona palisada
         sl.add(box(L, 1.1, 0.35, 0.08), 'stone_dark', 'root', mtx((m, -0.05, 0.17)))
         n = max(1, int(L / 0.52))
@@ -108,8 +115,17 @@ def _odcinek(sl, poz, a, b, rng):
             p0, p1 = V(x, 2.6, 0), V(x, 0.6, 2.4)
             sl.add(cyl(0.12, 0.12, (p1 - p0).length, 6), 'wood_dark', 'root', seg(p0, p1))
             x += 7.0
-    elif poz == 3:  # mur kamienny
+    elif poz == 3:  # słaby mur kamienny: nieobrobione kamienie, drewniane blanki
         H = POMOST[3]
+        _bloki(sl, rng, a, b, 0.5, 1.9, 0.0, H, wys_rzedu=0.9, mat=('stone_dark', 'stone', 'stone_dark'))
+        sl.add(box(L, 1.7, 0.1, 0.02), 'wood_light', 'root', mtx((m, 0.55, H + 0.05)))
+        sl.add(box(L, 0.14, 0.9, 0.02), 'wood', 'root', mtx((m, -0.35, H + 0.45)))
+        x = a + 0.5
+        while x < b:
+            sl.add(cyl(0.08, 0.08, 1.2, 6), 'wood_dark', 'root', mtx((x, -0.35, H + 0.5)))
+            x += 1.5
+    elif poz == 4:  # lepszy mur kamienny
+        H = POMOST[4]
         _bloki(sl, rng, a, b, 0.6, 2.2, 0.0, H)
         sl.add(box(L, 2.0, 0.12, 0.02), 'stone_light', 'root', mtx((m, 0.6, H + 0.06)))
         x = a + 0.4
@@ -117,8 +133,8 @@ def _odcinek(sl, poz, a, b, rng):
             sl.add(box(0.75, 0.5, 0.85, 0.06), 'stone', 'root', mtx((x + 0.37, -0.3, H + 0.48)))
             x += 1.3
         sl.add(box(L, 0.25, 0.4, 0.03), 'stone_dark', 'root', mtx((m, 1.6, H + 0.2)))
-    elif poz == 4:  # warownia
-        H = POMOST[4]
+    elif poz == 5:  # warownia
+        H = POMOST[5]
         sl.add(taper(box(L, 3.6, 1.2, 0.1), bottom=1.0, top=0.85, axis='y'), 'stone_dark', 'root', mtx((m, 0.6, 0.6)))
         _bloki(sl, rng, a, b, 0.6, 2.8, 1.2, H, wys_rzedu=0.75)
         sl.add(box(L, 2.6, 0.14, 0.02), 'stone_light', 'root', mtx((m, 0.6, H + 0.07)))
@@ -153,7 +169,7 @@ def mur(sl, poz, L, brama_szer=0.0, seed=1):
         _odcinek(sl, poz, brama_szer / 2, L / 2, rng)
     else:
         _odcinek(sl, poz, -L / 2, L / 2, rng)
-    y = {1: 0.95, 2: 1.25, 3: 0.6, 4: 0.6}[poz]
+    y = {1: 0.0, 2: 1.25, 3: 0.55, 4: 0.6, 5: 0.6}[poz]
     return _miejsca(poz, L, brama_szer, y)
 
 
@@ -195,7 +211,17 @@ def brama(sl, poz):
                 sl.add(cyl(0.1, 0.1, 1.2, 6), 'wood_dark', 'root', mtx((sg * 3.5, y, 4.8)))
         wrota(3.8, True)
         miejsca = [('obronca_01', (-1.8, 0.8, 4.22)), ('obronca_02', (1.8, 0.8, 4.22))]
-    elif poz == 3:
+    elif poz == 3:  # słaby kamień: filary z polnego kamienia, drewniany pomost nad bramą
+        rng = random.Random(30)
+        for sg in (1, -1):
+            _bloki(sl, rng, sg * 3.9 - 1.0, sg * 3.9 + 1.0, 0.5, 2.6, 0.0, 4.6, wys_rzedu=0.9,
+                   mat=('stone_dark', 'stone', 'stone_dark'))
+        sl.add(box(9.8, 2.2, 0.16, 0.03), 'wood_light', 'root', mtx((0, 0.5, 4.6)))
+        sl.add(box(9.8, 0.14, 0.9, 0.02), 'wood', 'root', mtx((0, -0.55, 5.1)))
+        sl.add(box(6.4, 0.5, 0.5, 0.06), 'wood_dark', 'root', mtx((0, -0.2, 4.3)))
+        wrota(4.0, True)
+        miejsca = [('obronca_01', (-1.5, 0.6, 4.7)), ('obronca_02', (1.5, 0.6, 4.7))]
+    elif poz == 4:
         rng = random.Random(33)
         for sg in (1, -1):
             _bloki(sl, rng, sg * 4.2 - 1.3, sg * 4.2 + 1.3, 0.6, 3.4, 0.0, 6.0)
@@ -207,7 +233,7 @@ def brama(sl, poz):
             sl.add(box(0.8, 0.5, 0.8, 0.06), 'stone', 'root', mtx((x, -0.95, 6.47)))
         wrota(4.3, True)
         miejsca = [('obronca_01', (-3.6, 0.8, 6.15)), ('obronca_02', (0.0, 0.8, 6.15)), ('obronca_03', (3.6, 0.8, 6.15))]
-    elif poz == 4:
+    elif poz == 5:
         rng = random.Random(44)
         for sg in (1, -1):
             sl.add(taper(cyl(2.3, 2.3, 8.0, 16), bottom=1.15, top=1.0), 'stone', 'root', mtx((sg * 4.7, 0.3, 4.0)))
@@ -236,7 +262,17 @@ def brama(sl, poz):
 # ------------------------------------------------------------------ wieża narożna (środek w 0,0)
 
 def naroznik(sl, poz):
-    if poz == 1:
+    if poz == 1:  # palisada: wiązka grubych pali na rogu, bez miejsca dla obrońcy
+        for i in range(9):
+            a = 2 * math.pi * i / 9
+            r, h = 0.3, 3.4 + 0.3 * math.sin(i * 1.7)
+            p = V(math.cos(a) * 0.75, math.sin(a) * 0.75, 0)
+            sl.add(cyl(r, r, h, 8), 'wood', 'root', mtx(p + V(0, 0, h / 2)))
+            sl.add(cyl(r, 0.0, 0.5, 8), 'wood_light', 'root', mtx(p + V(0, 0, h + 0.25)))
+        sl.add(cyl(1.08, 1.08, 0.2, 12), 'wood_dark', 'root', mtx((0, 0, 1.4)))
+        sl.add(cyl(1.08, 1.08, 0.2, 12), 'wood_dark', 'root', mtx((0, 0, 2.6)))
+        return []
+    if poz == 2:
         for x in (-1.1, 1.1):
             for y in (-1.1, 1.1):
                 sl.add(cyl(0.16, 0.16, 4.4, 8), 'wood_dark', 'root', mtx((x, y, 2.2)))
@@ -248,17 +284,18 @@ def naroznik(sl, poz):
                 sl.add(cyl(0.08, 0.08, 1.6, 6), 'wood_dark', 'root', mtx((x, y, 5.1)))
         sl.add(cyl(2.3, 0.0, 1.5, 4), 'wood_dark', 'root', mtx((0, 0, 6.6), (0, 0, 45)))
         return [('obronca_01', (0.0, 0.0, 4.3))]
-    if poz == 2:
-        sl.add(box(3.4, 3.4, 5.0, 0.08), 'wood', 'root', mtx((0, 0, 2.5)))
-        for z in (1.0, 2.5, 4.0):
-            sl.add(box(3.5, 3.5, 0.18, 0.03), 'wood_dark', 'root', mtx((0, 0, z)))
-        sl.add(box(4.0, 4.0, 0.2, 0.04), 'wood_light', 'root', mtx((0, 0, 5.2)))
-        for x in (-1.85, 1.85):
-            for y in (-1.85, 1.85):
-                sl.add(cyl(0.12, 0.12, 2.0, 6), 'wood_dark', 'root', mtx((x, y, 6.2)))
-        sl.add(cyl(3.2, 0.0, 2.0, 4), 'wood_dark', 'root', mtx((0, 0, 8.1), (0, 0, 45)))
-        return [('obronca_01', (-0.6, 0.0, 5.32)), ('obronca_02', (0.6, 0.0, 5.32))]
-    if poz == 3:
+    if poz == 3:  # mała wieża z polnego kamienia z drewnianym daszkiem
+        rng = random.Random(31)
+        sl.add(cyl(2.0, 2.15, 4.8, 12), 'stone_dark', 'root', mtx((0, 0, 2.4)))
+        for z in (1.2, 2.6, 4.0):
+            sl.add(cyl(2.12, 2.12, 0.12, 12), 'stone', 'root', mtx((0, 0, z)))
+        sl.add(cyl(2.25, 2.25, 0.16, 12), 'wood_light', 'root', mtx((0, 0, 4.88)))
+        for i in range(6):
+            a = 2 * math.pi * i / 6
+            sl.add(cyl(0.09, 0.09, 1.6, 6), 'wood_dark', 'root', mtx((math.cos(a) * 1.9, math.sin(a) * 1.9, 5.7)))
+        sl.add(cyl(2.6, 0.0, 1.6, 6), 'wood_dark', 'root', mtx((0, 0, 7.3)))
+        return [('obronca_01', (0.0, 0.0, 4.98))]
+    if poz == 4:
         sl.add(cyl(2.4, 2.4, 6.2, 18), 'stone', 'root', mtx((0, 0, 3.1)))
         for z in (1.5, 3.2, 4.9):
             sl.add(cyl(2.45, 2.45, 0.15, 18), 'stone_dark', 'root', mtx((0, 0, z)))
@@ -267,7 +304,7 @@ def naroznik(sl, poz):
             a = 2 * math.pi * i / 10
             sl.add(box(0.75, 0.5, 0.85, 0.06), 'stone', 'root', mtx((math.cos(a) * 2.25, math.sin(a) * 2.25, 6.8), (0, 0, math.degrees(a) + 90)))
         return [('obronca_01', (-0.8, 0.0, 6.42)), ('obronca_02', (0.8, 0.0, 6.42))]
-    # poz 4
+    # poz 5
     sl.add(taper(cyl(2.8, 2.8, 7.5, 18), bottom=1.12, top=1.0), 'stone', 'root', mtx((0, 0, 3.75)))
     sl.add(cyl(3.0, 3.0, 0.25, 18), 'stone_light', 'root', mtx((0, 0, 7.6)))
     for i in range(4):

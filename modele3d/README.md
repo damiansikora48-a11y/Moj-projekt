@@ -155,22 +155,33 @@ Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `bal
 
 ## 6. Mapa miasta
 
-Miasto pod wysoką górą, z murami z 3 stron (lewy, przedni z bramą, prawy). Każdy mur i brama ulepszają się **osobno**, w 4 poziomach: Palisada → Wzmocniona palisada → Mur kamienny → Warownia. Wieże na przednich narożnikach przyjmują poziom wyższego z dwóch sąsiednich murów.
+Miasto pod wysoką górą (z wodospadem, jeziorem i rzeką po prawej, półkami skalnymi i głazami), z murami z 3 stron (lewy, przedni z bramą, prawy). Każdy mur i brama ulepszają się **osobno**, w **15 poziomach**. Wygląd zmienia się co 3 poziomy, więc jest **5 etapów wyglądu**:
+
+| Poziomy | Etap | Wygląd | Obrońcy (mur boczny) |
+|---|---|---|---|
+| 1–3 | 1 | Palisada | brak (bez pomostu) |
+| 4–6 | 2 | Mur drewniany | 2 |
+| 7–9 | 3 | Słaby mur kamienny | 3 |
+| 10–12 | 4 | Lepszy mur kamienny | 5 |
+| 13–15 | 5 | Warownia | 6 |
+
+Brama zmienia wygląd na tych samych progach. Wieże na przednich narożnikach przyjmują poziom wyższego z dwóch sąsiednich murów. Liczbę poziomów i progi zmieniasz w `src/mapa/uklad.py` (`LICZBA_POZIOMOW`, `POZIOMY`).
 
 | Chcę zmienić… | Plik |
 |---|---|
 | wymiary miasta, położenie murów, działki pod budynki, strefy ataku | `src/mapa/uklad.py` |
-| wygląd murów, bramy i wież na każdym poziomie, liczbę miejsc dla obrońców | `src/mapa/mury.py` |
-| teren: góra, łąki, lasy, staw z wodospadem, plac, drogi | `src/mapa/teren.py` |
+| wygląd murów, bramy i wież w każdym etapie, liczbę miejsc dla obrońców | `src/mapa/mury.py` |
+| liczbę poziomów ulepszeń i to, przy którym poziomie zmienia się wygląd | `src/mapa/uklad.py` |
+| teren: góra (wodospad, jezioro, rzeka, półki skalne, głazy), łąki, lasy, staw, plac, drogi | `src/mapa/teren.py` |
 
 Polecenie: `python build.py --mapa` (eksport) albo `python build.py --mapa --podglad` (eksport + rendery).
 
 Pliki w `export/mapa/`:
-- `teren.glb`, `mur_bok_<1-4>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_<1-4>.glb`, `brama_<1-4>.glb`, `naroznik_<1-4>.glb`;
+- `teren.glb`, `mur_bok_etap<1-5>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_etap<1-5>.glb`, `brama_etap<1-5>.glb`, `naroznik_etap<1-5>.glb`;
 - w każdym murze, bramie i wieży są puste węzły `obronca_01`, `obronca_02`… czyli **miejsca dla obrońców**. Wyższy poziom ma więcej miejsc;
-- `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), liczba miejsc obrońców na poziom, **działki pod budynki** (D1–D9, wszystkie na razie wolne), plac i **strefy ataku** przed każdym murem.
+- `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D9, wszystkie na razie wolne), plac i **strefy ataku** przed każdym murem.
 
-W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 3)`, `ustaw_poziom_bramy(2)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
+W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
 
 **Nowy budynek w przyszłości:** wpisz go w `DZIALKI` w `src/mapa/uklad.py` (zajmij wolną działkę albo dodaj nową).
 

@@ -13,13 +13,19 @@ GLEB = 28.0     # od muru przedniego do góry
 PRZOD_Y = -GLEB / 2   # linia muru przedniego
 BRAMA_SZER = 6.0      # szerokość prześwitu bramy w murze przednim
 
-# --- poziomy ulepszeń murów i bramy (łatwo dodać kolejne – patrz mapa/mury.py)
-POZIOMY = {
-    1: {'nazwa': 'Palisada', 'opis': 'pale z zaostrzonymi końcami, drewniany pomost'},
-    2: {'nazwa': 'Wzmocniona palisada', 'opis': 'grubsze podwójne pale, okucia, kamienny fundament, pomost z barierką'},
-    3: {'nazwa': 'Mur kamienny', 'opis': 'mur z kamiennych bloków z blankami'},
-    4: {'nazwa': 'Warownia', 'opis': 'grubszy i wyższy mur, przypory, sztandary, runy, kosze z ogniem'},
+# --- ETAPY WYGLĄDU murów, bramy i wież (modele są robione dla etapów – patrz mapa/mury.py)
+ETAPY = {
+    1: {'nazwa': 'Palisada', 'opis': 'pale z zaostrzonymi końcami, bez pomostu – brak miejsc dla obrońców'},
+    2: {'nazwa': 'Mur drewniany', 'opis': 'grubsze podwójne pale, okucia, kamienny fundament, pomost – mało obrońców'},
+    3: {'nazwa': 'Słaby mur kamienny', 'opis': 'nieobrobione kamienie, drewniane blanki i pomost'},
+    4: {'nazwa': 'Lepszy mur kamienny', 'opis': 'mur z ciosanych bloków z kamiennymi blankami'},
+    5: {'nazwa': 'Warownia', 'opis': 'grubszy i wyższy mur, przypory, sztandary, runy, kosze z ogniem'},
 }
+
+# --- POZIOMY ULEPSZEŃ w grze (osobno dla każdego muru i dla bramy): poziom -> etap wyglądu.
+# Wygląd zmienia się co 3 poziomy. Zmiana liczby poziomów albo progów: tylko tutaj.
+LICZBA_POZIOMOW = 15
+POZIOMY = {p: (p + 2) // 3 for p in range(1, LICZBA_POZIOMOW + 1)}
 
 # --- elementy do ulepszania (każdy osobno)
 MURY = {
@@ -48,12 +54,14 @@ DZIALKI = [
     {'id': 'D9', 'srodek': (4.5, -8.5), 'rozmiar': (4.0, 3.5), 'budynek': None, 'uwagi': 'mała, przy bramie'},
 ]
 STAW = {'srodek': (-14.0, 11.2), 'promien': 1.8}
+# duży wodospad na górze (po prawej, za murem) i jezioro z rzeką
+JEZIORO = {'srodek': (41.0, 4.0), 'promien': 3.6}
 
 # --- strefy, z których atakujący wypuszcza wojska (prostokąty x0, x1, y0, y1)
 STREFY_ATAKU = {
     'przod': (-20.0, 20.0, -42.0, -24.0),
     'lewy': (-48.0, -28.0, -12.0, 8.0),
-    'prawy': (28.0, 48.0, -12.0, 8.0),
+    'prawy': (28.0, 48.0, -18.0, 0.0),  # z tyłu po prawej jest jezioro pod wodospadem
 }
 
 

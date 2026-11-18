@@ -40,8 +40,23 @@ def wys_gory(x, y):
     return H * prof + 1.6 * _szum(x * 0.6, y * 0.6) * prof
 
 
+# rzeka wypływająca z jeziora pod wodospadem (linia łamana x, y)
+RZEKA = [(43.5, 3.0), (52.0, 0.5), (60.0, -5.0), (68.0, -14.0), (76.0, -27.0), (84.0, -42.0), (92.0, -60.0), (98.0, -80.0)]
+
+
+def _odl_od_rzeki(x, y):
+    best = 1e9
+    for (ax, ay), (bx, by) in zip(RZEKA, RZEKA[1:]):
+        dx, dy = bx - ax, by - ay
+        t = max(0.0, min(1.0, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)))
+        best = min(best, math.hypot(x - ax - t * dx, y - ay - t * dy))
+    return best
+
+
 def wys_ziemi(x, y):
     """Wnętrze miasta i pas przy murach płaskie; dalej lekkie falowanie łąk."""
+    if _odl_od_rzeki(x, y) < 4.5 or math.hypot(x - U.JEZIORO['srodek'][0], y - U.JEZIORO['srodek'][1]) < U.JEZIORO['promien'] + 3:
+        return 0.0  # płasko przy rzece i jeziorze
     if abs(x) < 4.0 and y < U.PRZOD_Y:
         return 0.0  # pas drogi od bramy
     poza = max(0.0, abs(x) - U.SZER / 2 - 4) + max(0.0, U.PRZOD_Y - 4 - y)
@@ -90,10 +105,93 @@ def _zajete(x, y):
         return True
     if abs(x) < 4.5 and y < U.PRZOD_Y:
         return True
+    if _odl_od_rzeki(x, y) < 4.0 or math.hypot(x - U.JEZIORO['srodek'][0], y - U.JEZIORO['srodek'][1]) < U.JEZIORO['promien'] + 4:
+        return True
     for (a, b, c, d) in U.STREFY_ATAKU.values():
         if a - 3 < x < b + 3 and c - 3 < y < d + 3:
             return True
     return False
+
+
+def _na_gorze(x, y, odsun=0.0):
+    return V(x, y - odsun, wys_gory(x, y))
+
+
+def _szczegoly_gory(sl, rng):
+    """Duży wodospad z jeziorem i rzeką, półki skalne, duże głazy."""
+    # --- wodospad: wstęga wody spływająca po zboczu do jeziora
+    (jx, jy), jr = U.JEZIORO['srodek'], U.JEZIORO['promien']
+    y = podstawa_gory(jx)
+    while wys_gory(jx, y) < 17.0 and y < 60:
+        y += 0.25
+    y_gora, n = y, 14
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        yy = y_gora + (podstawa_gory(jx) - 0.3 - y_gora) * t
+        pts.append(V(jx, yy - 0.7, max(0.05, wys_gory(jx, yy) + 0.25)))
+    pts.append(V(jx, jy + jr * 0.6, 0.06))
+    for i, (a, b) in enumerate(zip(pts, pts[1:])):
+        w = 1.8 + 1.6 * (i / len(pts))
+        bm = bmesh.new()
+        q = [bm.verts.new(a + V(-w / 2, 0, 0)), bm.verts.new(a + V(w / 2, 0, 0)),
+             bm.verts.new(b + V(w / 2 + 0.15, 0, 0)), bm.verts.new(b + V(-w / 2 - 0.15, 0, 0))]
+        bm.faces.new(q)
+        bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.15)
+        sl.add(bm, 'fall', 'root')
+    # skała-próg, z którego spada woda, i piana
+    sl.add(rock(4.0, 2.4, 1.2, 811), 'mtn_dark', 'root', mtx(pts[0] + V(0, 0.4, -0.5)))
+    for i in range(14):
+        a = 2 * math.pi * i / 14
+        sl.add(sphere(0.6, 0.55, 0.35, 10, 6), 'foam', 'root', mtx((jx + math.cos(a) * 1.4, jy + jr * 0.55 + math.sin(a) * 0.9, 0.15)))
+    # jezioro i rzeka
+    sl.add(cyl(jr, jr, 0.06, 28), 'water', 'root', mtx((jx, jy, 0.05)))
+    for i in range(16):
+        a = 2 * math.pi * i / 16
+        sl.add(rock(1.0, 0.8, 0.6, 820 + i), rng.choice(('stone', 'stone_dark')), 'root',
+               mtx((jx + math.cos(a) * jr, jy + math.sin(a) * jr, 0.25), (0, 0, math.degrees(a))))
+    for (ax, ay), (bx, by) in zip(RZEKA, RZEKA[1:]):
+        a, b = V(ax, ay, 0.045), V(bx, by, 0.045)
+        d = b - a
+        sl.add(box(3.2, d.length + 1.5, 0.05, 0.0), 'water', 'root',
+               mtx(((a + b) / 2).to_tuple(), (0, 0, math.degrees(math.atan2(-d.x, d.y)))))
+        for k in range(3):  # kamienie na brzegach
+            t = (k + 0.5) / 3
+            p = a + d * t
+            nrm = V(-d.y, d.x, 0).normalized()
+            sg = 1 if k % 2 else -1
+            sl.add(rock(0.9, 0.7, 0.5, 900 + int(ax) + k), 'stone', 'root', mtx((p + nrm * sg * 2.0).to_tuple()))
+    # --- półki skalne (część z trawą i sosnami)
+    n_polek = 0
+    proby = 0
+    while n_polek < 34 and proby < 2000:
+        proby += 1
+        x, y = rng.uniform(-80, 80), rng.uniform(podstawa_gory(0) + 3, 45)
+        if abs(x - jx) < 6:
+            continue
+        z = wys_gory(x, y)
+        if not (5 < z < 22):
+            continue
+        w, g, h = rng.uniform(3.5, 7.0), rng.uniform(2.2, 3.6), rng.uniform(0.8, 1.4)
+        p = V(x, y - g * 0.35, z - h * 0.3)
+        sl.add(rock(w, g, h, 1000 + n_polek, rough=0.06), rng.choice(('mtn', 'mtn_dark')), 'root',
+               mtx(p.to_tuple(), (rng.uniform(-4, 4), rng.uniform(-6, 6), rng.uniform(-12, 12))))
+        if rng.random() < 0.7:
+            sl.add(jitter(box(w * 0.85, g * 0.8, 0.2, 0.06), 0.06, 1100 + n_polek), 'grass', 'root',
+                   mtx((p + V(0, 0, h * 0.5)).to_tuple()))
+            if rng.random() < 0.6:
+                sosna(sl, p + V(rng.uniform(-w / 4, w / 4), 0, h * 0.55), rng.uniform(0.9, 1.3), rng)
+        n_polek += 1
+    # --- duże głazy u podnóża i na zboczach
+    for i in range(46):
+        x = rng.uniform(-88, 88)
+        if abs(x) < U.SZER / 2 + 3 or abs(x - jx) < 6:
+            continue
+        y = podstawa_gory(x) + rng.uniform(-1.5, 10.0)
+        s = rng.uniform(1.6, 3.6)
+        p = V(x, y, max(0.0, wys_gory(x, y)) + s * 0.25)
+        sl.add(rock(s * 1.2, s, s * 0.85, 1200 + i, rough=0.14), rng.choice(('mtn', 'mtn_dark', 'stone_dark')), 'root',
+               mtx(p.to_tuple(), (rng.uniform(-10, 10), rng.uniform(-10, 10), rng.uniform(0, 90))))
 
 
 def teren(sl):
@@ -125,6 +223,7 @@ def teren(sl):
         dz = wys_gory(x, y + 0.8) - z
         if 2 < z < 21 and dz < 1.1:
             sosna(sl, V(x, y, z - 0.1), rng.uniform(1.0, 1.6), rng)
+    _szczegoly_gory(sl, rng)
     # --- lasy i kępy drzew wokół (z dala od miasta, drogi i stref ataku)
     for _ in range(420):
         x, y = rng.uniform(-92, 92), rng.uniform(-82, podstawa_gory(0))
