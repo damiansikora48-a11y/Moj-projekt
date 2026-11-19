@@ -9,6 +9,8 @@
 #   miejsca_obroncow("lewy")           # -> Array[Vector3] pozycji dla obrońców na murze
 #   ustaw_uszkodzenie("przod", 0.35)   # wytrzymałość 0–1 -> widoczne uszkodzenia (gruz, dziury, wyłom)
 #   wylom("przod")                     # -> Vector3 środka wyłomu albo null (gdy mur nie jest przebity)
+#   ustaw_poziom_budynku_dzialki("kuznia", 5)   # kuźnia / koszary / budynek_fuzji: poziom 1–20
+#   tablica_ogloszen()                 # -> Node3D tablicy przy studni (np. do kliknięcia i dymka „!”)
 #
 # USZKODZENIA: każdy .glb muru/bramy/wieży ma warstwy (węzły) *_znika_k, *_pojawia_k, *_pokaz_a_b,
 # które pokazujemy zależnie od stanu 0–3 (progi w uklad.json "uszkodzenia"). Dym w ruchu warto dodać
@@ -25,6 +27,7 @@ var poziom_murow := {"lewy": 1, "przod": 1, "prawy": 1}
 var poziom_bramy := 1
 var poziom_wiez := {}   # id wieży -> poziom (6 wież z uklad.json "wieze")
 var poziom_budynku := 1
+var poziom_budynkow := {}  # id budynku z działki (uklad.json "budynki") -> poziom 1–20
 var stan_uszkodzen := {}   # klucz elementu -> stan 0 cały, 1 lekko, 2 mocno uszkodzony, 3 wyłom
 var _wezly := {}   # klucz elementu -> instancja sceny
 
@@ -40,13 +43,20 @@ func _ready() -> void:
 	_postaw("brama", uklad["brama"], poziom_bramy)
 	_odswiez_narozniki()
 	ustaw_poziom_budynku(poziom_budynku)
+	for b in uklad["budynki"]:
+		ustaw_poziom_budynku_dzialki(b["id"], 1)
+	var t: Dictionary = uklad["tablica_ogloszen"]
+	_postaw("tablica_ogloszen", t, 1)
 
 
 func _postaw(klucz: String, opis: Dictionary, poziom: int) -> Node3D:
 	if _wezly.has(klucz):
 		_wezly[klucz].queue_free()
-	var etap: int = uklad["poziomy"][str(poziom)]["etap"]
-	var plik: String = opis["plik"].replace("{etap}", str(etap))
+	var plik: String = opis["plik"]
+	if plik.contains("{etap}"):
+		plik = plik.replace("{etap}", str(uklad["poziomy"][str(poziom)]["etap"]))
+	elif plik.contains("{poziom:02}"):
+		plik = plik.replace("{poziom:02}", "%02d" % poziom)
 	var n: Node3D = (load(mapa_dir + "/" + plik) as PackedScene).instantiate()
 	var p: Array = opis["pozycja"]
 	n.position = Vector3(p[0], p[1], p[2])
@@ -92,6 +102,22 @@ func ustaw_poziom_budynku(poziom: int) -> void:
 	n.position = Vector3(p[0], p[1], p[2])
 	add_child(n)
 	_wezly["budynek_glowny"] = n
+
+
+## Budynek na działce ("kuznia", "koszary", "budynek_fuzji"): poziom 1–20, każdy poziom coś zmienia
+## (opis zmian: uklad.json "budynki"[...]["zmiany"]). Budynek stoi przodem do placu.
+func ustaw_poziom_budynku_dzialki(id: String, poziom: int) -> void:
+	for b in uklad["budynki"]:
+		if b["id"] == id:
+			poziom_budynkow[id] = poziom
+			_postaw(id, b, poziom)
+			return
+	push_warning("Nie ma budynku: " + id)
+
+
+## Tablica ogłoszeń przy studni – węzeł "tablica_info" w środku tablicy (np. na dymek przy aktualizacji).
+func tablica_ogloszen() -> Node3D:
+	return _wezly.get("tablica_ogloszen")
 
 
 func _klucz(element: String) -> String:

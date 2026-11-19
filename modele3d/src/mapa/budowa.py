@@ -9,6 +9,8 @@ Pliki:
 Poziomy ulepszeń (1–15) wskazują etap wyglądu – mapowanie w uklad.json ('poziomy').
   uklad.json                         – gdzie co postawić w Godot + działki + strefy ataku
   budynek_glowny_poz<01-20>.glb     – budynek główny (stawiany na skalnej półce działki D1)
+  kuznia_poz<01-20>.glb, koszary_poz<01-20>.glb, budynek_fuzji_poz<01-20>.glb – budynki na działkach
+  tablica_ogloszen.glb               – tablica ogłoszeń przy studni (pusty węzeł 'tablica_info')
 Każdy element muru/bramy/wieży ma puste węzły 'obronca_01'… = miejsca dla obrońców.
 """
 import json
@@ -23,6 +25,7 @@ from mapa import mury as M
 from mapa import teren as T
 from mapa import budynek_glowny as BG
 from mapa import uszkodzenia as USZ
+from mapa import budynki as BUD
 
 EXPORT = None  # ustawiane w zbuduj()
 
@@ -133,6 +136,16 @@ def uklad_json(liczba_miejsc):
         out['dzialki'].append({'id': d['id'], 'pozycja': U.do_godota(*d['srodek']), 'rozmiar_m': list(d['rozmiar']),
                                'budynek': d['budynek'], 'uwagi': d['uwagi']})
     out['plac'] = {'pozycja': U.do_godota(*U.PLAC['srodek']), 'promien_m': U.PLAC['promien']}
+    out['tablica_ogloszen'] = {'plik': 'tablica_ogloszen.glb', 'pozycja': U.do_godota(*U.TABLICA['srodek']),
+                               'obrot_y_stopnie': U.TABLICA['obrot']}
+    out['budynki'] = []
+    for d in U.DZIALKI:
+        if d['budynek'] in BUD.BUDYNKI:
+            b = BUD.BUDYNKI[d['budynek']]
+            out['budynki'].append({'id': d['budynek'], 'nazwa': b['nazwa'], 'dzialka': d['id'],
+                                   'plik': d['budynek'] + '_poz{poziom:02}.glb', 'poziomy': U.POZIOMY_BUDYNKOW,
+                                   'pozycja': U.do_godota(*d['srodek']), 'obrot_y_stopnie': d.get('obrot', 0),
+                                   'zmiany': {str(k): v for k, v in b['zmiany'].items()}})
     d1 = next(d for d in U.DZIALKI if d['id'] == U.BUDYNEK_GLOWNY['dzialka'])
     out['budynek_glowny'] = {'plik': 'budynek_glowny_poz{poziom:02}.glb', 'poziomy': U.BUDYNEK_GLOWNY['poziomy'],
                              'pozycja': U.do_godota(*d1['srodek'], d1['podwyzszenie']), 'obrot_y_stopnie': 0,
@@ -159,6 +172,16 @@ def zbuduj(export_dir, podglad_dir, podglad=False):
         ob, _ = _obiekt(f'budynek_glowny_poz{p:02}', lambda sl, p=p: BG.budynek(sl, p), BG.PALETA)
         _eksport(ob, os.path.join(katalog, f'budynek_glowny_poz{p:02}.glb'))
     print('EXPORT mapa budynek_glowny 1-20')
+    for bid, b in BUD.BUDYNKI.items():
+        for p in range(1, U.POZIOMY_BUDYNKOW + 1):
+            reset_scene()
+            ob, _ = _obiekt(f'{bid}_poz{p:02}', lambda sl, p=p, b=b: b['fn'](sl, p), BUD.PALETA)
+            _eksport(ob, os.path.join(katalog, f'{bid}_poz{p:02}.glb'))
+        print('EXPORT mapa', bid, '1-20')
+    reset_scene()
+    ob, _ = _obiekt('tablica_ogloszen', BUD.tablica_ogloszen, BUD.PALETA)
+    _eksport(ob, os.path.join(katalog, 'tablica_ogloszen.glb'))
+    print('EXPORT mapa tablica_ogloszen')
     reset_scene()
     ob, _ = _obiekt('teren', T.teren, T.PALETA, normalne=False)
     _eksport(ob, os.path.join(katalog, 'teren.glb'))
@@ -169,11 +192,12 @@ def zbuduj(export_dir, podglad_dir, podglad=False):
         podglad_budynku(podglad_dir)
         podglady(podglad_dir)
         podglad_uszkodzen(podglad_dir)
+        podglad_budynkow(podglad_dir)
 
 
 # ------------------------------------------------------------------ podglądy
 
-def _scena(poziomy, brama_poz, jednostki=None, budynek=None, uszkodzenia=None):
+def _scena(poziomy, brama_poz, jednostki=None, budynek=None, uszkodzenia=None, budynki=None):
     """Składa całe miasto: poziomy = {'lewy': p, 'przod': p, 'prawy': p}."""
     reset_scene()
     ob, _ = _obiekt('teren', T.teren, T.PALETA, normalne=False)
@@ -200,6 +224,13 @@ def _scena(poziomy, brama_poz, jednostki=None, budynek=None, uszkodzenia=None):
         o, _ = _obiekt(nz['id'], ELEMENTY['wieza'](poz), M.PALETA)
         ustaw_stan(o, (uszkodzenia or {}).get(nz['id'], 0))
         _postaw(o, nz['srodek'], 0)
+    o, _ = _obiekt('tablica', BUD.tablica_ogloszen, BUD.PALETA)
+    _postaw(o, U.TABLICA['srodek'], U.TABLICA['obrot'])
+    for d in U.DZIALKI:
+        poz = (budynki or {}).get(d['budynek'])
+        if poz:
+            o, _ = _obiekt(d['budynek'], lambda sl, p=poz, f=BUD.BUDYNKI[d['budynek']]['fn']: f(sl, p), BUD.PALETA)
+            _postaw(o, d['srodek'], d.get('obrot', 0))
     if budynek:
         d1 = next(d for d in U.DZIALKI if d['id'] == U.BUDYNEK_GLOWNY['dzialka'])
         o, _ = _obiekt('budynek', lambda sl: BG.budynek(sl, budynek), BG.PALETA)
@@ -221,7 +252,7 @@ def podglady(katalog):
     rej = Rejestr()
     jd = {k: rej.do_budowy(rej.wszystkie[k]) for k in ('zolnierz', 'lesny_lucznik', 'mag_ognia', 'golem', 'kamienny_rycerz')}
     # 1) miasto na starcie (wszystko poziom 1)
-    _scena({'lewy': 1, 'przod': 1, 'prawy': 1}, 1, budynek=1)
+    _scena({'lewy': 1, 'przod': 1, 'prawy': 1}, 1, budynek=1, budynki={'kuznia': 1, 'koszary': 1, 'budynek_fuzji': 1})
     _studio(1600, 1000, 48)
     render_view(os.path.join(katalog, 'mapa_start_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     render_view(os.path.join(katalog, 'mapa_okolica.png'), (0, -30, 8), 150, 30, 0, lens=35)
@@ -230,7 +261,8 @@ def podglady(katalog):
             'lewy': [jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik']],
             'prawy': [jd['mag_ognia'], jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik'], jd['mag_ognia'], jd['lesny_lucznik']],
             'brama': [jd['zolnierz'], jd['lesny_lucznik'], jd['zolnierz']]}
-    _scena({'lewy': 3, 'przod': 4, 'prawy': 5, **{w['id']: 5 for w in U.WIEZE}}, 5, jedn, budynek=20)
+    _scena({'lewy': 3, 'przod': 4, 'prawy': 5, **{w['id']: 5 for w in U.WIEZE}}, 5, jedn, budynek=20,
+           budynki={'kuznia': 20, 'koszary': 20, 'budynek_fuzji': 20})
     b = build_unit(jd['kamienny_rycerz'])
     b['arm'].location = (-2.5, U.PRZOD_Y - 4.5, 0)
     b = build_unit(jd['golem'])
@@ -241,7 +273,8 @@ def podglady(katalog):
     render_view(os.path.join(katalog, 'mapa_budynek_glowny.png'), (0, U.GLEB / 2 - 5.5, 4), 30, 35, 15, lens=35)
     # 2b) miasto po ataku: różne stany uszkodzeń
     _scena({'lewy': 3, 'przod': 4, 'prawy': 5, **{w['id']: 4 for w in U.WIEZE}}, 4, budynek=12,
-           uszkodzenia={'lewy': 1, 'przod': 3, 'prawy': 2, 'brama': 2, 'wieza_przod_lewa': 3, 'wieza_brama_prawa': 1})
+           uszkodzenia={'lewy': 1, 'przod': 3, 'prawy': 2, 'brama': 2, 'wieza_przod_lewa': 3, 'wieza_brama_prawa': 1},
+           budynki={'kuznia': 12, 'koszary': 9, 'budynek_fuzji': 14})
     _studio(1600, 1000, 48)
     render_view(os.path.join(katalog, 'mapa_po_ataku_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     # 3) wszystkie poziomy murów obok siebie (fragment muru z bramą i wieżą)
@@ -258,6 +291,36 @@ def podglady(katalog):
     o, _ = _obiekt('trawa', lambda sl: sl.add(__import__('kit').box(160, 40, 0.02), 'grass', 'root', mtx((0, 4, -0.01))), T.PALETA)
     _studio(1800, 700, 48)
     render_view(os.path.join(katalog, 'mapa_poziomy_murow.png'), (-1, 0, 3), 122, 22, 0, lens=35)
+
+
+def podglad_budynkow(katalog, samples=20):
+    """20 poziomów każdego budynku z działek (kuźnia, koszary, budynek fuzji) – obrazki <id>_poziomy.png."""
+    from PIL import Image, ImageDraw, ImageFont
+    from kit import box as _box
+    W, H = 440, 380
+    try:
+        f = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 18)
+        fs = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 13)
+    except OSError:
+        f = fs = ImageFont.load_default()
+    for bid, b in BUD.BUDYNKI.items():
+        img = Image.new('RGB', (W * 5, (H + 50) * 4), (238, 240, 236))
+        d = ImageDraw.Draw(img)
+        for p in range(1, U.POZIOMY_BUDYNKOW + 1):
+            reset_scene()
+            _obiekt('b', lambda sl, p=p: b['fn'](sl, p), BUD.PALETA)
+            _obiekt('dzialka', lambda sl: (sl.add(_box(7.0, 7.0, 0.12, 0.03), 'plot', 'root', mtx((0, 0, 0.0))),
+                                           sl.add(_box(40, 40, 0.02), 'grass', 'root', mtx((0, 0, -0.02))))[0], T.PALETA)
+            _studio(W, H, samples)
+            sc = os.path.join(katalog, '_bud.png')
+            render_view(sc, (0, 0, 2.2 if p < 16 else 3.0), 17 if p < 11 else 20, 40, 25, lens=35)
+            x, y = ((p - 1) % 5) * W, ((p - 1) // 5) * (H + 50)
+            img.paste(Image.open(sc).convert('RGB'), (x, y))
+            os.remove(sc)
+            d.text((x + 8, y + H + 3), f'Poziom {p}', fill=(35, 39, 31), font=f)
+            d.text((x + 8, y + H + 26), b['zmiany'][p][:58], fill=(90, 95, 85), font=fs)
+        img.save(os.path.join(katalog, f'{bid}_poziomy.png'))
+        print('PODGLAD', bid)
 
 
 def podglad_budynku(katalog, samples=24):

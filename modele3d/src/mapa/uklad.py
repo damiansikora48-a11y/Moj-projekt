@@ -51,19 +51,24 @@ DZIALKI = [
     {'id': 'D1', 'srodek': (0.0, GLEB / 2 - 1.0 - 4.25), 'rozmiar': (14.0, 8.5), 'budynek': 'budynek_glowny',
      'uwagi': 'skalna półka (podwyższenie) przy ścianie góry ze schodami – budynek główny z wolnym miejscem wokół',
      'podwyzszenie': 1.6},
-    {'id': 'D2', 'srodek': (-15.0, -10.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D3', 'srodek': (-15.0, 0.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D2', 'srodek': (-15.0, -10.0), 'rozmiar': (7.0, 7.0), 'budynek': 'kuznia', 'uwagi': 'Kuźnia', 'obrot': 90},
+    {'id': 'D3', 'srodek': (-15.0, 0.0), 'rozmiar': (7.0, 7.0), 'budynek': 'budynek_fuzji', 'uwagi': 'Budynek fuzji', 'obrot': 90},
     {'id': 'D4', 'srodek': (-15.0, 9.5), 'rozmiar': (6.5, 6.0), 'budynek': None, 'uwagi': ''},
     {'id': 'D5', 'srodek': (15.0, -10.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D6', 'srodek': (15.0, 0.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D6', 'srodek': (15.0, 0.0), 'rozmiar': (7.0, 7.0), 'budynek': 'koszary', 'uwagi': 'Koszary', 'obrot': -90},
     {'id': 'D7', 'srodek': (15.0, 9.5), 'rozmiar': (6.5, 6.0), 'budynek': None, 'uwagi': ''},
     {'id': 'D8', 'srodek': (-6.5, -13.5), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'mała, przy bramie'},
     {'id': 'D9', 'srodek': (6.5, -13.5), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'mała, przy bramie'},
     {'id': 'D10', 'srodek': (-12.0, 16.0), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'obok półki budynku głównego'},
     {'id': 'D11', 'srodek': (12.0, 16.0), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'obok półki budynku głównego'},
 ]
+# 'obrot' działki: obrót budynku (stopnie wokół osi pionowej) – przodem do placu
 # budynek główny: 20 poziomów, każdy coś zmienia (mapa/budynek_glowny.py)
 BUDYNEK_GLOWNY = {'dzialka': 'D1', 'poziomy': 20}
+# budynki na działkach (mapa/budynki.py): każdy 20 poziomów; działka -> budynek w DZIALKI ('budynek')
+POZIOMY_BUDYNKOW = 20
+# tablica ogłoszeń na placu przy studni (aktualizacje, wydarzenia) – od strony bramy, obok drogi
+TABLICA = {'srodek': (2.7, -0.9), 'obrot': -15}
 STAW = {'srodek': (-20.5, 16.5), 'promien': 1.9}
 # duży wodospad na górze (po prawej, za murem) i jezioro z rzeką
 JEZIORO = {'srodek': (41.0, 4.0), 'promien': 3.6}

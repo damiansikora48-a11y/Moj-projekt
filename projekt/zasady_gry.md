@@ -114,6 +114,12 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 - **Atakujący wybiera stronę ataku** (lewa, przód, prawa). Przed każdym murem jest wolna łąka na rozstawienie wojsk.
 - Wnętrze miasta: 52 × 40 m.
 - **Budynki w środku stoją na stałych działkach** (D1–D11). **Budynek główny** stoi na skalnej półce (podwyższeniu) D1 przy ścianie góry, ze schodami na plac i wolnym miejscem wokół. Ma **20 poziomów** i każdy poziom coś widocznie zmienia: od małej drewnianej chaty po okazałą kamienną rezydencję ze zdobieniami. Na środku miasta jest plac ze studnią. Co stoi na pozostałych działkach, ustalamy razem; część zostaje wolna na przyszłe budynki.
+- **Budynki na działkach** (każdy ma **20 poziomów**, każdy poziom coś widocznie zmienia; wygląd: drewno → mur pruski → kamień → okazała budowla):
+  - **Budynek fuzji** (D3): łączenie jednostek, księga przepisów, szansa na Przebudzenie; od kręgu kamieni z ołtarzem po świątynię z unoszącym się kryształem,
+  - **Koszary** (D6): szkolenie jednostek i zdobywanie doświadczenia; od namiotu z ogniskiem po okazałe koszary z wieżą,
+  - **Kuźnia** (D2): ulepszanie broni i pancerzy; od szopy z kowadłem po kamienną kuźnię z piecem hutniczym.
+  Wolne działki: D4, D5, D7–D11 (na przyszłe budynki).
+- **Tablica ogłoszeń** przy studni na placu: aktualizacje, wydarzenia i wiadomości dla graczy (np. dymek „!” przy nowej aktualizacji).
 - Klimat: dużo zieleni (łąki, lasy, staw z wodospadem), a góra ma trawiaste zbocza, półki skalne z sosnami, głazy, śnieżny szczyt i duży wodospad po prawej z jeziorem i rzeką.
 
 ## 5. Ekonomia
@@ -155,4 +161,5 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 - [ ] Czy rubiny mogą kupić złoto (i z jakim limitem)?
 - [ ] Rodzaje wrogów i ich słabości na żywioły.
 - [ ] Koszty ulepszeń murów i bramy na każdym z 15 poziomów (oraz co poza wyglądem daje każdy poziom, np. wytrzymałość).
-- [ ] Co stoi na działkach D2–D11.
+- [ ] Co dają kolejne poziomy budynku fuzji, koszar i kuźni (koszty, czasy, bonusy).
+- [ ] Co stanie na wolnych działkach D4, D5, D7–D11.
