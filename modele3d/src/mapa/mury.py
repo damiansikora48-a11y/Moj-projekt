@@ -18,6 +18,7 @@ import math
 import random
 
 from kit import V, box, cyl, sphere, ico, rock, taper, jitter, mtx, frame, seg
+from mapa import uszkodzenia as USZ
 
 PALETA = {
     'wood': ('#8a5a2b', 0.85), 'wood_dark': ('#5e3b1c', 0.9), 'wood_light': ('#b07a42', 0.85),
@@ -27,6 +28,7 @@ PALETA = {
     'shingle': ('#7a4e2a', 0.9), 'shingle_dark': ('#5a3820', 0.9),
     'rune': ('#2fd0ff', 0.4, 0.0, 4.0),
     'fire': ('#ff5200', 0.4, 0.0, 2.2), 'fire_core': ('#ffae00', 0.3, 0.0, 3.0),
+    **USZ.PALETA,
 }
 
 # wysokość pomostu (gdzie stoją obrońcy) i liczba miejsc na 28 m muru – dla każdego ETAPU
@@ -107,6 +109,26 @@ def _dach(sl, cx, cy, z0, r, h, mat=DACHOWKI, boki=16, rzedy=6, obrot=0.0, iglic
         sl.add(cyl(0.06, 0.0, 0.45, 8), 'gold', 'root', mtx((cx, cy, z0 + h + 0.35)))
 
 
+def _pas(sl, a, b, gl, h, bevel, mat, y, z, kawalek=1.6, ksztalt=None):
+    """Długa listwa/belka wzdłuż X złożona z kawałków (≤ kawalek m), żeby przy uszkodzeniu
+    mogła odpaść tylko jej część (np. zawalony fragment pomostu nad dziurą)."""
+    n = max(1, math.ceil((b - a) / kawalek))
+    dl = (b - a) / n
+    for i in range(n):
+        bm = box(dl - 0.01, gl, h, bevel)
+        if ksztalt:
+            bm = ksztalt(bm)
+        sl.add(bm, mat, 'root', mtx((a + (i + 0.5) * dl, y, z)))
+
+
+# wymiary muru kamiennego dla planu uszkodzeń: szczyt blanków, lico zewnętrzne i wewnętrzne, podstawa (gruz)
+KAMIEN = {
+    3: {'gora': POMOST[3] + 0.95, 'lico': -0.45, 'lico_tyl': 1.45, 'stopa': (-0.45, 1.45)},
+    4: {'gora': POMOST[4] + 0.9, 'lico': -0.5, 'lico_tyl': 1.7, 'stopa': (-0.5, 1.75)},
+    5: {'gora': POMOST[5] + 1.07, 'lico': -0.8, 'lico_tyl': 2.0, 'stopa': (-1.25, 2.4)},
+}
+
+
 # ------------------------------------------------------------------ odcinek muru
 
 def _odcinek(sl, poz, a, b, rng):
@@ -158,8 +180,8 @@ def _odcinek(sl, poz, a, b, rng):
     elif poz == 3:  # słaby mur kamienny: nieobrobione kamienie, drewniane blanki
         H = POMOST[3]
         _bloki(sl, rng, a, b, 0.5, 1.9, 0.0, H, wys_rzedu=0.9, mat=('stone_dark', 'stone', 'stone_dark'))
-        sl.add(box(L, 1.7, 0.1, 0.02), 'wood_light', 'root', mtx((m, 0.55, H + 0.05)))
-        sl.add(box(L, 0.14, 0.9, 0.02), 'wood', 'root', mtx((m, -0.35, H + 0.45)))
+        _pas(sl, a, b, 1.7, 0.1, 0.02, 'wood_light', 0.55, H + 0.05)
+        _pas(sl, a, b, 0.14, 0.9, 0.02, 'wood', -0.35, H + 0.45, kawalek=1.0)
         x = a + 0.5
         while x < b:
             sl.add(cyl(0.08, 0.08, 1.2, 6), 'wood_dark', 'root', mtx((x, -0.35, H + 0.5)))
@@ -167,22 +189,23 @@ def _odcinek(sl, poz, a, b, rng):
     elif poz == 4:  # lepszy mur kamienny
         H = POMOST[4]
         _bloki(sl, rng, a, b, 0.6, 2.2, 0.0, H)
-        sl.add(box(L, 2.0, 0.12, 0.02), 'stone_light', 'root', mtx((m, 0.6, H + 0.06)))
+        _pas(sl, a, b, 2.0, 0.12, 0.02, 'stone_light', 0.6, H + 0.06)
         x = a + 0.4
         while x < b - 0.3:
             sl.add(box(0.75, 0.5, 0.85, 0.06), 'stone', 'root', mtx((x + 0.37, -0.3, H + 0.48)))
             x += 1.3
-        sl.add(box(L, 0.25, 0.4, 0.03), 'stone_dark', 'root', mtx((m, 1.6, H + 0.2)))
+        _pas(sl, a, b, 0.25, 0.4, 0.03, 'stone_dark', 1.6, H + 0.2)
     elif poz == 5:  # warownia
         H = POMOST[5]
-        sl.add(taper(box(L, 3.6, 1.2, 0.1), bottom=1.0, top=0.85, axis='y'), 'stone_dark', 'root', mtx((m, 0.6, 0.6)))
+        _pas(sl, a, b, 3.6, 1.2, 0.1, 'stone_dark', 0.6, 0.6, kawalek=1.4,
+             ksztalt=lambda bm: taper(bm, bottom=1.0, top=0.85, axis='y'))
         _bloki(sl, rng, a, b, 0.6, 2.8, 1.2, H, wys_rzedu=0.75)
-        sl.add(box(L, 2.6, 0.14, 0.02), 'stone_light', 'root', mtx((m, 0.6, H + 0.07)))
+        _pas(sl, a, b, 2.6, 0.14, 0.02, 'stone_light', 0.6, H + 0.07)
         x = a + 0.4
         while x < b - 0.4:
             sl.add(box(0.9, 0.6, 1.0, 0.07), 'stone', 'root', mtx((x + 0.45, -0.5, H + 0.57)))
             x += 1.5
-        sl.add(box(L, 0.3, 0.55, 0.03), 'stone_dark', 'root', mtx((m, 1.75, H + 0.27)))
+        _pas(sl, a, b, 0.3, 0.55, 0.03, 'stone_dark', 1.75, H + 0.27)
         x = a + 3.2
         k = 0
         while x < b - 1.0:
@@ -202,15 +225,30 @@ def _odcinek(sl, poz, a, b, rng):
             k += 1
 
 
-def mur(sl, poz, L, brama_szer=0.0, seed=1, margines=3.6, strefa_bramy=9.6):
+def mur(sl, poz, L, brama_szer=0.0, seed=1, margines=3.6, strefa_bramy=9.6, uszkodzenia=False):
+    """uszkodzenia=True: dodaje warstwy uszkodzeń (sl musi być uszkodzenia.Warstwy), patrz uszkodzenia.py."""
     rng = random.Random(seed * 100 + poz)
+    plan = None
+    if uszkodzenia and poz in KAMIEN:
+        k = KAMIEN[poz]
+        a0, b0 = -L / 2 + margines, L / 2 - margines
+        wolne = [(a0, -strefa_bramy), (strefa_bramy, b0)] if brama_szer else [(a0, b0)]
+        plan = USZ.Plan(k['gora'], POMOST[poz], wolne, k['lico'], k['stopa'], seed=seed * 10 + poz, lico_tyl=k['lico_tyl'])
+        sl.klasyfikator = plan.klasyfikator
     if brama_szer:
         _odcinek(sl, poz, -L / 2, -brama_szer / 2, rng)
         _odcinek(sl, poz, brama_szer / 2, L / 2, rng)
     else:
         _odcinek(sl, poz, -L / 2, L / 2, rng)
     y = {1: 0.0, 2: 1.25, 3: 0.55, 4: 0.6, 5: 0.6}[poz]
-    return _miejsca(poz, L, brama_szer, y, margines, strefa_bramy if brama_szer else 0.0)
+    miejsca = _miejsca(poz, L, brama_szer, y, margines, strefa_bramy if brama_szer else 0.0)
+    if plan:
+        sl.klasyfikator = None
+        plan.dodaj_skutki(sl)
+        plan.dodaj_wylom(sl)
+        for n, p in miejsca:
+            plan.miejsce_obroncy(n, p, sl)
+    return miejsca
 
 
 # ------------------------------------------------------------------ brama (środek prześwitu w 0,0)

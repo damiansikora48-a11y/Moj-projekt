@@ -22,15 +22,12 @@ from mapa import uklad as U
 from mapa import mury as M
 from mapa import teren as T
 from mapa import budynek_glowny as BG
+from mapa import uszkodzenia as USZ
 
 EXPORT = None  # ustawiane w zbuduj()
 
 
-def _obiekt(nazwa, fn, paleta, normalne=True):
-    """Mesh z funkcji fn(sl) + puste węzły z miejscami obrońców (zwraca obiekt, lista miejsc)."""
-    mats = {k: make_material(f'mapa_{k}', *v) for k, v in paleta.items()}
-    sl = Slot(nazwa)
-    miejsca = fn(sl) or []
+def _siatka(nazwa, sl, mats, normalne=True):
     import bmesh
     me = bpy.data.meshes.new(nazwa)
     if normalne:  # teren ma płaskie, rozłączne trójkąty skierowane w górę – nie przeliczamy
@@ -43,20 +40,42 @@ def _obiekt(nazwa, fn, paleta, normalne=True):
     me.set_sharp_from_angle(angle=math.radians(38))
     ob = bpy.data.objects.new(nazwa, me)
     bpy.context.scene.collection.objects.link(ob)
-    for n, p in miejsca:
+    return ob
+
+
+def _obiekt(nazwa, fn, paleta, normalne=True):
+    """Mesh z funkcji fn(sl) + puste węzły z miejscami obrońców (zwraca obiekt, lista miejsc).
+    Warstwy uszkodzeń (znika_k / pojawia_k / pokaz_a_b, patrz uszkodzenia.py) są dziećmi obiektu."""
+    mats = {k: make_material(f'mapa_{k}', *v) for k, v in paleta.items()}
+    sl = USZ.Warstwy(nazwa)
+    miejsca = fn(sl) or []
+    ob = _siatka(nazwa, sl.sloty.pop(''), mats, normalne)
+    warstwy = {}
+    for w in sorted(sl.sloty):
+        o = _siatka(f'{nazwa}_{w}', sl.sloty[w], mats, normalne)
+        o.parent = ob
+        warstwy[w] = o
+    for n, p in list(miejsca) + sl.puste:
         e = bpy.data.objects.new(n, None)
         e.empty_display_type = 'PLAIN_AXES'
         e.location = p
-        e.parent = ob
+        e.parent = warstwy.get(sl.warstwa_pustego.get(n), ob)
         bpy.context.scene.collection.objects.link(e)
     return ob, miejsca
+
+
+def ustaw_stan(ob, stan):
+    """Podgląd: pokazuje/ukrywa warstwy uszkodzeń obiektu (stan 0–3)."""
+    for c in ob.children:
+        if c.type == 'MESH' and c.name[-1].isdigit():
+            c.hide_render = c.hide_viewport = not USZ.widoczna(c.name, stan)
 
 
 def _eksport(ob, path):
     for o in bpy.context.scene.objects:
         o.select_set(False)
     ob.select_set(True)
-    for c in ob.children:
+    for c in ob.children_recursive:
         c.select_set(True)
     bpy.context.view_layer.objects.active = ob
     bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', use_selection=True, export_apply=True,
@@ -258,3 +277,39 @@ def podglad_budynku(katalog, samples=24):
         d.text((x + 10, y + H + 30), BG.ZMIANY[i + 1][:62], fill=(90, 95, 85), font=fs)
         os.remove(k)
     img.save(os.path.join(katalog, 'budynek_glowny_poziomy.png'))
+
+
+def podglad_uszkodzen(katalog, samples=40):
+    """Kamienne mury (etapy 3–5) w 4 stanach uszkodzeń, obok siebie, z podpisami."""
+    from PIL import Image, ImageDraw, ImageFont
+    from kit import box as _box
+    kafle = []
+    for poz in (3, 4, 5):
+        rzad = []
+        for stan in range(4):
+            reset_scene()
+            o, _ = _obiekt('mur', lambda sl: M.mur(sl, poz, 22.0, 0.0, seed=3, margines=1.0, uszkodzenia=True), M.PALETA)
+            ustaw_stan(o, stan)
+            _obiekt('trawa', lambda sl: sl.add(_box(80, 60, 0.02), 'grass', 'root', mtx((0, 4, -0.01))), T.PALETA)
+            _studio(800, 470, samples)
+            sc = os.path.join(katalog, f'_usz_{poz}_{stan}.png')
+            render_view(sc, (0, 0.4, 2.2), 21, 38, 14, lens=35)
+            rzad.append(sc)
+        kafle.append(rzad)
+    W, H, P = 800, 470, 40
+    img = Image.new('RGB', (W * 4, P + (H + P) * 3), (238, 240, 236))
+    d = ImageDraw.Draw(img)
+    try:
+        f = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 24)
+    except OSError:
+        f = ImageFont.load_default()
+    for stan in range(4):
+        prog = {0: '100–70%', 1: '70–40%', 2: '40–1%', 3: '0%'}[stan]
+        d.text((stan * W + 14, 8), f'{USZ.STANY[stan].capitalize()} ({prog})', fill=(35, 39, 31), font=f)
+    for r, (poz, rzad) in enumerate(zip((3, 4, 5), kafle)):
+        y = P + r * (H + P)
+        d.text((14, y + H + 6), f"Etap {poz}: {U.ETAPY[poz]['nazwa']}", fill=(90, 95, 85), font=f)
+        for stan, k in enumerate(rzad):
+            img.paste(Image.open(k).convert('RGB'), (stan * W, y))
+            os.remove(k)
+    img.save(os.path.join(katalog, 'mury_uszkodzenia.png'))
