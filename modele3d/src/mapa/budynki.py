@@ -4,6 +4,8 @@ oraz TABLICA OGŁOSZEŃ przy studni.
   kuznia         – Kuźnia (działka D2): ulepszanie broni i pancerzy jednostek
   koszary        – Koszary (działka D6): szkolenie jednostek, zdobywanie doświadczenia
   budynek_fuzji  – Budynek fuzji (działka D3): łączenie jednostek, księga przepisów, Przebudzenie
+  magazyn        – Magazyn (działka D5): przechowuje złoto i zapasy
+  akademia       – Akademia (działka D4): badania i odkrycia (ulepszenia na całe miasto)
 
 Każdy budynek ma 4 etapy po 5 poziomów:
    1–5  drewniany / prowizoryczny      11–15  kamienny
@@ -34,6 +36,7 @@ PALETA = {
     'molten': ('#ff7a1a', 0.4, 0.0, 3.5), 'forge_glow': ('#ff9a3c', 0.5, 0.0, 1.8),
     'magic': ('#b46cff', 0.2, 0.0, 2.6), 'magic_soft': ('#c9a0ff', 0.3, 0.0, 1.2), 'magic_dark': ('#4b2a78', 0.6),
     'rune': ('#2fd0ff', 0.4, 0.0, 4.0), 'paper': ('#f3ead2', 0.95), 'paper_y': ('#f0d98a', 0.95),
+    'dirt': ('#9a7a52', 0.95), 'gravel': ('#b3a68c', 0.95),
 }
 
 
@@ -747,8 +750,433 @@ def tablica_ogloszen(sl):
     return [('tablica_info', (0.0, -0.3, 1.45))]
 
 
+# ================================================================== MAGAZYN
+
+ZMIANY_MAGAZYN = {
+    1: 'wiata ze skrzyniami i workami', 2: 'mała szopa z bali', 3: 'stos beczek', 4: 'wózek z towarem',
+    5: 'ogrodzony plac składowy z kolejnymi skrzyniami',
+    6: 'duża drewniana stodoła z podwójnymi wrotami', 7: 'belka z bloczkiem i workiem na strych',
+    8: 'przybudówka ze stosami drewna', 9: 'skrzynia ze złotem przy wrotach i latarnia', 10: 'drzwi strychu i wiatrowskaz',
+    11: 'kamienny magazyn z łukowymi wrotami', 12: 'rampa załadunkowa ze skrzyniami', 13: 'dźwig z ładunkiem',
+    14: 'okuty skarbczyk i budka strażnika', 15: 'dach z niebieskiej dachówki i sztandary',
+    16: 'okazały magazyn z dwiema wieżyczkami', 17: 'stosy złotych monet i skrzynie na placu', 18: 'złote zdobienia i herb z monetą',
+    19: 'kryty wóz kupiecki z towarem', 20: 'złota kopuła skarbca ze świecącą monetą',
+}
+
+
+def _skrzynia(sl, s=1.0, zloto=False):
+    sl.add(box(0.7 * s, 0.6 * s, 0.55 * s, 0.03), 'wood', 'root', mtx((0, 0, 0.275 * s)))
+    for x in (-0.33 * s, 0.33 * s):
+        sl.add(box(0.06, 0.62 * s, 0.57 * s, 0.0), 'wood_dark' if not zloto else 'iron', 'root', mtx((x, 0, 0.275 * s)))
+    if zloto:
+        sl.add(box(0.6 * s, 0.5 * s, 0.08, 0.0), 'gold', 'root', mtx((0, 0, 0.58 * s)))
+        for i in range(5):
+            sl.add(cyl(0.07, 0.07, 0.03, 8), 'gold', 'root', mtx((-0.2 + i * 0.1, -0.1 + (i % 2) * 0.15, 0.64 * s), (20 * i, 0, 0)))
+
+
+def _worek(sl):
+    sl.add(sphere(0.28, 0.24, 0.3, u=10, v=8), 'canvas', 'root', mtx((0, 0, 0.28)))
+    sl.add(cyl(0.08, 0.05, 0.14, 6), 'rope', 'root', mtx((0, 0, 0.6)))
+
+
+def _stos_drewna(sl, dl=1.6):
+    for k in range(3):
+        for i in range(4 - k):
+            sl.add(cyl(0.13, 0.13, dl, 8), 'log' if (i + k) % 2 else 'log_dark', 'root', mtx((0, -0.38 + i * 0.26 + k * 0.13, 0.13 + k * 0.23), (0, 90, 0)))
+
+
+def _monety(sl, n=7, rng=None):
+    rng = rng or random.Random(7)
+    sl.add(cyl(0.45, 0.1, 0.4, 12), 'gold', 'root', mtx((0, 0, 0.2)))
+    for _ in range(n):
+        sl.add(cyl(0.08, 0.08, 0.03, 8), 'gold', 'root', mtx((rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), 0.03), (rng.uniform(0, 40), 0, 0)))
+
+
+def _woz(sl, kryty=True):
+    sl.add(box(2.0, 1.1, 0.15, 0.02), 'wood', 'root', mtx((0, 0, 0.75)))
+    for y in (-0.55, 0.55):
+        sl.add(box(2.0, 0.08, 0.35, 0.01), 'wood_dark', 'root', mtx((0, y, 1.0)))
+    for x in (-0.65, 0.65):
+        for y in (-0.62, 0.62):
+            sl.add(cyl(0.38, 0.38, 0.1, 12), 'wood_dark', 'root', mtx((x, y, 0.38), (90, 0, 0)))
+            sl.add(cyl(0.1, 0.1, 0.14, 8), 'iron', 'root', mtx((x, y, 0.38), (90, 0, 0)))
+    sl.add(cyl(0.04, 0.04, 1.4, 6), 'wood_dark', 'root', mtx((-1.6, 0, 0.6), (0, 75, 0)))
+    if kryty:
+        sl.add(sphere(1.0, 0.62, 0.7, u=12, v=8), 'canvas', 'root', mtx((0.05, 0, 0.95)) @ scale_m(1, 1, 1))
+        sl.add(box(2.1, 1.3, 0.12, 0.0), 'wood', 'root', mtx((0.05, 0, 0.83)))
+    _skrzynia(_w(sl, -0.75, 0, 0.82), 0.5)
+
+
+def magazyn(sl, p):
+    rng = random.Random(5000 + p)
+    if p <= 5:
+        for sx in (-1.6, 1.6):
+            for sy in (-0.2, 1.8):
+                sl.add(cyl(0.09, 0.09, 2.3, 6), 'wood_dark', 'root', mtx((sx, sy, 1.15)))
+        sl.add(box(3.8, 2.6, 0.06, 0.0), 'canvas', 'root', mtx((0, 0.8, 2.35), (-6, 0, 0)))
+        for (x, y, s) in ((-1.0, 1.4, 1.0), (-0.2, 1.5, 0.8), (-0.9, 1.4, 0.0)):
+            _skrzynia(_w(sl, x, y, 0.55 if s == 0.0 else 0.0), s or 0.75)
+        for x in (0.7, 1.2):
+            _worek(_w(sl, x, 1.2))
+        if p >= 2:
+            _bale(sl, 0.0, 2.7, 3.4, 1.0, 0.0, 1.8, r=0.13)
+            _dach2(sl, 0.0, 2.7, 1.8, 3.4, 1.0, 0.6, ov=0.3, rzedy=2, szczyt='log')
+        if p >= 3:
+            for i, (x, y, z) in enumerate(((2.4, -0.6, 0), (2.4, 0.05, 0), (2.4, -0.28, 0.75))):
+                _beczka(_w(sl, x, y, z))
+        if p >= 4:
+            _woz(_w(sl, -1.6, -1.9, 0, 20), kryty=False)
+        if p >= 5:
+            _plotek(sl, (-3.2, -3.2), (-0.9, -3.2))
+            _plotek(sl, (0.9, -3.2), (3.2, -3.2))
+            _plotek(sl, (3.2, -3.2), (3.2, 1.0))
+            for (x, y) in ((1.4, -2.4), (2.2, -2.5)):
+                _skrzynia(_w(sl, x, y, 0, 15), 0.8)
+        return
+    if p <= 10:
+        cx, cy, w, d = 0.0, 1.5, 4.8, 3.4
+        sl.add(box(w + 0.2, d + 0.2, 0.3, 0.03), 'stone_dark', 'root', mtx((cx, cy, 0.15)))
+        _bale(sl, cx, cy, w, d, 0.3, 2.8, r=0.16)
+        _dach2(sl, cx, cy, 3.1, w, d, 2.0, ov=0.4, rzedy=5, szczyt='wood')
+        for sx in (-0.65, 0.65):  # podwójne wrota
+            sl.add(box(1.25, 0.12, 2.3, 0.03), 'wood', 'root', mtx((sx, cy - d / 2 - 0.12, 1.45)))
+            sl.add(cyl(0.04, 0.04, 1.6, 4), 'wood_dark', 'root', seg(V(sx - 0.55, cy - d / 2 - 0.2, 0.5), V(sx + 0.55, cy - d / 2 - 0.2, 2.4)))
+        sl.add(box(2.7, 0.15, 0.2, 0.02), 'wood_dark', 'root', mtx((0, cy - d / 2 - 0.15, 2.7)))
+        for (x, y, s) in ((-2.4, -0.8, 0.8), (-1.7, -1.4, 0.7), (2.2, -1.0, 0.8)):
+            _skrzynia(_w(sl, x, y, 0, rng.uniform(-20, 20)), s)
+        _worek(_w(sl, 1.6, -0.5))
+        _worek(_w(sl, 1.9, -0.2))
+        if p >= 7:
+            sl.add(box(0.15, 1.2, 0.15, 0.02), 'beam', 'root', mtx((0, cy - d / 2 - 0.5, 4.45)))
+            sl.add(cyl(0.12, 0.12, 0.08, 10), 'wood_dark', 'root', mtx((0, cy - d / 2 - 1.0, 4.3), (0, 90, 0)))
+            sl.add(cyl(0.015, 0.015, 1.5, 4), 'rope', 'root', mtx((0, cy - d / 2 - 1.05, 3.5)))
+            _worek(_w(sl, 0, cy - d / 2 - 1.05, 2.25))
+        if p >= 8:
+            sl.add(box(1.4, 3.0, 0.08, 0.0), 'shingle', 'root', mtx((-3.1, cy, 2.0), (0, 14, 0)))
+            for sy in (-1.3, 1.3):
+                sl.add(cyl(0.07, 0.07, 1.9, 6), 'wood_dark', 'root', mtx((-3.6, cy + sy, 0.95)))
+            _stos_drewna(_w(sl, -3.0, cy, 0, 90), 2.6)
+        if p >= 9:
+            _skrzynia(_w(sl, 1.6, -1.8, 0, -15), 0.8, zloto=True)
+            _latarnia(sl, -1.5, -0.2, 0.0, 1.9)
+        if p >= 10:
+            sl.add(box(0.9, 0.1, 0.9, 0.02), 'wood_dark', 'root', mtx((0, cy - d / 2 - 0.15, 3.9)))
+            sl.add(cyl(0.03, 0.03, 0.9, 4), 'iron', 'root', mtx((1.6, cy, 5.5)))
+            sl.add(box(0.5, 0.03, 0.25, 0.0), 'iron', 'root', mtx((1.75, cy, 5.85)))
+            sl.add(cyl(0.05, 0.0, 0.2, 4), 'gold', 'root', mtx((1.6, cy, 6.05)))
+        return
+    if p <= 15:
+        cx, cy, w, d = 0.0, 1.6, 5.2, 3.2
+        _bloki_prost(sl, rng, cx, cy, w, d, 0.0, 3.2, otwor=(2.0, 2.3))
+        sl.add(cyl(1.0, 1.0, 0.3, 14), 'stone_light', 'root', mtx((cx, cy - d / 2 - 0.05, 2.3), (90, 0, 0)))
+        for sx in (-0.48, 0.48):
+            sl.add(box(0.94, 0.12, 2.3, 0.02), 'wood', 'root', mtx((sx, cy - d / 2 + 0.15, 1.15)))
+        dachy = DACHOWKI if p >= 15 else GONT
+        _dach2(sl, cx, cy, 3.2, w, d, 1.9, mats=dachy, ov=0.4, rzedy=5, szczyt='stone_light')
+        for sx in (-1.9, 1.9):
+            _okno(sl, sx, cy - d / 2 - 0.1, 2.2, 0.5, 0.6, okiennice=True)
+        for (x, y, s) in ((-2.5, -1.0, 0.8), (-2.2, -1.7, 0.7)):
+            _skrzynia(_w(sl, x, y, 0, rng.uniform(-20, 20)), s)
+        if p >= 12:  # rampa
+            sl.add(box(2.0, 1.4, 0.6, 0.03), 'stone', 'root', mtx((2.0, -0.6, 0.3)))
+            sl.add(box(2.1, 1.5, 0.08, 0.01), 'wood', 'root', mtx((2.0, -0.6, 0.64)))
+            for x in (1.5, 2.3):
+                _skrzynia(_w(sl, x, -0.6, 0.68), 0.6)
+            _worek(_w(sl, 2.6, -0.3, 0.68))
+        if p >= 13:  # dźwig
+            sl.add(box(0.22, 0.22, 4.2, 0.02), 'beam', 'root', mtx((-3.0, 0.2, 2.1)))
+            sl.add(box(0.2, 2.2, 0.2, 0.02), 'beam', 'root', mtx((-3.0, -0.7, 4.1)))
+            sl.add(cyl(0.05, 0.05, 1.3, 6), 'beam', 'root', seg(V(-3.0, 0.2, 3.1), V(-3.0, -0.6, 4.05)))
+            sl.add(cyl(0.02, 0.02, 1.8, 4), 'rope', 'root', mtx((-3.0, -1.7, 3.15)))
+            _skrzynia(_w(sl, -3.0, -1.7, 1.9), 0.7)
+        if p >= 14:  # skarbczyk i budka strażnika
+            _skrzynia(_w(sl, 0.9, -2.4, 0, 10), 0.9, zloto=True)
+            for ox in (-0.5, 0.5):
+                for oy in (-0.5, 0.5):
+                    sl.add(cyl(0.07, 0.07, 2.2, 6), 'wood_dark', 'root', mtx((2.7 + ox, -2.5 + oy, 1.1)))
+            _dach(sl, 2.7, -2.5, 2.2, 0.9, 0.8, GONT, boki=4, rzedy=2, obrot=45, iglica=False)
+        if p >= 15:
+            for sx in (-1.4, 1.4):
+                _sztandar(sl, sx, cy - d / 2 - 0.35, 0.0, 2.9)
+        return
+    # 16–20 okazały magazyn
+    cx, cy, w, d = 0.0, 1.6, 5.0, 3.2
+    _bloki_prost(sl, rng, cx, cy, w, d, 0.0, 3.6, mats=('stone', 'stone_light', 'stone'), otwor=(2.0, 2.4))
+    sl.add(cyl(1.0, 1.0, 0.32, 14), 'gold' if p >= 18 else 'stone_light', 'root', mtx((cx, cy - d / 2 - 0.05, 2.4), (90, 0, 0)))
+    for sx in (-0.48, 0.48):
+        sl.add(box(0.94, 0.12, 2.4, 0.02), 'wood', 'root', mtx((sx, cy - d / 2 + 0.15, 1.2)))
+        for z in (0.5, 1.2, 1.9):
+            sl.add(box(0.94, 0.06, 0.1, 0.0), 'iron', 'root', mtx((sx, cy - d / 2 + 0.07, z)))
+    _dach2(sl, cx, cy, 3.6, w, d, 1.9, mats=DACHOWKI, ov=0.4, rzedy=5, szczyt='stone_light')
+    for sx in (-1, 1):  # wieżyczki
+        tx = sx * (w / 2 + 0.3)
+        _wieza(sl, random.Random(170 + sx), 0.7, 0.65, 0.0, 4.8, cx=tx, cy=cy - d / 2 + 0.3, wys_rzedu=0.5, mat=('stone', 'stone_light', 'stone'))
+        _dach(sl, tx, cy - d / 2 + 0.3, 4.8, 0.9, 1.5, boki=12, rzedy=4, iglica=p >= 18)
+    if p >= 18:
+        _herb(sl, cx, cy - d / 2 - 0.15, 3.2, 'banner', s=0.6)
+        sl.add(cyl(0.16, 0.16, 0.05, 12), 'gold', 'root', mtx((cx, cy - d / 2 - 0.22, 3.2), (90, 0, 0)))
+    _skrzynia(_w(sl, 0.9, -2.4, 0, 10), 0.9, zloto=True)
+    sl.add(box(2.0, 1.4, 0.6, 0.03), 'stone', 'root', mtx((2.2, -0.4, 0.3)))
+    sl.add(box(2.1, 1.5, 0.08, 0.01), 'wood', 'root', mtx((2.2, -0.4, 0.64)))
+    _skrzynia(_w(sl, 1.8, -0.4, 0.68), 0.6)
+    _skrzynia(_w(sl, 2.6, -0.4, 0.68), 0.6, zloto=True)
+    if p >= 17:
+        _monety(_w(sl, -1.0, -2.2), 9, rng)
+        _skrzynia(_w(sl, -2.0, -1.6, 0, -20), 0.85, zloto=True)
+    if p >= 19:
+        _woz(_w(sl, -2.0, -0.1, 0, 90))
+    if p >= 20:  # złota kopuła skarbca
+        sl.add(cyl(0.9, 0.9, 0.7, 14), 'stone_light', 'root', mtx((cx, cy + 0.2, 5.4)))
+        sl.add(sphere(0.95, 0.95, 0.85, u=16, v=8), 'gold', 'root', mtx((cx, cy + 0.2, 5.75)))
+        sl.add(cyl(0.3, 0.3, 0.06, 14), 'glass_lit', 'root', mtx((cx, cy + 0.2, 7.0), (90, 0, 0)))
+        sl.add(cyl(0.22, 0.22, 0.07, 14), 'lamp', 'root', mtx((cx, cy + 0.2, 7.0), (90, 0, 0)))
+
+
+# ================================================================== AKADEMIA (badania)
+
+ZMIANY_AKADEMIA = {
+    1: 'chatka uczonego ze stołem i zwojami', 2: 'regał ze zwojami i latarnia', 3: 'luneta na trójnogu',
+    4: 'ogródek z ziołami', 5: 'globus na stojaku',
+    6: 'dom nauki z muru pruskiego z dużymi oknami', 7: 'przybudówka biblioteki', 8: 'taras obserwacyjny z lunetą na dachu',
+    9: 'stół alchemiczny z kolorowymi kolbami', 10: 'tablica z zapiskami, sztandary i latarnie',
+    11: 'kamienna akademia z łukowymi oknami', 12: 'wieżyczka obserwatorium z kopułą', 13: 'złota sfera armilarna na placu',
+    14: 'posąg uczonego z księgą', 15: 'dach z niebieskiej dachówki i sztandary',
+    16: 'okazała akademia z portykiem i kolumnami', 17: 'duże obserwatorium z wielkim teleskopem', 18: 'złote zdobienia i świecące runiczne okna',
+    19: 'unoszące się księgi i magiczne kule', 20: 'gwiezdny kryształ nad kopułą',
+}
+
+
+def _stol(sl, rzeczy='zwoje'):
+    sl.add(box(1.2, 0.6, 0.06, 0.01), 'wood', 'root', mtx((0, 0, 0.78)))
+    for x in (-0.5, 0.5):
+        for y in (-0.22, 0.22):
+            sl.add(box(0.06, 0.06, 0.75, 0.0), 'wood_dark', 'root', mtx((x, y, 0.375)))
+    if rzeczy == 'zwoje':
+        for i in range(3):
+            sl.add(cyl(0.05, 0.05, 0.4, 8), 'paper', 'root', mtx((-0.3 + i * 0.25, 0.05, 0.86), (0, 90, i * 20)))
+        sl.add(box(0.35, 0.25, 0.02, 0.0), 'paper_y', 'root', mtx((0.3, -0.08, 0.82), (0, 0, 10)))
+    else:  # kolby alchemiczne
+        for i, m in enumerate(('magic', 'rune', 'molten', 'leaves')):
+            x = -0.42 + i * 0.28
+            sl.add(sphere(0.09, u=8, v=6), 'glass', 'root', mtx((x, 0.05, 0.9)))
+            sl.add(sphere(0.07, u=8, v=6), m, 'root', mtx((x, 0.05, 0.88)))
+            sl.add(cyl(0.025, 0.025, 0.14, 6), 'glass', 'root', mtx((x, 0.05, 1.03)))
+
+
+def _regal(sl):
+    sl.add(box(1.2, 0.4, 1.8, 0.02), 'wood_dark', 'root', mtx((0, 0, 0.9)))
+    for k in range(4):
+        z = 0.25 + k * 0.45
+        sl.add(box(1.1, 0.34, 0.05, 0.0), 'wood', 'root', mtx((0, -0.04, z)))
+        for i in range(7):
+            m = ('banner', 'banner_red', 'leather', 'magic_dark', 'leaves')[(i + k) % 5]
+            sl.add(box(0.11, 0.28, 0.32, 0.0), m, 'root', mtx((-0.45 + i * 0.15, -0.06, z + 0.18)))
+
+
+def _luneta(sl, s=1.0):
+    for a in (0, 120, 240):
+        r = math.radians(a)
+        sl.add(cyl(0.025 * s, 0.025 * s, 1.3 * s, 4), 'wood_dark', 'root', seg(V(math.cos(r) * 0.4 * s, math.sin(r) * 0.4 * s, 0), V(0, 0, 1.2 * s)))
+    sl.add(cyl(0.07 * s, 0.11 * s, 1.0 * s, 10), 'gold', 'root', mtx((0, -0.1 * s, 1.35 * s), (55, 0, 0)))
+    sl.add(cyl(0.12 * s, 0.12 * s, 0.05, 10), 'glass', 'root', mtx((0, -0.5 * s, 1.63 * s), (55, 0, 0)))
+
+
+def _globus(sl):
+    sl.add(cyl(0.06, 0.1, 0.9, 8), 'wood_dark', 'root', mtx((0, 0, 0.45)))
+    sl.add(sphere(0.3, u=14, v=10), 'water', 'root', mtx((0, 0, 1.2)))
+    for (x, y, z) in ((0.1, -0.22, 1.3), (-0.15, -0.2, 1.1), (0.2, 0.1, 1.05)):
+        sl.add(sphere(0.12, 0.08, 0.1, u=8, v=6), 'leaves', 'root', mtx((x, y, z)))
+    _pierscien(_T(sl, mtx((0, 0, 1.2), (90, 0, 20))), 0.36, 0.0, 'gold', n=16, grub=0.035)
+
+
+def _sfera(sl, s=1.0):
+    sl.add(cyl(0.12 * s, 0.25 * s, 1.0 * s, 10), 'stone_light', 'root', mtx((0, 0, 0.5 * s)))
+    for k, (rx, rz) in enumerate(((0, 0), (90, 0), (90, 60), (90, 120), (30, 0))):
+        _pierscien(_T(sl, mtx((0, 0, 1.55 * s), (rx, 0, rz))), 0.5 * s, 0.0, 'gold', n=20, grub=0.05)
+    sl.add(sphere(0.14 * s, u=10, v=8), 'lamp', 'root', mtx((0, 0, 1.55 * s)))
+
+
+def _ksiega(sl, mat='banner'):
+    sl.add(box(0.36, 0.26, 0.07, 0.01), mat, 'root', mtx((0, 0, 0)))
+    sl.add(box(0.33, 0.24, 0.05, 0.0), 'paper', 'root', mtx((0.01, 0, 0.0)))
+
+
+def akademia(sl, p):
+    rng = random.Random(6000 + p)
+    if p <= 5:
+        cx, cy, w, d = 0.0, 1.7, 3.4, 2.4
+        _bale(sl, cx, cy, w, d, 0.0, 2.2, r=0.14)
+        _dach2(sl, cx, cy, 2.2, w, d, 1.3, ov=0.35, rzedy=3, szczyt='log')
+        _drzwi(sl, -0.6, cy - d / 2 - 0.15, 0.0, 0.9, 1.7)
+        _okno(sl, 0.8, cy - d / 2 - 0.15, 1.3, 0.6, 0.6, okiennice=True)
+        _stol(_w(sl, 0.6, -0.6))
+        sl.add(cyl(0.18, 0.18, 0.45, 8), 'log', 'root', mtx((0.6, -1.2, 0.22)))
+        if p >= 2:
+            _regal(_w(sl, -2.3, 0.5, 0, 90))
+            _latarnia(sl, -0.9, -0.5, 0.0, 1.8)
+        if p >= 3:
+            _luneta(_w(sl, 2.2, 0.0, 0, 30))
+        if p >= 4:
+            sl.add(box(1.6, 1.0, 0.2, 0.02), 'wood_dark', 'root', mtx((-1.8, -2.2, 0.1)))
+            sl.add(box(1.5, 0.9, 0.04, 0.0), 'dirt', 'root', mtx((-1.8, -2.2, 0.2)))
+            for i in range(8):
+                sl.add(ico(0.13, 1), ('leaves', 'flower_y', 'leaves', 'flower_r')[i % 4], 'root',
+                       mtx((-2.35 + (i % 4) * 0.37, -2.4 + (i // 4) * 0.4, 0.3)))
+        if p >= 5:
+            _globus(_w(sl, 1.8, -2.0))
+        return
+    if p <= 10:
+        cx, cy, w, d = 0.0, 1.6, 4.6, 3.0
+        sl.add(box(w + 0.2, d + 0.2, 0.4, 0.03), 'stone_dark', 'root', mtx((cx, cy, 0.2)))
+        _szachulec(sl, cx, cy, w, d, 0.4, 2.6)
+        _dach2(sl, cx, cy, 3.0, w, d, 1.6, ov=0.4, rzedy=4, szczyt='plaster')
+        _drzwi(sl, cx, cy - d / 2 - 0.1, 0.4, 1.0, 1.9)
+        for sx in (-1.5, 1.5):
+            _okno(sl, sx, cy - d / 2 - 0.1, 1.8, 0.9, 1.1, szklo='glass_lit' if p >= 10 else 'glass')
+        _stol(_w(sl, 1.5, -1.0))
+        _globus(_w(sl, 2.5, -2.2))
+        _luneta(_w(sl, -2.4, -2.2, 0, -20))
+        if p >= 7:  # biblioteka
+            _bale(sl, -2.5, cy + 0.3, 1.4, 2.2, 0.0, 2.0, r=0.12)
+            _dach2(sl, -2.5, cy + 0.3, 2.0, 1.4, 2.2, 0.8, ov=0.25, rzedy=2, szczyt='log')
+            _regal(_w(sl, -2.5, cy + 0.3 - 1.35, 0, 0))
+        if p >= 8:  # taras z lunetą
+            sl.add(box(1.6, 1.6, 0.12, 0.02), 'wood', 'root', mtx((1.2, cy + 0.3, 4.15)))
+            for sx in (0.45, 1.95):
+                sl.add(cyl(0.06, 0.06, 1.3, 6), 'wood_dark', 'root', mtx((sx, cy + 0.3, 3.55)))
+            for (ox, oy, ww, dd) in ((0, -0.78, 1.6, 0.05), (0, 0.78, 1.6, 0.05), (-0.78, 0, 0.05, 1.6), (0.78, 0, 0.05, 1.6)):
+                sl.add(box(ww, dd, 0.45, 0.0), 'wood_dark', 'root', mtx((1.2 + ox, cy + 0.3 + oy, 4.45)))
+            _luneta(_w(sl, 1.2, cy + 0.3, 4.2, 20), 0.8)
+        if p >= 9:
+            _stol(_w(sl, -0.8, -1.6, 0, 15), 'kolby')
+        if p >= 10:
+            sl.add(box(1.2, 0.08, 0.8, 0.02), 'coal', 'root', mtx((-2.5, -0.4, 1.3), (0, 0, 90)))
+            for k in range(3):
+                sl.add(box(0.03, 0.6, 0.03, 0.0), 'paper', 'root', mtx((-2.45, -0.4, 1.5 - k * 0.2)))
+            for sy in (-0.5, -0.3):
+                sl.add(box(0.06, 0.06, 1.0, 0.0), 'wood_dark', 'root', mtx((-2.55, -0.4 + sy * 1.4 + 0.56, 0.5)))
+            for sx in (-1.1, 1.1):
+                _sztandar(sl, sx, cy - d / 2 - 0.5, 0.0, 2.6, 'magic_dark')
+        return
+    if p <= 15:
+        cx, cy, w, d = 0.0, 1.5, 4.8, 3.0
+        _bloki_prost(sl, rng, cx, cy, w, d, 0.0, 3.4, mats=('stone_light', 'stone', 'stone_light'))
+        dachy = DACHOWKI if p >= 15 else GONT
+        _dach2(sl, cx, cy, 3.4, w, d, 1.7, mats=dachy, ov=0.4, rzedy=4, szczyt='stone_light')
+        _drzwi(sl, cx, cy - d / 2 - 0.1, 0.0, 1.1, 2.1, luk=True)
+        for sx in (-1.6, 1.6):
+            for z in (1.3, 2.7):
+                _okno(sl, sx, cy - d / 2 - 0.1, z, 0.55, 0.8, rama='stone_light', luk=True)
+        _regal(_w(sl, -2.5, -1.2, 0, 90))
+        _stol(_w(sl, 1.6, -1.4), 'kolby')
+        if p >= 12:  # wieżyczka obserwatorium
+            _wieza(sl, random.Random(120), 0.95, 0.9, 0.0, 5.4, cx=2.0, cy=cy + 0.8, wys_rzedu=0.55, mat=('stone_light', 'stone', 'stone_light'))
+            sl.add(sphere(1.0, 1.0, 0.85, u=16, v=8), 'stone_light' if p < 15 else 'roof', 'root', mtx((2.0, cy + 0.8, 5.4)))
+            sl.add(box(0.3, 1.1, 0.9, 0.0), 'coal', 'root', mtx((2.0, cy + 0.25, 5.85), (35, 0, 0)))
+            sl.add(cyl(0.1, 0.14, 1.2, 8), 'gold', 'root', mtx((2.0, cy + 0.05, 6.1), (50, 0, 0)))
+        if p >= 13:
+            _sfera(_w(sl, -0.3, -2.1), 1.0)
+        if p >= 14:
+            _posag_postaci(_w(sl, -2.4, -2.5), 'rycerz')
+            _ksiega(_w(sl, -2.15, -2.75, 1.45, 30), 'banner')
+        if p >= 15:
+            for sx in (-1.0, 1.0):
+                _sztandar(sl, sx, cy - d / 2 - 0.4, 0.0, 2.8, 'magic_dark')
+        return
+    # 16–20 okazała akademia
+    cx, cy, w, d = -0.3, 1.5, 4.6, 3.0
+    _bloki_prost(sl, rng, cx, cy, w, d, 0.0, 3.8, mats=('stone_light', 'stone', 'stone_light'))
+    _dach2(sl, cx, cy, 3.8, w, d, 1.7, mats=DACHOWKI, ov=0.4, rzedy=4, szczyt='stone_light')
+    szklo = 'rune' if p >= 18 else 'glass'
+    rama = 'gold' if p >= 18 else 'stone_light'
+    _drzwi(sl, cx, cy - d / 2 - 0.1, 0.0, 1.1, 2.1, luk=True)
+    for sx in (-1.5, 1.5):
+        for z in (1.3, 2.9):
+            _okno(sl, cx + sx, cy - d / 2 - 0.1, z, 0.55, 0.85, szklo=szklo, rama=rama, luk=True)
+    # portyk
+    py = cy - d / 2 - 1.1
+    for sx in (-1.2, -0.4, 0.4, 1.2):
+        sl.add(cyl(0.16, 0.16, 2.8, 10), 'stone_light', 'root', mtx((cx + sx, py, 1.4)))
+        sl.add(box(0.4, 0.4, 0.15, 0.02), rama, 'root', mtx((cx + sx, py, 2.88)))
+    sl.add(box(3.2, 1.4, 0.25, 0.03), 'stone_light', 'root', mtx((cx, py + 0.45, 3.05)))
+    bm = bmesh.new()  # trójkątny fronton
+    vs = [bm.verts.new(V(cx - 1.6, py - 0.2, 3.17)), bm.verts.new(V(cx + 1.6, py - 0.2, 3.17)), bm.verts.new(V(cx, py - 0.2, 3.9))]
+    bm.faces.new(vs)
+    bm.normal_update()
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.3)
+    sl.add(bm, 'stone_light', 'root')
+    if p >= 18:
+        sl.add(box(0.5, 0.06, 0.3, 0.01), 'gold', 'root', mtx((cx, py - 0.38, 3.45)))
+    # obserwatorium
+    ox, oy = 2.1, cy + 0.9
+    r_o = 1.0 if p < 17 else 1.25
+    _wieza(sl, random.Random(160), r_o, r_o - 0.05, 0.0, 5.6, cx=ox, cy=oy, wys_rzedu=0.55, mat=('stone_light', 'stone', 'stone_light'))
+    sl.add(sphere(r_o + 0.1, r_o + 0.1, r_o, u=18, v=9), 'roof', 'root', mtx((ox, oy, 5.6)))
+    sl.add(box(0.35, 1.2, r_o, 0.0), 'coal', 'root', mtx((ox, oy - r_o * 0.55, 6.1), (35, 0, 0)))
+    tl = 1.3 if p < 17 else 2.2
+    sl.add(cyl(0.12, 0.2 if p >= 17 else 0.14, tl, 10), 'gold', 'root', mtx((ox, oy - 0.5 - tl * 0.25, 6.3), (50, 0, 0)))
+    _sfera(_w(sl, -0.3, -2.6), 0.9)
+    _regal(_w(sl, -2.8, -1.5, 0, 90))
+    if p >= 19:  # unoszące się księgi i kule
+        for i, (x, y, z) in enumerate(((-2.2, -2.4, 2.0), (-1.7, -2.7, 2.4), (2.4, -2.3, 2.2), (1.9, -2.7, 1.8))):
+            _ksiega(_w(sl, x, y, z, 30 * i), ('banner', 'banner_red', 'magic_dark', 'leather')[i])
+        for (x, y, z) in ((-2.6, -0.6, 2.6), (2.7, -1.0, 2.8)):
+            sl.add(sphere(0.18, u=10, v=8), 'magic', 'root', mtx((x, y, z)))
+    if p >= 20:
+        _krysztal(_w(sl, ox, oy, 7.9), 1.3, 'rune')
+        _pierscien(_w(sl, ox, oy, 7.9), 0.75, 0.0, 'gold', n=18, grub=0.06)
+
+
+# ================================================================== PODWÓRZE (grunt pod budynkiem, bez „kwadratu” działki)
+
+def _podloze(sl, p, w, g, seed=1):
+    """Nieregularne podwórze budynku – zmienia się z poziomem: ubita ziemia -> żwir -> płyty -> bruk z obwódką."""
+    rng = random.Random(seed)
+    mat = 'dirt' if p <= 5 else ('gravel' if p <= 10 else 'paving')
+    nx, ny = 3, 3
+    for i in range(nx):
+        for j in range(ny):
+            x = -w / 2 + (i + 0.5) * w / nx + rng.uniform(-0.25, 0.25)
+            y = -g / 2 + (j + 0.5) * g / ny + rng.uniform(-0.25, 0.25)
+            r = min(w, g) / 3 * rng.uniform(0.78, 0.92)
+            sl.add(cyl(r, r, 0.04 + 0.002 * (i + j), 10), mat, 'root', mtx((x, y, 0.025), (0, 0, rng.uniform(0, 36))))
+    if p >= 11:  # płyty na przedniej części podwórza
+        y0, y1 = -g / 2 + 0.4, -0.2
+        y = y0
+        k = 0
+        while y < y1:
+            x = -w / 2 + 0.6 + (0.3 if k % 2 else 0.0)
+            while x < w / 2 - 0.5:
+                if rng.random() < 0.9:
+                    sl.add(rock(0.62, 0.48, 0.07, rng.randint(0, 9999), rough=0.05, bevel=0.2),
+                           rng.choice(('paving', 'stone', 'paving')), 'root', mtx((x, y, 0.06), (0, 0, rng.uniform(-6, 6))))
+                x += 0.68
+            y += 0.55
+            k += 1
+    if p >= 6:  # krzewy i kwiaty na skraju (nie z przodu – tam jest wejście)
+        for i in range(10 if p < 16 else 16):
+            a = rng.uniform(0.15, 0.85) * math.pi if i % 2 else rng.uniform(-0.15, 0.15) * math.pi + (0 if i % 4 == 1 else math.pi)
+            x, y = math.cos(a) * w * 0.47, math.sin(a) * g * 0.47
+            if y < -g * 0.3:
+                continue
+            sl.add(ico(rng.uniform(0.22, 0.34), 1), 'leaves', 'root', mtx((x, y, 0.2)))
+            if p >= 11 and i % 3 == 0:
+                sl.add(ico(0.08, 0), rng.choice(('flower_r', 'flower_y')), 'root', mtx((x, y - 0.15, 0.42)))
+
+
+def budynek(sl, bid, p):
+    """Budynek z działki (id z BUDYNKI) na poziomie p, razem z podwórzem."""
+    b = BUDYNKI[bid]
+    _podloze(sl, p, *b['podworze'], seed=len(bid) * 31 + p // 6)
+    b['fn'](sl, p)
+    return []
+
+
+# 'podworze' – rozmiar podwórza w układzie budynku (szer. x gł.), dopasowany do działki
 BUDYNKI = {
-    'kuznia': {'nazwa': 'Kuźnia', 'fn': kuznia, 'zmiany': ZMIANY_KUZNIA},
-    'koszary': {'nazwa': 'Koszary', 'fn': koszary, 'zmiany': ZMIANY_KOSZARY},
-    'budynek_fuzji': {'nazwa': 'Budynek fuzji', 'fn': budynek_fuzji, 'zmiany': ZMIANY_FUZJA},
+    'kuznia': {'nazwa': 'Kuźnia', 'fn': kuznia, 'zmiany': ZMIANY_KUZNIA, 'podworze': (6.8, 6.8)},
+    'koszary': {'nazwa': 'Koszary', 'fn': koszary, 'zmiany': ZMIANY_KOSZARY, 'podworze': (6.8, 6.8)},
+    'budynek_fuzji': {'nazwa': 'Budynek fuzji', 'fn': budynek_fuzji, 'zmiany': ZMIANY_FUZJA, 'podworze': (6.8, 6.8)},
+    'magazyn': {'nazwa': 'Magazyn', 'fn': magazyn, 'zmiany': ZMIANY_MAGAZYN, 'podworze': (6.8, 6.8)},
+    'akademia': {'nazwa': 'Akademia', 'fn': akademia, 'zmiany': ZMIANY_AKADEMIA, 'podworze': (5.8, 6.3)},
 }

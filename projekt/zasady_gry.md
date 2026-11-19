@@ -118,7 +118,10 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
   - **Budynek fuzji** (D3): łączenie jednostek, księga przepisów, szansa na Przebudzenie; od kręgu kamieni z ołtarzem po świątynię z unoszącym się kryształem,
   - **Koszary** (D6): szkolenie jednostek i zdobywanie doświadczenia; od namiotu z ogniskiem po okazałe koszary z wieżą,
   - **Kuźnia** (D2): ulepszanie broni i pancerzy; od szopy z kowadłem po kamienną kuźnię z piecem hutniczym.
-  Wolne działki: D4, D5, D7–D11 (na przyszłe budynki).
+  - **Magazyn** (D5): przechowuje złoto i zapasy (wyższy poziom = większa pojemność); od wiaty ze skrzyniami po kamienny magazyn ze złotą kopułą skarbca,
+  - **Akademia** (D4): badania i odkrycia, czyli ulepszenia działające na całe miasto (np. szybsza budowa, tańsze naprawy murów); od chatki uczonego po akademię z obserwatorium.
+  Wolne działki: D7–D11 (na przyszłe budynki; oznaczone palikami ze sznurkiem).
+- **Drogi:** brukowana droga od bramy do placu, a od placu wijące się ścieżki z płyt do wejść budynków. Zabudowane działki nie mają widocznego prostokąta: podwórze jest częścią budynku i zmienia się z poziomem (ubita ziemia → żwir → płyty → bruk z krzewami).
 - **Tablica ogłoszeń** przy studni na placu: aktualizacje, wydarzenia i wiadomości dla graczy (np. dymek „!” przy nowej aktualizacji).
 - Klimat: dużo zieleni (łąki, lasy, staw z wodospadem), a góra ma trawiaste zbocza, półki skalne z sosnami, głazy, śnieżny szczyt i duży wodospad po prawej z jeziorem i rzeką.
 
@@ -161,5 +164,5 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 - [ ] Czy rubiny mogą kupić złoto (i z jakim limitem)?
 - [ ] Rodzaje wrogów i ich słabości na żywioły.
 - [ ] Koszty ulepszeń murów i bramy na każdym z 15 poziomów (oraz co poza wyglądem daje każdy poziom, np. wytrzymałość).
-- [ ] Co dają kolejne poziomy budynku fuzji, koszar i kuźni (koszty, czasy, bonusy).
-- [ ] Co stanie na wolnych działkach D4, D5, D7–D11.
+- [ ] Co dają kolejne poziomy budynku fuzji, koszar, kuźni, magazynu i akademii (koszty, czasy, bonusy, lista badań).
+- [ ] Co stanie na wolnych działkach D7–D11.

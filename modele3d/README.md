@@ -172,9 +172,9 @@ Brama i **6 wież** też ulepszają się **osobno**, w tych samych 15 poziomach 
 | wymiary miasta, położenie murów, działki pod budynki, strefy ataku | `src/mapa/uklad.py` |
 | wygląd murów, bramy i wież w każdym etapie, liczbę miejsc dla obrońców | `src/mapa/mury.py` |
 | liczbę poziomów ulepszeń i to, przy którym poziomie zmienia się wygląd | `src/mapa/uklad.py` |
-| teren: góra (wodospad, jezioro, rzeka, półki skalne, głazy), łąki, lasy, staw, plac, drogi, skalna półka pod budynek główny | `src/mapa/teren.py` |
+| teren: góra (wodospad, jezioro, rzeka, półki skalne, głazy), łąki, lasy, staw, plac, brukowana droga i ścieżki z płyt do budynków, paliki na wolnych działkach, skalna półka pod budynek główny | `src/mapa/teren.py` |
 | budynek główny: co zmienia każdy z 20 poziomów | `src/mapa/budynek_glowny.py` (lista `ZMIANY` i warunki `p >= N`) |
-| budynki na działkach (kuźnia, koszary, budynek fuzji): co zmienia każdy z 20 poziomów; tablica ogłoszeń | `src/mapa/budynki.py` (listy `ZMIANY_*`, warunki `p >= N`, słownik `BUDYNKI`); działki i obroty w `src/mapa/uklad.py` (`DZIALKI`, `TABLICA`) |
+| budynki na działkach (kuźnia, koszary, budynek fuzji, magazyn, akademia) i ich podwórza: co zmienia każdy z 20 poziomów; tablica ogłoszeń | `src/mapa/budynki.py` (listy `ZMIANY_*`, warunki `p >= N`, słownik `BUDYNKI`); działki i obroty w `src/mapa/uklad.py` (`DZIALKI`, `TABLICA`) |
 | uszkodzenia (4 stany): gdzie mur pęka, ile gruzu i ognia; wymiary elementów do planu uszkodzeń | `src/mapa/uszkodzenia.py`, tabele `USZ_MUR`, `USZ_BRAMA`, `USZ_WIEZA` i funkcje `plan_bramy`, `plan_wiezy` w `src/mapa/mury.py` |
 
 Polecenie: `python build.py --mapa` (eksport) albo `python build.py --mapa --podglad` (eksport + rendery).
@@ -183,7 +183,7 @@ Pliki w `export/mapa/`:
 - `teren.glb`, `mur_bok_etap<1-5>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_etap<1-5>.glb`, `brama_etap<1-5>.glb`, `wieza_etap<1-5>.glb` (6 wież);
 - w każdym murze, bramie i wieży są puste węzły `obronca_01`, `obronca_02`… czyli **miejsca dla obrońców**. Wyższy poziom ma więcej miejsc;
 - **uszkodzenia**: każdy mur, brama i wieża ma w tym samym pliku warstwy uszkodzeń (węzły `*_znika_k`, `*_pojawia_k`, `*_pokaz_a_b`) dla 4 stanów: 0 cały (100–70%), 1 lekko (70–40%), 2 mocno (40–1%), 3 wyłom (0%). Miejsca obrońców na zawalonych fragmentach znikają razem z nimi, a pusty węzeł `wylom` wskazuje przejście dla wrogów. Podgląd: `podglad/uszkodzenia_mury.png`, `uszkodzenia_brama.png`, `uszkodzenia_wieze.png`;
-- `kuznia_poz<01-20>.glb`, `koszary_poz<01-20>.glb`, `budynek_fuzji_poz<01-20>.glb` (budynki na działkach D2, D6, D3, obrócone przodem do placu) i `tablica_ogloszen.glb` (z pustym węzłem `tablica_info`). Podgląd poziomów: `podglad/<budynek>_poziomy.png`;
+- `<budynek>_poz<01-20>.glb` dla `kuznia` (D2), `budynek_fuzji` (D3), `akademia` (D4), `magazyn` (D5), `koszary` (D6): budynki obrócone przodem do placu, każdy z własnym podwórzem; `tablica_ogloszen.glb` (z pustym węzłem `tablica_info`). Podgląd poziomów: `podglad/<budynek>_poziomy.png`;
 - `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D11; D1 przy skalnej ścianie góry to budynek główny, reszta wolna), plac ze studnią na środku i **strefy ataku** przed każdym murem.
 
 W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `ustaw_poziom_wiezy("wieza_tyl_lewa", 9)`, `miejsca_obroncow("lewy")`, `ustaw_uszkodzenie("przod", 0.35)` (wytrzymałość 0–1), `wylom("przod")`, `ustaw_poziom_budynku_dzialki("kuznia", 5)`, `tablica_ogloszen()` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.

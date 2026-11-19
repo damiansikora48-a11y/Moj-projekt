@@ -19,6 +19,7 @@ PALETA = {
     'trunk': ('#6b4423', 0.9), 'leaves': ('#4f9a3a', 0.85), 'leaves_light': ('#69b443', 0.85), 'pine': ('#2f6a3a', 0.85),
     'stone': ('#9a948a', 0.92), 'stone_dark': ('#6d665e', 0.95), 'wood': ('#8a5a2b', 0.85), 'roof': ('#2f5fb8', 0.75),
     'flower_r': ('#e04848', 0.7), 'flower_y': ('#f2d04a', 0.7), 'flower_w': ('#f4f1ea', 0.7),
+    'cobble': ('#a59d90', 0.9), 'curb': ('#8a8378', 0.92), 'rope': ('#a88a5a', 0.9),
 }
 
 
@@ -280,30 +281,112 @@ def teren(sl):
                mtx(((p0 + p1) / 2).to_tuple(), (0, 0, math.degrees(math.atan2(-d.x, d.y)))))
     pas(V(0, U.PRZOD_Y + 0.5, 0.03), V(0, -85, 0.03), 4.0)
     plac = V(*U.PLAC['srodek'], 0)
-    pas(V(0, U.PRZOD_Y, 0.04), plac, 3.0, 'dirt')
+    rr = random.Random(77)
+    # --- brukowana droga od bramy do placu: kocie łby + krawężniki
+    y0, y1 = U.PRZOD_Y + 0.3, plac.y - U.PLAC['promien'] + 0.3
+    sl.add(box(3.4, y1 - y0, 0.05, 0.0), 'road', 'root', mtx((0, (y0 + y1) / 2, 0.03)))
+    y, k = y0 + 0.2, 0
+    while y < y1:
+        x = -1.35 + (0.2 if k % 2 else 0.0)
+        while x < 1.4:
+            sl.add(rock(0.36, 0.34, 0.07, rr.randint(0, 9999), rough=0.08, bevel=0.3), rr.choice(('cobble', 'cobble', 'stone', 'stone_dark')),
+                   'root', mtx((x, y, 0.06), (0, 0, rr.uniform(-10, 10))))
+            x += 0.4
+        y += 0.38
+        k += 1
+    for sx in (-1.75, 1.75):
+        y = y0
+        while y < y1 - 0.3:
+            sl.add(box(0.22, 0.75, 0.14, 0.03), 'curb', 'root', mtx((sx, y + 0.4, 0.07)))
+            y += 0.8
+
+    # --- ścieżki z płyt do budynków: łagodny łuk od placu do wejścia na działkę
+    def front(d):
+        """Kierunek „przodu” działki (do placu) i odległość od środka do krawędzi w tym kierunku."""
+        (x, y), (w, g) = d['srodek'], d['rozmiar']
+        if 'obrot' in d:
+            a = math.radians(d['obrot'])
+            f = V(math.sin(a), -math.cos(a), 0)
+        else:
+            dd = plac - V(x, y, 0)
+            f = V(math.copysign(1, dd.x), 0, 0) if abs(dd.x) > abs(dd.y) else V(0, math.copysign(1, dd.y), 0)
+        pol = (w if abs(f.x) > 0.5 else g) / 2
+        return f, pol
+
+    def sciezka(p0, k0, p3, k3):
+        L = (p3 - p0).length
+        p1, p2 = p0 + k0 * L * 0.38, p3 + k3 * L * 0.38
+        n = max(4, int(L / 0.45))
+        pts = []
+        for i in range(n + 1):
+            t = i / n
+            pts.append(p0 * (1 - t) ** 3 + p1 * 3 * (1 - t) ** 2 * t + p2 * 3 * (1 - t) * t * t + p3 * t ** 3)
+        # ubita ziemia: jedna ciągła wstęga (bez nachodzących na siebie kawałków)
+        bm = bmesh.new()
+        lewe, prawe = [], []
+        for i, q in enumerate(pts):
+            d = (pts[min(i + 1, n)] - pts[max(i - 1, 0)]).normalized()
+            bok = V(-d.y, d.x, 0)
+            szer = 0.75 + 0.06 * math.sin(i * 1.7)
+            lewe.append(bm.verts.new(q + bok * szer + V(0, 0, 0.045)))
+            prawe.append(bm.verts.new(q - bok * szer + V(0, 0, 0.045)))
+        for i in range(n):
+            bm.faces.new((prawe[i], prawe[i + 1], lewe[i + 1], lewe[i]))
+        bm.normal_update()
+        for f in bm.faces:
+            if f.normal.z < 0:
+                f.normal_flip()
+        sl.add(bm, 'road', 'root')
+        for i in range(1, n, 2):  # pojedyncze płyty co kawałek, na zmianę lekko w lewo i w prawo
+            a, b = pts[i], pts[i + 1]
+            d = (b - a).normalized()
+            bok = V(-d.y, d.x, 0)
+            q = (a + b) / 2 + bok * ((0.18 if (i // 2) % 2 else -0.18) + rr.uniform(-0.05, 0.05))
+            sl.add(rock(0.62, 0.5, 0.07, rr.randint(0, 9999), rough=0.06, bevel=0.3), rr.choice(('paving', 'stone')), 'root',
+                   mtx((q.x, q.y, 0.06), (0, 0, math.degrees(math.atan2(-d.x, d.y)) + rr.uniform(-12, 12))))
+            if rr.random() < 0.3:  # kępki trawy i kamyki przy brzegu
+                q = (a + b) / 2 + bok * rr.choice((-1, 1)) * rr.uniform(0.75, 0.9)
+                sl.add(ico(rr.uniform(0.1, 0.15), 0), rr.choice(('stone', 'meadow', 'grass_dark')), 'root', mtx((q.x, q.y, 0.08)))
+
     for d in U.DZIALKI:
-        if d.get('podwyzszenie'):
-            continue  # do podwyższenia prowadzą schody prosto z placu
-        c = V(*d['srodek'], 0.04)
-        pas(V(plac.x, plac.y, 0.04), c, 1.6, 'dirt')
-    # --- plac ze studnią
-    sl.add(cyl(U.PLAC['promien'], U.PLAC['promien'], 0.1, 28), 'paving', 'root', mtx((plac.x, plac.y, 0.05)))
+        if d.get('podwyzszenie') or not d['budynek']:
+            continue  # do podwyższenia prowadzą schody z placu; do wolnych działek ścieżki jeszcze nie ma
+        c = V(*d['srodek'], 0)
+        f, pol = front(d)
+        do = c + f * (pol - 0.6)
+        r0 = (do - plac).normalized()
+        start = plac + r0 * (U.PLAC['promien'] - 0.4)
+        sciezka(start, r0, do, f)
+    # --- plac ze studnią: bruk, krawężnik i ozdobne kręgi
+    R = U.PLAC['promien']
+    sl.add(cyl(R, R, 0.1, 32), 'paving', 'root', mtx((plac.x, plac.y, 0.05)))
+    for rk, mat in ((R - 0.25, 'curb'), (2.6, 'stone_dark'), (1.6, 'cobble')):
+        n = int(2 * math.pi * rk / 0.55)
+        for i in range(n):
+            a = 2 * math.pi * i / n
+            sl.add(box(0.5, 0.3 if mat == 'curb' else 0.22, 0.05 if mat != 'curb' else 0.1, 0.02), mat, 'root',
+                   mtx((plac.x + math.cos(a) * rk, plac.y + math.sin(a) * rk, 0.11), (0, 0, math.degrees(a) + 90)))
     sl.add(cyl(0.9, 0.9, 0.8, 14), 'stone', 'root', mtx((plac.x, plac.y, 0.5)))
     sl.add(cyl(0.65, 0.65, 0.05, 14), 'water', 'root', mtx((plac.x, plac.y, 0.88)))
     for sg in (1, -1):
         sl.add(cyl(0.08, 0.08, 1.4, 6), 'wood', 'root', mtx((plac.x + sg * 0.75, plac.y, 1.5)))
     sl.add(cyl(1.3, 0.0, 0.7, 4), 'roof', 'root', mtx((plac.x, plac.y, 2.5), (0, 0, 45)))
-    # --- działki pod budynki: utwardzony grunt + kamienne narożniki
+    # --- działki: zabudowane nie mają „kwadratu” (podwórze jest częścią modelu budynku);
+    #     wolne są oznaczone palikami ze sznurkiem (miejsce pod przyszły budynek)
     for d in U.DZIALKI:
         (x, y), (w, g) = d['srodek'], d['rozmiar']
         if d.get('podwyzszenie'):
             _podwyzszenie(sl, x, y, w, g, d['podwyzszenie'])
             continue
-        sl.add(box(w, g, 0.12, 0.03), 'plot', 'root', mtx((x, y, 0.06)))
-        for sx in (-1, 1):
-            for sy in (-1, 1):
-                sl.add(rock(0.45, 0.45, 0.35, int(x * 7 + y * 13 + sx + sy * 3) % 997), 'stone', 'root',
-                       mtx((x + sx * (w / 2 - 0.2), y + sy * (g / 2 - 0.2), 0.18)))
+        if d['budynek']:
+            continue
+        rogi = [(x + sx * (w / 2 - 0.3), y + sy * (g / 2 - 0.3)) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+        for (px, py) in rogi:
+            sl.add(cyl(0.06, 0.04, 0.8, 6), 'wood', 'root', mtx((px, py, 0.4)))
+            sl.add(box(0.1, 0.1, 0.12, 0.0), 'flower_r', 'root', mtx((px, py, 0.82)))
+        for k in range(4):
+            a, b = V(*rogi[k], 0.62), V(*rogi[(k + 1) % 4], 0.62)
+            sl.add(cyl(0.015, 0.015, (b - a).length, 4), 'rope', 'root', seg(a, b))
     # --- staw z wodospadem spływającym z góry
     (sx, sy), r = U.STAW['srodek'], U.STAW['promien']
     sl.add(cyl(r, r, 0.06, 24), 'water', 'root', mtx((sx, sy, 0.05)))
@@ -316,6 +399,6 @@ def teren(sl):
     for i in range(6):
         sl.add(sphere(0.35, 0.3, 0.2, 10, 6), 'foam', 'root', mtx((sx + (i - 2.5) * 0.3, sy + r * 0.55, 0.12)))
     # --- kilka drzew w mieście (przy murach i stawie)
-    for (x, y) in ((-22.5, -16.0), (22.5, -16.0), (-22.5, 4.5), (22.5, 4.5), (-7.5, 5.5), (7.5, 5.5),
-                   (-22.0, 11.5), (21.5, 16.0), (-6.0, -8.0), (6.0, -8.0)):
+    for (x, y) in ((-22.5, -16.0), (22.5, -16.0), (-22.5, 4.5), (22.5, 4.5), (-9.0, 4.0), (9.0, 4.0),
+                   (-22.0, 11.5), (21.5, 16.0), (-9.5, -4.8), (9.5, -4.8)):
         drzewo(sl, V(x, y, 0), 1.0, rng)

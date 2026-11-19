@@ -9,7 +9,7 @@ Pliki:
 Poziomy ulepszeń (1–15) wskazują etap wyglądu – mapowanie w uklad.json ('poziomy').
   uklad.json                         – gdzie co postawić w Godot + działki + strefy ataku
   budynek_glowny_poz<01-20>.glb     – budynek główny (stawiany na skalnej półce działki D1)
-  kuznia_poz<01-20>.glb, koszary_poz<01-20>.glb, budynek_fuzji_poz<01-20>.glb – budynki na działkach
+  <budynek>_poz<01-20>.glb (kuznia, koszary, budynek_fuzji, magazyn, akademia) – budynki na działkach
   tablica_ogloszen.glb               – tablica ogłoszeń przy studni (pusty węzeł 'tablica_info')
 Każdy element muru/bramy/wieży ma puste węzły 'obronca_01'… = miejsca dla obrońców.
 """
@@ -175,7 +175,7 @@ def zbuduj(export_dir, podglad_dir, podglad=False):
     for bid, b in BUD.BUDYNKI.items():
         for p in range(1, U.POZIOMY_BUDYNKOW + 1):
             reset_scene()
-            ob, _ = _obiekt(f'{bid}_poz{p:02}', lambda sl, p=p, b=b: b['fn'](sl, p), BUD.PALETA)
+            ob, _ = _obiekt(f'{bid}_poz{p:02}', lambda sl, p=p, bid=bid: BUD.budynek(sl, bid, p), BUD.PALETA)
             _eksport(ob, os.path.join(katalog, f'{bid}_poz{p:02}.glb'))
         print('EXPORT mapa', bid, '1-20')
     reset_scene()
@@ -229,7 +229,7 @@ def _scena(poziomy, brama_poz, jednostki=None, budynek=None, uszkodzenia=None, b
     for d in U.DZIALKI:
         poz = (budynki or {}).get(d['budynek'])
         if poz:
-            o, _ = _obiekt(d['budynek'], lambda sl, p=poz, f=BUD.BUDYNKI[d['budynek']]['fn']: f(sl, p), BUD.PALETA)
+            o, _ = _obiekt(d['budynek'], lambda sl, p=poz, bid=d['budynek']: BUD.budynek(sl, bid, p), BUD.PALETA)
             _postaw(o, d['srodek'], d.get('obrot', 0))
     if budynek:
         d1 = next(d for d in U.DZIALKI if d['id'] == U.BUDYNEK_GLOWNY['dzialka'])
@@ -252,7 +252,7 @@ def podglady(katalog):
     rej = Rejestr()
     jd = {k: rej.do_budowy(rej.wszystkie[k]) for k in ('zolnierz', 'lesny_lucznik', 'mag_ognia', 'golem', 'kamienny_rycerz')}
     # 1) miasto na starcie (wszystko poziom 1)
-    _scena({'lewy': 1, 'przod': 1, 'prawy': 1}, 1, budynek=1, budynki={'kuznia': 1, 'koszary': 1, 'budynek_fuzji': 1})
+    _scena({'lewy': 1, 'przod': 1, 'prawy': 1}, 1, budynek=1, budynki={k: 1 for k in BUD.BUDYNKI})
     _studio(1600, 1000, 48)
     render_view(os.path.join(katalog, 'mapa_start_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     render_view(os.path.join(katalog, 'mapa_okolica.png'), (0, -30, 8), 150, 30, 0, lens=35)
@@ -262,7 +262,7 @@ def podglady(katalog):
             'prawy': [jd['mag_ognia'], jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik'], jd['mag_ognia'], jd['lesny_lucznik']],
             'brama': [jd['zolnierz'], jd['lesny_lucznik'], jd['zolnierz']]}
     _scena({'lewy': 3, 'przod': 4, 'prawy': 5, **{w['id']: 5 for w in U.WIEZE}}, 5, jedn, budynek=20,
-           budynki={'kuznia': 20, 'koszary': 20, 'budynek_fuzji': 20})
+           budynki={k: 20 for k in BUD.BUDYNKI})
     b = build_unit(jd['kamienny_rycerz'])
     b['arm'].location = (-2.5, U.PRZOD_Y - 4.5, 0)
     b = build_unit(jd['golem'])
@@ -274,7 +274,7 @@ def podglady(katalog):
     # 2b) miasto po ataku: różne stany uszkodzeń
     _scena({'lewy': 3, 'przod': 4, 'prawy': 5, **{w['id']: 4 for w in U.WIEZE}}, 4, budynek=12,
            uszkodzenia={'lewy': 1, 'przod': 3, 'prawy': 2, 'brama': 2, 'wieza_przod_lewa': 3, 'wieza_brama_prawa': 1},
-           budynki={'kuznia': 12, 'koszary': 9, 'budynek_fuzji': 14})
+           budynki={'kuznia': 12, 'koszary': 9, 'budynek_fuzji': 14, 'magazyn': 7, 'akademia': 11})
     _studio(1600, 1000, 48)
     render_view(os.path.join(katalog, 'mapa_po_ataku_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     # 3) wszystkie poziomy murów obok siebie (fragment muru z bramą i wieżą)
@@ -308,9 +308,8 @@ def podglad_budynkow(katalog, samples=20):
         d = ImageDraw.Draw(img)
         for p in range(1, U.POZIOMY_BUDYNKOW + 1):
             reset_scene()
-            _obiekt('b', lambda sl, p=p: b['fn'](sl, p), BUD.PALETA)
-            _obiekt('dzialka', lambda sl: (sl.add(_box(7.0, 7.0, 0.12, 0.03), 'plot', 'root', mtx((0, 0, 0.0))),
-                                           sl.add(_box(40, 40, 0.02), 'grass', 'root', mtx((0, 0, -0.02))))[0], T.PALETA)
+            _obiekt('b', lambda sl, p=p: BUD.budynek(sl, bid, p), BUD.PALETA)
+            _obiekt('trawa', lambda sl: sl.add(_box(40, 40, 0.02), 'grass', 'root', mtx((0, 0, -0.02))), T.PALETA)
             _studio(W, H, samples)
             sc = os.path.join(katalog, '_bud.png')
             render_view(sc, (0, 0, 2.2 if p < 16 else 3.0), 17 if p < 11 else 20, 40, 25, lens=35)

@@ -9,7 +9,7 @@
 #   miejsca_obroncow("lewy")           # -> Array[Vector3] pozycji dla obrońców na murze
 #   ustaw_uszkodzenie("przod", 0.35)   # wytrzymałość 0–1 -> widoczne uszkodzenia (gruz, dziury, wyłom)
 #   wylom("przod")                     # -> Vector3 środka wyłomu albo null (gdy mur nie jest przebity)
-#   ustaw_poziom_budynku_dzialki("kuznia", 5)   # kuźnia / koszary / budynek_fuzji: poziom 1–20
+#   ustaw_poziom_budynku_dzialki("kuznia", 5)   # kuznia / koszary / budynek_fuzji / magazyn / akademia: 1–20
 #   tablica_ogloszen()                 # -> Node3D tablicy przy studni (np. do kliknięcia i dymka „!”)
 #
 # USZKODZENIA: każdy .glb muru/bramy/wieży ma warstwy (węzły) *_znika_k, *_pojawia_k, *_pokaz_a_b,
