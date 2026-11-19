@@ -13,6 +13,7 @@ import math
 import random
 
 import bmesh
+from mathutils import Matrix
 
 from kit import V, box, cyl, sphere, ico, rock, taper, jitter, mtx, frame, seg
 from mapa.mury import _wieza, _dach, DACHOWKI, GONT
@@ -34,14 +35,31 @@ ZMIANY = {
     1: 'mała chata z bali z drzwiami', 2: 'okna z okiennicami, ławka i beczka', 3: 'kamienny komin',
     4: 'zadaszony ganek, latarnie przy schodach', 5: 'drewniana dobudówka z boku',
     6: 'duży drewniany dom na kamiennym fundamencie', 7: 'piętro z muru pruskiego, donice z kwiatami',
-    8: 'skrzydło boczne', 9: 'drewniana wieża obserwacyjna, sztandary przy wejściu', 10: 'duży kamienny komin, latarnie na fasadzie, herb nad drzwiami',
-    11: 'kamienna sala z piętrem z muru pruskiego', 12: 'łukowy kamienny portal i narożniki z jasnego kamienia, balustrada na półce',
+    8: 'skrzydło boczne, lukarny w dachu', 9: 'drewniana wieża obserwacyjna, sztandary przy wejściu', 10: 'duży kamienny komin, latarnie na fasadzie, herb nad drzwiami',
+    11: 'kamienna sala z piętrem z muru pruskiego i lukarnami', 12: 'łukowy portal, narożniki z jasnego kamienia, drewniany balkon, balustrada na półce',
     13: 'pierwsza kamienna wieża', 14: 'druga kamienna wieża, kosze z ogniem przy schodach', 15: 'dachy z niebieskiej dachówki i flagi',
-    16: 'okazała dwupiętrowa rezydencja z łukowymi oknami', 17: 'złote gzymsy, ozdobne obramienia okien, herb, posągi',
-    18: 'portyk z kolumnami', 19: 'wysokie wieże z balkonami i długimi sztandarami, czerwony dywan', 20: 'iglica z kryształem, świecące okna, złote zwieńczenia',
+    16: 'okazała rezydencja: łukowe okna, lukarny, kominy, balkon nad wejściem', 17: 'złote gzymsy i ozdoby na kalenicy, obramienia okien, herb, posągi',
+    18: 'portyk z kolumnami i dużym balkonem na nim', 19: 'wysokie wieże z balkonami i długimi sztandarami, czerwony dywan', 20: 'iglica z kryształem, świecące okna, złote zwieńczenia',
 }
 
 TY = 0.9  # przesunięcie budynku do tyłu półki (z przodu zostaje podwórze)
+
+# skala budynku (żeby nie przytłaczał osady) – zmniejszany w stronę skalnej ściany; podwórze bez zmian
+SKALA = {'chata': 1.0, 'dom': 0.8, 'sala': 0.8, 'rezydencja': 0.75}
+PIVOT = V(0.0, 4.0, 0.0)
+
+
+class _Skalowany:
+    """Przekazuje części do slotu, zmniejszając je względem PIVOT (tył półki)."""
+    def __init__(self, sl, skala):
+        self.sl = sl
+        self.M = Matrix.Translation(PIVOT) @ Matrix.Diagonal((skala, skala, skala, 1.0)) @ Matrix.Translation(-PIVOT)
+
+    def add(self, tbm, mat, kosc, M=None):
+        if M is not None:
+            bmesh.ops.transform(tbm, matrix=M, verts=tbm.verts)
+        bmesh.ops.transform(tbm, matrix=self.M, verts=tbm.verts)
+        self.sl.add(tbm, mat, kosc)
 
 
 # ------------------------------------------------------------------ pomocnicze
@@ -198,6 +216,38 @@ def _komin(sl, x, y, z0, h, w=0.7):
         sl.add(sphere(0.22 + 0.08 * i, u=8, v=6), 'smoke', 'root', mtx((x + 0.15 * i, y, z0 + h + 0.45 + 0.4 * i)))
 
 
+def _na_dachu(cy, z0, d, h, f, ov=0.45):
+    """Punkt (y, z) na przedniej połaci dachu _dach2 (f=0 okap, f=1 kalenica)."""
+    pol = d / 2 + ov
+    hh = h * pol / (d / 2)
+    return cy - pol + pol * f, z0 - (hh - h) + hh * f
+
+
+def _lukarna(sl, x, cy, z0, d, h, f=0.3, w=0.95, hd=0.95, sciana='plaster', mats=GONT, szklo='glass', rama='wood_dark', ov=0.45):
+    """Lukarna: okienko wystające z przedniej połaci dachu, z własnym daszkiem."""
+    y, z = _na_dachu(cy, z0, d, h, f, ov)
+    sl.add(box(w, 1.5, hd, 0.03), sciana, 'root', mtx((x, y + 0.55, z + hd / 2 - 0.25)))
+    _okno(sl, x, y - 0.22, z + hd / 2 - 0.2, w * 0.55, hd * 0.55, szklo=szklo, rama=rama)
+    _dach(sl, x, y + 0.45, z + hd - 0.27, w * 0.72, 0.65, mats, boki=4, rzedy=2, obrot=45, iglica=False)
+
+
+def _balkon(sl, cx, y, z, w, glb, plyta='stone_light', slupki='stone', porecz='stone_light', wsporniki=True):
+    """Balkon na ścianie przedniej: y = lico ściany, z = poziom podłogi balkonu, glb = głębokość."""
+    sl.add(box(w, glb, 0.2, 0.03), plyta, 'root', mtx((cx, y - glb / 2, z)))
+    if wsporniki:
+        for sx in (-w / 2 + 0.3, 0.0, w / 2 - 0.3):
+            sl.add(taper(box(0.22, glb * 0.85, 0.5, 0.03), bottom=0.35, top=1.0, axis='y'), plyta, 'root',
+                   mtx((cx + sx, y - glb * 0.45, z - 0.33)))
+    n = max(2, int(w / 0.28))
+    for i in range(n + 1):
+        sl.add(cyl(0.045, 0.05, 0.62, 6), slupki, 'root', mtx((cx - w / 2 + 0.1 + i * (w - 0.2) / n, y - glb + 0.08, z + 0.41)))
+    for sx in (-1, 1):
+        for k in range(3):
+            sl.add(cyl(0.045, 0.05, 0.62, 6), slupki, 'root', mtx((cx + sx * (w / 2 - 0.08), y - 0.15 - k * (glb - 0.25) / 2, z + 0.41)))
+        sl.add(box(0.1, glb, 0.08, 0.01), porecz, 'root', mtx((cx + sx * (w / 2 - 0.08), y - glb / 2, z + 0.76)))
+    sl.add(box(w, 0.1, 0.08, 0.01), porecz, 'root', mtx((cx, y - glb + 0.08, z + 0.76)))
+
+
 # ------------------------------------------------------------------ podwórze na półce (zmienia się z poziomem)
 
 def _podworze(sl, p):
@@ -279,6 +329,9 @@ def _dom(sl, p):
     _drzwi(sl, cx, cy - d / 2 - 0.2, 0.5, 1.4, 2.0)
     for sx in (-2.0, 2.0):
         _okno(sl, sx, cy - d / 2 - 0.2, 1.7, 0.7, 0.8, okiennice=True)
+    if p >= 8:  # lukarny w dachu
+        for lx in (-1.7, 0.2):
+            _lukarna(sl, lx, cy, top, d + 0.2, 2.0)
     if p >= 8:  # skrzydło boczne
         bx = cx + w / 2 + 1.5
         _bale(sl, bx, cy + 0.4, 2.8, 3.2, 0.0, 2.6, r=0.15)
@@ -316,6 +369,10 @@ def _sala(sl, p):
         _okno(sl, sx, cy - d / 2 - 0.12, 4.3, 0.6, 0.85)
     dachy = DACHOWKI if p >= 15 else GONT
     _dach2(sl, cx, cy, 5.5, w + 0.1, d + 0.1, 2.3, mats=dachy, szczyt='plaster')
+    for lx in (-2.2, 0.0, 2.2):  # lukarny
+        _lukarna(sl, lx, cy, 5.5, d + 0.1, 2.3, mats=dachy)
+    if p >= 12:  # drewniany balkon na piętrze
+        _balkon(sl, cx, cy - d / 2 - 0.1, 3.25, 2.6, 0.85, plyta='wood', slupki='wood_dark', porecz='wood_dark')
     _drzwi(sl, cx, cy - d / 2 - 0.3, 0.0, 1.4, 2.1, luk=p >= 12)
     for sx in (-2.3, 2.3):
         _okno(sl, sx, cy - d / 2 - 0.3, 1.6, 0.7, 1.0, luk=p >= 12, rama='stone_light' if p >= 12 else 'wood_dark')
@@ -356,9 +413,16 @@ def _rezydencja(sl, p):
     for z in (1.5, 4.2):
         for sx in (-3.3, -1.9, 1.9, 3.3):
             _okno(sl, sx, cy - d / 2 - 0.3, z, 0.65, 1.1, szklo=szklo, rama=rama, luk=True)
-    _okno(sl, 0.0, cy - d / 2 - 0.3, 4.2, 0.9, 1.2, szklo=szklo, rama=rama, luk=True)
+    # środek piętra: drzwi na balkon
+    _drzwi(sl, cx, cy - d / 2 - 0.3, 3.35, 1.0, 1.7, luk=True)
     _drzwi(sl, cx, cy - d / 2 - 0.3, 0.0, 1.6, 2.4, luk=True)
     _dach2(sl, cx, cy, H, w + 0.3, d + 0.3, 3.0, mats=DACHOWKI, rzedy=6, szczyt='stone_light')
+    for lx in (-2.7, 0.0, 2.7):  # lukarny
+        _lukarna(sl, lx, cy, H, d + 0.3, 3.0, f=0.28, w=1.05, hd=1.05, sciana='stone_light', mats=DACHOWKI, szklo=szklo, rama=rama)
+    for sx in (-1, 1):  # kominy przy kalenicy
+        _komin(sl, sx * 2.9, cy + 1.0, H + 1.2, 2.4, 0.6)
+    if p < 18:  # balkon nad wejściem (od 18 zastępuje go balkon na portyku)
+        _balkon(sl, cx, cy - d / 2 - 0.3, 3.3, 2.3, 0.9, porecz='gold' if p >= 17 else 'stone_light')
     th = 9.0 if p < 19 else 11.0
     for sx in (-1, 1):  # wieże narożne
         tx, ty = cx + sx * (w / 2 + 0.7), cy + d / 2 - 0.6
@@ -373,25 +437,26 @@ def _rezydencja(sl, p):
                 sl.add(cyl(0.06, 0.06, 0.6, 6), 'stone_light', 'root', mtx((tx + math.cos(a) * 2.05, ty + math.sin(a) * 2.05, th - 1.2)))
             sl.add(box(0.9, 0.05, 3.4, 0.01), 'banner_red', 'root', mtx((tx, ty - 1.86, th - 4.0)))
             sl.add(box(0.35, 0.06, 0.35, 0.01), 'gold', 'root', mtx((tx, ty - 1.9, th - 3.0), (0, 45, 0)))
-    if p >= 17:  # złote gzymsy i herb
+    if p >= 17:  # złote gzymsy, ozdoby na kalenicy i herb
+        x = -w / 2
+        while x <= w / 2 + 0.01:
+            sl.add(cyl(0.07, 0.0, 0.45, 6), 'gold', 'root', mtx((x, cy, H + 3.0 + 0.4)))
+            sl.add(sphere(0.09, u=8, v=6), 'gold', 'root', mtx((x, cy, H + 3.0 + 0.2)))
+            x += 0.95
         sl.add(box(w + 0.35, d + 0.35, 0.12, 0.02), 'gold', 'root', mtx((cx, cy, 3.06)))
         sl.add(box(w + 0.35, d + 0.35, 0.14, 0.02), 'gold', 'root', mtx((cx, cy, H - 0.05)))
         sl.add(box(1.2, 0.1, 1.4, 0.05), 'banner', 'root', mtx((cx, cy - d / 2 - 0.34, 2.95 + 0.0)))
         sl.add(box(0.6, 0.08, 0.6, 0.03), 'gold', 'root', mtx((cx, cy - d / 2 - 0.4, 3.0), (0, 45, 0)))
-    if p >= 18:  # portyk z kolumnami i trójkątnym szczytem
+    if p >= 18:  # portyk z kolumnami, na nim duży balkon
         py = cy - d / 2 - 1.5
         for sx in (-1.8, -0.7, 0.7, 1.8):
             sl.add(cyl(0.22, 0.22, 3.0, 12), 'stone_light', 'root', mtx((sx, py, 1.5)))
             sl.add(box(0.55, 0.55, 0.2, 0.03), 'stone_light' if p < 17 else 'gold', 'root', mtx((sx, py, 3.1)))
             sl.add(box(0.55, 0.55, 0.2, 0.03), 'stone', 'root', mtx((sx, py, 0.1)))
         sl.add(box(4.4, 2.6, 0.3, 0.04), 'stone_light', 'root', mtx((0, py + 0.75, 3.35)))
-        bm = bmesh.new()
-        v = [bm.verts.new(V(-2.3, py - 0.6, 3.5)), bm.verts.new(V(2.3, py - 0.6, 3.5)), bm.verts.new(V(0, py - 0.6, 4.7))]
-        bm.faces.new(v)
-        bm.normal_update()
-        bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.3)
-        sl.add(bm, 'stone_light', 'root')
-        _dach2(sl, 0, py + 0.55, 3.5, 4.6, 2.4, 1.2, mats=DACHOWKI, ov=0.15, rzedy=3, szczyt=None)
+        sl.add(box(4.5, 2.7, 0.1, 0.02), 'gold', 'root', mtx((0, py + 0.75, 3.17)))
+        lico = cy - d / 2 - 0.3
+        _balkon(sl, 0, lico, 3.5, 4.4, lico - (py - 0.55), wsporniki=False, porecz='gold')
     if p >= 20:  # iglica z kryształem i złote zwieńczenia
         sl.add(box(1.2, 1.2, 1.4, 0.05), 'stone_light', 'root', mtx((cx, cy, H + 3.2)))
         _dach(sl, cx, cy, H + 3.9, 0.8, 2.6, boki=8, rzedy=4, iglica=False)
@@ -403,12 +468,12 @@ def _rezydencja(sl, p):
 def budynek(sl, p):
     """Budynek główny na poziomie p (1–20) wraz z podwórzem na półce."""
     if p <= 5:
-        _chata(sl, p)
+        _chata(_Skalowany(sl, SKALA['chata']), p)
     elif p <= 10:
-        _dom(sl, p)
+        _dom(_Skalowany(sl, SKALA['dom']), p)
     elif p <= 15:
-        _sala(sl, p)
+        _sala(_Skalowany(sl, SKALA['sala']), p)
     else:
-        _rezydencja(sl, p)
+        _rezydencja(_Skalowany(sl, SKALA['rezydencja']), p)
     _podworze(sl, p)
     return []
