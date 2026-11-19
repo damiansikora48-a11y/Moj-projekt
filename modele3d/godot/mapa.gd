@@ -1,5 +1,5 @@
 # Składa miasto z elementów w modele3d/export/mapa/ według uklad.json:
-# teren, 3 mury (lewy, przod, prawy), brama i 2 wieże narożne – każdy element w swoim poziomie
+# teren, 3 mury (lewy, przod, prawy), brama i 6 wież – każdy element w swoim poziomie
 # ulepszenia (1–15). Poziom wskazuje etap wyglądu (uklad.json: "poziomy"); wygląd zmienia się co 3 poziomy.
 # Na etapie 1 (palisada, poziomy 1–3) mury nie mają miejsc dla obrońców.
 #
