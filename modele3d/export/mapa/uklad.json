@@ -141,10 +141,11 @@
       "5": 3
     }
   },
-  "narozniki": [
+  "wieze": [
     {
-      "id": "wieza_lewa",
-      "plik": "naroznik_etap{etap}.glb",
+      "id": "wieza_przod_lewa",
+      "opis": "przedni lewy narożnik",
+      "plik": "wieza_etap{etap}.glb",
       "pozycja": [
         -26.0,
         0.0,
@@ -160,10 +161,83 @@
       }
     },
     {
-      "id": "wieza_prawa",
-      "plik": "naroznik_etap{etap}.glb",
+      "id": "wieza_przod_prawa",
+      "opis": "przedni prawy narożnik",
+      "plik": "wieza_etap{etap}.glb",
       "pozycja": [
         26.0,
+        0.0,
+        20.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_tyl_lewa",
+      "opis": "koniec lewego muru przy górze",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        -26.0,
+        0.0,
+        -17.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_tyl_prawa",
+      "opis": "koniec prawego muru przy górze",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        26.0,
+        0.0,
+        -17.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_brama_lewa",
+      "opis": "po lewej stronie bramy",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        -6.2,
+        0.0,
+        20.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_brama_prawa",
+      "opis": "po prawej stronie bramy",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        6.2,
         0.0,
         20.0
       ],
