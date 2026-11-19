@@ -277,8 +277,8 @@
         7.0,
         7.0
       ],
-      "budynek": null,
-      "uwagi": ""
+      "budynek": "kuznia",
+      "uwagi": "Kuźnia"
     },
     {
       "id": "D3",
@@ -291,8 +291,8 @@
         7.0,
         7.0
       ],
-      "budynek": null,
-      "uwagi": ""
+      "budynek": "budynek_fuzji",
+      "uwagi": "Budynek fuzji"
     },
     {
       "id": "D4",
@@ -333,8 +333,8 @@
         7.0,
         7.0
       ],
-      "budynek": null,
-      "uwagi": ""
+      "budynek": "koszary",
+      "uwagi": "Koszary"
     },
     {
       "id": "D7",
@@ -480,6 +480,122 @@
     ],
     "promien_m": 5.0
   },
+  "tablica_ogloszen": {
+    "plik": "tablica_ogloszen.glb",
+    "pozycja": [
+      2.7,
+      0.0,
+      0.9
+    ],
+    "obrot_y_stopnie": -15
+  },
+  "budynki": [
+    {
+      "id": "kuznia",
+      "nazwa": "Kuźnia",
+      "dzialka": "D2",
+      "plik": "kuznia_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        -15.0,
+        0.0,
+        10.0
+      ],
+      "obrot_y_stopnie": 90,
+      "zmiany": {
+        "1": "szopa z bali z daszkiem i kowadłem na pniu",
+        "2": "kamienne palenisko z ogniem",
+        "3": "kamienny komin",
+        "4": "koryto z wodą i kamień szlifierski",
+        "5": "stojak z bronią i tarczami",
+        "6": "warsztat z muru pruskiego z dużym zadaszeniem",
+        "7": "skórzany miech przy palenisku",
+        "8": "drugie kowadło, sterta węgla i beczka",
+        "9": "szyld z kowadłem na wysięgniku",
+        "10": "wysoki komin i latarnie",
+        "11": "kamienna kuźnia z łukowym, rozżarzonym wejściem",
+        "12": "wielki piec hutniczy",
+        "13": "stojaki z pełnymi zbrojami",
+        "14": "żuraw z łańcuchem i zawieszonym ładunkiem",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazała kuźnia: jasne narożniki, łukowe okna, dwa kominy",
+        "17": "runiczne kowadło świecące na niebiesko",
+        "18": "kanał z płynnym metalem od pieca",
+        "19": "złoty młot-godło na fasadzie i posąg kowala",
+        "20": "kryształowe płomienie na kominach i świecące okna"
+      }
+    },
+    {
+      "id": "budynek_fuzji",
+      "nazwa": "Budynek fuzji",
+      "dzialka": "D3",
+      "plik": "budynek_fuzji_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        -15.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": 90,
+      "zmiany": {
+        "1": "krąg kamieni z ołtarzem i małym kryształem",
+        "2": "drewniany daszek nad ołtarzem",
+        "3": "świecące runy na kamieniach",
+        "4": "dwa kosze z fioletowym ogniem",
+        "5": "pulpit z księgą przepisów",
+        "6": "okrągła sala z kamienną podstawą i stożkowym dachem",
+        "7": "kryształ na szczycie dachu",
+        "8": "świecący krąg run przed wejściem",
+        "9": "dwa unoszące się kryształy",
+        "10": "fioletowe sztandary",
+        "11": "kamienna rotunda z kolumnadą",
+        "12": "kopuła",
+        "13": "dwa świecące obeliski",
+        "14": "runiczny łuk-brama przed wejściem",
+        "15": "kopuła z niebieskiej dachówki i złota iglica",
+        "16": "okazała dwupoziomowa świątynia fuzji",
+        "17": "złote pierścienie krążące wokół kryształu",
+        "18": "więcej obelisków i złote zdobienia",
+        "19": "posągi golema i rycerza (symbol fuzji)",
+        "20": "wielki unoszący się kryształ i świecące okna"
+      }
+    },
+    {
+      "id": "koszary",
+      "nazwa": "Koszary",
+      "dzialka": "D6",
+      "plik": "koszary_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        15.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": -90,
+      "zmiany": {
+        "1": "namiot i ognisko",
+        "2": "drugi namiot i stojak z bronią",
+        "3": "manekin treningowy",
+        "4": "drewniany płotek placu ćwiczeń",
+        "5": "tarcza strzelnicza",
+        "6": "długi budynek z bali",
+        "7": "maszt z flagą i ławka",
+        "8": "piętro z muru pruskiego",
+        "9": "trzy manekiny i worki z piaskiem",
+        "10": "drewniana strażnica przy budynku",
+        "11": "kamienne koszary z piętrem",
+        "12": "piaszczysta arena ćwiczeń otoczona kamieniami",
+        "13": "rząd tarcz-herbów na fasadzie",
+        "14": "zbrojownia z bronią pod zadaszeniem",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazałe koszary z blankami i wieżyczkami",
+        "17": "posąg wojownika",
+        "18": "złote herby i czerwone sztandary",
+        "19": "brukowany plac musztry z koszami ognia",
+        "20": "wysoka wieża z wielkim sztandarem i złotą iglicą"
+      }
+    }
+  ],
   "budynek_glowny": {
     "plik": "budynek_glowny_poz{poziom:02}.glb",
     "poziomy": 20,
