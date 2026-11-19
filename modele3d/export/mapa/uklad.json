@@ -305,8 +305,8 @@
         6.5,
         6.0
       ],
-      "budynek": null,
-      "uwagi": ""
+      "budynek": "akademia",
+      "uwagi": "Akademia (badania)"
     },
     {
       "id": "D5",
@@ -319,8 +319,8 @@
         7.0,
         7.0
       ],
-      "budynek": null,
-      "uwagi": ""
+      "budynek": "magazyn",
+      "uwagi": "Magazyn"
     },
     {
       "id": "D6",
@@ -558,6 +558,76 @@
         "18": "więcej obelisków i złote zdobienia",
         "19": "posągi golema i rycerza (symbol fuzji)",
         "20": "wielki unoszący się kryształ i świecące okna"
+      }
+    },
+    {
+      "id": "akademia",
+      "nazwa": "Akademia",
+      "dzialka": "D4",
+      "plik": "akademia_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        -15.0,
+        0.0,
+        -9.5
+      ],
+      "obrot_y_stopnie": 90,
+      "zmiany": {
+        "1": "chatka uczonego ze stołem i zwojami",
+        "2": "regał ze zwojami i latarnia",
+        "3": "luneta na trójnogu",
+        "4": "ogródek z ziołami",
+        "5": "globus na stojaku",
+        "6": "dom nauki z muru pruskiego z dużymi oknami",
+        "7": "przybudówka biblioteki",
+        "8": "taras obserwacyjny z lunetą na dachu",
+        "9": "stół alchemiczny z kolorowymi kolbami",
+        "10": "tablica z zapiskami, sztandary i latarnie",
+        "11": "kamienna akademia z łukowymi oknami",
+        "12": "wieżyczka obserwatorium z kopułą",
+        "13": "złota sfera armilarna na placu",
+        "14": "posąg uczonego z księgą",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazała akademia z portykiem i kolumnami",
+        "17": "duże obserwatorium z wielkim teleskopem",
+        "18": "złote zdobienia i świecące runiczne okna",
+        "19": "unoszące się księgi i magiczne kule",
+        "20": "gwiezdny kryształ nad kopułą"
+      }
+    },
+    {
+      "id": "magazyn",
+      "nazwa": "Magazyn",
+      "dzialka": "D5",
+      "plik": "magazyn_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        15.0,
+        0.0,
+        10.0
+      ],
+      "obrot_y_stopnie": -90,
+      "zmiany": {
+        "1": "wiata ze skrzyniami i workami",
+        "2": "mała szopa z bali",
+        "3": "stos beczek",
+        "4": "wózek z towarem",
+        "5": "ogrodzony plac składowy z kolejnymi skrzyniami",
+        "6": "duża drewniana stodoła z podwójnymi wrotami",
+        "7": "belka z bloczkiem i workiem na strych",
+        "8": "przybudówka ze stosami drewna",
+        "9": "skrzynia ze złotem przy wrotach i latarnia",
+        "10": "drzwi strychu i wiatrowskaz",
+        "11": "kamienny magazyn z łukowymi wrotami",
+        "12": "rampa załadunkowa ze skrzyniami",
+        "13": "dźwig z ładunkiem",
+        "14": "okuty skarbczyk i budka strażnika",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazały magazyn z dwiema wieżyczkami",
+        "17": "stosy złotych monet i skrzynie na placu",
+        "18": "złote zdobienia i herb z monetą",
+        "19": "kryty wóz kupiecki z towarem",
+        "20": "złota kopuła skarbca ze świecącą monetą"
       }
     },
     {
