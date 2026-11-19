@@ -1139,7 +1139,7 @@ def _podloze(sl, p, w, g, seed=1):
             x = -w / 2 + (i + 0.5) * w / nx + rng.uniform(-0.25, 0.25)
             y = -g / 2 + (j + 0.5) * g / ny + rng.uniform(-0.25, 0.25)
             r = min(w, g) / 3 * rng.uniform(0.78, 0.92)
-            sl.add(cyl(r, r, 0.04 + 0.002 * (i + j), 10), mat, 'root', mtx((x, y, 0.025), (0, 0, rng.uniform(0, 36))))
+            sl.add(cyl(r, r, 0.04, 10), mat, 'root', mtx((x, y, 0.02 + 0.004 * (i * ny + j)), (0, 0, rng.uniform(0, 36))))
     if p >= 11:  # płyty na przedniej części podwórza
         y0, y1 = -g / 2 + 0.4, -0.2
         y = y0
