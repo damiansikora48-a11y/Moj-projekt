@@ -157,13 +157,13 @@ Statystyki walki (obrażenia, życie, zasięg) trzymaj osobno w grze, np. w `bal
 
 Miasto pod wysoką górą (z wodospadem, jeziorem i rzeką po prawej, półkami skalnymi i głazami), z murami z 3 stron (lewy, przedni z bramą, prawy). Każdy mur i brama ulepszają się **osobno**, w **15 poziomach**. Wygląd zmienia się co 3 poziomy, więc jest **5 etapów wyglądu**:
 
-| Poziomy | Etap | Wygląd | Obrońcy (mur boczny) |
+| Poziomy | Etap | Wygląd | Obrońcy (mur boczny / przedni) |
 |---|---|---|---|
 | 1–3 | 1 | Palisada | brak (bez pomostu) |
-| 4–6 | 2 | Mur drewniany | 2 |
-| 7–9 | 3 | Słaby mur kamienny | 3 |
-| 10–12 | 4 | Lepszy mur kamienny | 5 |
-| 13–15 | 5 | Warownia | 6 |
+| 4–6 | 2 | Mur drewniany | 3 / 4 |
+| 7–9 | 3 | Słaby mur kamienny | 4 / 6 |
+| 10–12 | 4 | Lepszy mur kamienny | 7 / 9 |
+| 13–15 | 5 | Warownia | 9 / 11 |
 
 Brama zmienia wygląd na tych samych progach. Wieże na przednich narożnikach przyjmują poziom wyższego z dwóch sąsiednich murów. Liczbę poziomów i progi zmieniasz w `src/mapa/uklad.py` (`LICZBA_POZIOMOW`, `POZIOMY`).
 

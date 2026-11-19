@@ -99,10 +99,10 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 - **Każdy mur ulepsza się osobno.** **Brama** na środku muru przedniego ulepsza się osobno.
 - **15 poziomów ulepszeń** dla każdego muru i dla bramy. Wygląd zmienia się co 3 poziomy:
   - 1–3 Palisada: **brak obrońców na murach** (nie ma pomostu),
-  - 4–6 Mur drewniany: mało miejsc dla obrońców (2 na boku),
-  - 7–9 Słaby mur kamienny (3),
-  - 10–12 Lepszy mur kamienny (5),
-  - 13–15 Warownia (6).
+  - 4–6 Mur drewniany: mało miejsc dla obrońców (3 na murze bocznym, 4 na przednim),
+  - 7–9 Słaby mur kamienny (4 / 6),
+  - 10–12 Lepszy mur kamienny (7 / 9),
+  - 13–15 Warownia (9 / 11).
 - Brama zmienia wygląd na tych samych progach.
 - **Atakujący wybiera stronę ataku** (lewa, przód, prawa). Przed każdym murem jest wolna łąka na rozstawienie wojsk.
 - Wnętrze miasta: 52 × 40 m.
