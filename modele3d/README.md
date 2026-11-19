@@ -180,7 +180,7 @@ Polecenie: `python build.py --mapa` (eksport) albo `python build.py --mapa --pod
 Pliki w `export/mapa/`:
 - `teren.glb`, `mur_bok_etap<1-5>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_etap<1-5>.glb`, `brama_etap<1-5>.glb`, `naroznik_etap<1-5>.glb`;
 - w każdym murze, bramie i wieży są puste węzły `obronca_01`, `obronca_02`… czyli **miejsca dla obrońców**. Wyższy poziom ma więcej miejsc;
-- `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D9; D1 przy skalnej ścianie góry to budynek główny, reszta wolna), plac ze studnią na środku i **strefy ataku** przed każdym murem.
+- `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D11; D1 przy skalnej ścianie góry to budynek główny, reszta wolna), plac ze studnią na środku i **strefy ataku** przed każdym murem.
 
 W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
 

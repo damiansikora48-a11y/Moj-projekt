@@ -8,8 +8,8 @@ Nowy budynek w przyszłości = wpis w DZIALKI (zajmij wolną działkę albo doda
 """
 
 # --- wnętrze miasta (linia murów)
-SZER = 36.0     # odległość między murem lewym a prawym
-GLEB = 28.0     # od muru przedniego do góry
+SZER = 52.0     # odległość między murem lewym a prawym
+GLEB = 40.0     # od muru przedniego do góry
 PRZOD_Y = -GLEB / 2   # linia muru przedniego
 BRAMA_SZER = 6.0      # szerokość prześwitu bramy w murze przednim
 
@@ -41,31 +41,33 @@ NAROZNIKI = [
 ]
 
 # --- działki pod budynki (środek x, y; rozmiar szer x gł). 'budynek': None = wolna.
-PLAC = {'srodek': (0.0, 0.5), 'promien': 4.5}  # plac centralny ze studnią (nie do zabudowy)
+PLAC = {'srodek': (0.0, 2.0), 'promien': 5.0}  # plac centralny ze studnią (nie do zabudowy)
 DZIALKI = [
-    {'id': 'D1', 'srodek': (0.0, 8.75), 'rozmiar': (14.0, 8.5), 'budynek': 'budynek_glowny',
+    {'id': 'D1', 'srodek': (0.0, GLEB / 2 - 1.0 - 4.25), 'rozmiar': (14.0, 8.5), 'budynek': 'budynek_glowny',
      'uwagi': 'skalna półka (podwyższenie) przy ścianie góry ze schodami – budynek główny z wolnym miejscem wokół',
      'podwyzszenie': 1.6},
-    {'id': 'D2', 'srodek': (-10.5, -6.5), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D3', 'srodek': (-10.5, 1.0), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D4', 'srodek': (-9.75, 7.5), 'rozmiar': (4.5, 4.0), 'budynek': None, 'uwagi': 'obok stawu z wodospadem'},
-    {'id': 'D5', 'srodek': (10.5, -6.5), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D6', 'srodek': (10.5, 1.0), 'rozmiar': (6.0, 6.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D7', 'srodek': (10.75, 8.0), 'rozmiar': (5.5, 5.0), 'budynek': None, 'uwagi': ''},
-    {'id': 'D8', 'srodek': (-4.5, -8.5), 'rozmiar': (4.0, 3.5), 'budynek': None, 'uwagi': 'mała, przy bramie'},
-    {'id': 'D9', 'srodek': (4.5, -8.5), 'rozmiar': (4.0, 3.5), 'budynek': None, 'uwagi': 'mała, przy bramie'},
+    {'id': 'D2', 'srodek': (-15.0, -10.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D3', 'srodek': (-15.0, 0.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D4', 'srodek': (-15.0, 9.5), 'rozmiar': (6.5, 6.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D5', 'srodek': (15.0, -10.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D6', 'srodek': (15.0, 0.0), 'rozmiar': (7.0, 7.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D7', 'srodek': (15.0, 9.5), 'rozmiar': (6.5, 6.0), 'budynek': None, 'uwagi': ''},
+    {'id': 'D8', 'srodek': (-6.5, -13.5), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'mała, przy bramie'},
+    {'id': 'D9', 'srodek': (6.5, -13.5), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'mała, przy bramie'},
+    {'id': 'D10', 'srodek': (-12.0, 16.0), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'obok półki budynku głównego'},
+    {'id': 'D11', 'srodek': (12.0, 16.0), 'rozmiar': (5.0, 4.0), 'budynek': None, 'uwagi': 'obok półki budynku głównego'},
 ]
 # budynek główny: 20 poziomów, każdy coś zmienia (mapa/budynek_glowny.py)
 BUDYNEK_GLOWNY = {'dzialka': 'D1', 'poziomy': 20}
-STAW = {'srodek': (-14.0, 11.2), 'promien': 1.8}
+STAW = {'srodek': (-20.5, 16.5), 'promien': 1.9}
 # duży wodospad na górze (po prawej, za murem) i jezioro z rzeką
 JEZIORO = {'srodek': (41.0, 4.0), 'promien': 3.6}
 
 # --- strefy, z których atakujący wypuszcza wojska (prostokąty x0, x1, y0, y1)
 STREFY_ATAKU = {
-    'przod': (-20.0, 20.0, -42.0, -24.0),
-    'lewy': (-48.0, -28.0, -12.0, 8.0),
-    'prawy': (28.0, 48.0, -18.0, 0.0),  # z tyłu po prawej jest jezioro pod wodospadem
+    'przod': (-26.0, 26.0, -52.0, -30.0),
+    'lewy': (-58.0, -34.0, -16.0, 6.0),
+    'prawy': (34.0, 58.0, -24.0, -4.0),  # z tyłu po prawej jest jezioro pod wodospadem
 }
 
 

@@ -191,7 +191,7 @@ def podglady(katalog):
     # 1) miasto na starcie (wszystko poziom 1)
     _scena({'lewy': 1, 'przod': 1, 'prawy': 1}, 1, budynek=1)
     _studio(1600, 1000, 48)
-    render_view(os.path.join(katalog, 'mapa_start_52st.png'), (0, -4, 4), 92, 52, 0, lens=35)
+    render_view(os.path.join(katalog, 'mapa_start_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     render_view(os.path.join(katalog, 'mapa_okolica.png'), (0, -30, 8), 150, 30, 0, lens=35)
     # 2) miasto rozbudowane z obrońcami na murach
     jedn = {'przod': [jd['lesny_lucznik'], jd['mag_ognia'], jd['lesny_lucznik'], jd['mag_ognia'], jd['lesny_lucznik'], jd['lesny_lucznik'], jd['mag_ognia']],
@@ -204,9 +204,9 @@ def podglady(katalog):
     b = build_unit(jd['golem'])
     b['arm'].location = (2.8, U.PRZOD_Y - 5.0, 0)
     _studio(1600, 1000, 48)
-    render_view(os.path.join(katalog, 'mapa_rozbudowana_52st.png'), (0, -4, 4), 92, 52, 0, lens=35)
+    render_view(os.path.join(katalog, 'mapa_rozbudowana_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     render_view(os.path.join(katalog, 'mapa_mury_z_bliska.png'), (2, U.PRZOD_Y, 3), 34, 40, 25, lens=35)
-    render_view(os.path.join(katalog, 'mapa_budynek_glowny.png'), (0, 8.5, 4), 30, 35, 15, lens=35)
+    render_view(os.path.join(katalog, 'mapa_budynek_glowny.png'), (0, U.GLEB / 2 - 5.5, 4), 30, 35, 15, lens=35)
     # 3) wszystkie poziomy murów obok siebie (fragment muru z bramą i wieżą)
     reset_scene()
     for i, poz in enumerate(sorted(U.ETAPY)):

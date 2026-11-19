@@ -28,7 +28,7 @@ def _szum(x, y):
 
 def podstawa_gory(x):
     """Linia, gdzie zaczyna się góra (za miastem; na bokach lekko wysuwa się do przodu)."""
-    return U.GLEB / 2 - 1.0 - 2.5 * max(0.0, (abs(x) - 14.0) / 10.0)
+    return U.GLEB / 2 - 1.0 - 2.5 * max(0.0, (abs(x) - (U.SZER / 2 - 4.0)) / 10.0)
 
 
 def wys_gory(x, y):
@@ -316,5 +316,6 @@ def teren(sl):
     for i in range(6):
         sl.add(sphere(0.35, 0.3, 0.2, 10, 6), 'foam', 'root', mtx((sx + (i - 2.5) * 0.3, sy + r * 0.55, 0.12)))
     # --- kilka drzew w mieście (przy murach i stawie)
-    for (x, y) in ((-15.5, -10.0), (15.5, -10.0), (-15.5, 4.5), (15.5, 4.5), (-8.3, 12.3), (8.5, 12.4), (14.5, 11.5)):
+    for (x, y) in ((-22.5, -16.0), (22.5, -16.0), (-22.5, 4.5), (22.5, 4.5), (-7.5, 5.5), (7.5, 5.5),
+                   (-22.0, 11.5), (21.5, 16.0), (-6.0, -8.0), (6.0, -8.0)):
         drzewo(sl, V(x, y, 0), 1.0, rng)
