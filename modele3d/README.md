@@ -174,15 +174,17 @@ Brama i **6 wież** też ulepszają się **osobno**, w tych samych 15 poziomach 
 | liczbę poziomów ulepszeń i to, przy którym poziomie zmienia się wygląd | `src/mapa/uklad.py` |
 | teren: góra (wodospad, jezioro, rzeka, półki skalne, głazy), łąki, lasy, staw, plac, drogi, skalna półka pod budynek główny | `src/mapa/teren.py` |
 | budynek główny: co zmienia każdy z 20 poziomów | `src/mapa/budynek_glowny.py` (lista `ZMIANY` i warunki `p >= N`) |
+| uszkodzenia (4 stany): gdzie mur pęka, ile gruzu i ognia; wymiary elementów do planu uszkodzeń | `src/mapa/uszkodzenia.py`, tabele `USZ_MUR`, `USZ_BRAMA`, `USZ_WIEZA` i funkcje `plan_bramy`, `plan_wiezy` w `src/mapa/mury.py` |
 
 Polecenie: `python build.py --mapa` (eksport) albo `python build.py --mapa --podglad` (eksport + rendery).
 
 Pliki w `export/mapa/`:
 - `teren.glb`, `mur_bok_etap<1-5>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_etap<1-5>.glb`, `brama_etap<1-5>.glb`, `wieza_etap<1-5>.glb` (6 wież);
 - w każdym murze, bramie i wieży są puste węzły `obronca_01`, `obronca_02`… czyli **miejsca dla obrońców**. Wyższy poziom ma więcej miejsc;
+- **uszkodzenia**: każdy mur, brama i wieża ma w tym samym pliku warstwy uszkodzeń (węzły `*_znika_k`, `*_pojawia_k`, `*_pokaz_a_b`) dla 4 stanów: 0 cały (100–70%), 1 lekko (70–40%), 2 mocno (40–1%), 3 wyłom (0%). Miejsca obrońców na zawalonych fragmentach znikają razem z nimi, a pusty węzeł `wylom` wskazuje przejście dla wrogów. Podgląd: `podglad/uszkodzenia_mury.png`, `uszkodzenia_brama.png`, `uszkodzenia_wieze.png`;
 - `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D11; D1 przy skalnej ścianie góry to budynek główny, reszta wolna), plac ze studnią na środku i **strefy ataku** przed każdym murem.
 
-W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `ustaw_poziom_wiezy("wieza_tyl_lewa", 9)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
+W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `ustaw_poziom_wiezy("wieza_tyl_lewa", 9)`, `miejsca_obroncow("lewy")`, `ustaw_uszkodzenie("przod", 0.35)` (wytrzymałość 0–1), `wylom("przod")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
 
 **Budynek główny** stoi na skalnej półce (podwyższeniu 1,6 m) przy ścianie góry, ze schodami na plac; wokół zostaje wolne miejsce. Ma **20 poziomów** i każdy coś zmienia: 1–5 drewniana chata, 6–10 duży drewniany dom, 11–15 kamienna sala, 16–20 okazała rezydencja (pliki `budynek_glowny_poz01…20.glb`, podgląd wszystkich: `podglad/budynek_glowny_poziomy.png`). W Godocie: `ustaw_poziom_budynku(12)`.
 

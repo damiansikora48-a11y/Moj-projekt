@@ -86,15 +86,27 @@ def widoczna(nazwa_warstwy, stan):
 
 
 class Plan:
-    """Plan uszkodzeń odcinka muru.
-    L – długość, gora – wysokość szczytu (z blankami), pomost – wysokość pomostu,
-    wolne – przedziały x, gdzie mogą być uszkodzenia (bez wież i bramy),
-    lico – y zewnętrznej ściany (pęknięcia), stopa – (y_przod, y_tyl) podstawy muru (gruz)."""
+    """Plan uszkodzeń elementu (mur, brama, wieża).
+    gora – wysokość szczytu (z blankami), pomost – wysokość pomostu,
+    lico – y zewnętrznej ściany (liczba albo funkcja x -> y, np. dla okrągłej wieży), lico_tyl – y ściany
+    od strony miasta (opcjonalnie), stopa – (y_przod, y_tyl) podstawy (gdzie leży gruz).
+    Miejsca uszkodzeń:  wolne=[(a, b), ...] – losowane na długości muru,  albo  dziury=[...] podane wprost:
+    (stan, x, pół-szerokość, głębokość od góry[, ostrość profilu]), punkty=[x, ...] – gdzie rysy i kamyki.
+    peknięcia=False – bez rys i osmaleń (drewno)."""
 
-    def __init__(self, gora, pomost, wolne, lico, stopa, seed=1, lico_tyl=None):
+    def __init__(self, gora, pomost, lico, stopa, seed=1, lico_tyl=None, wolne=None, dziury=None, punkty=(),
+                 wylom_x=None, pekniecia=True, ognie=2):
         self.gora, self.pomost, self.lico, self.stopa = gora, pomost, lico, stopa
         self.lico_tyl = lico_tyl
         self.seed = seed
+        self.pekniecia, self.ognie = pekniecia, ognie
+        self.usuniete = []  # (stan, środek, rozmiar, materiał)
+        if dziury is not None:
+            self.dziury = [d if len(d) == 5 else (*d, 2) for d in dziury]
+            self.punkty = list(punkty)
+            if wylom_x is not None:
+                self.x_wylomu = wylom_x
+            return
         rng = random.Random(seed * 7919 + 13)
         dl = sum(b - a for a, b in wolne)
         n_lekkie = max(1, round(dl / 12))
@@ -111,31 +123,29 @@ class Plan:
         ciezkie = set(rng.sample(range(n), n_ciezkie))
         wylom = rng.choice(sorted(ciezkie))
         szczyt = gora - pomost  # wysokość blanków nad pomostem
-        self.dziury = []    # (stan, x, pół-szerokość, głębokość od góry)
-        self.punkty = []    # (rodzaj, x) – miejsca uszkodzeń (do pęknięć, ognia)
+        self.dziury = []    # (stan, x, pół-szerokość, głębokość od góry, ostrość profilu)
+        self.punkty = []    # x miejsc uszkodzeń (rysy, kamyki)
         for i, x in enumerate(miejsca):
             if i in ciezkie:
-                self.dziury.append((1, x, rng.uniform(0.9, 1.3), szczyt + rng.uniform(0.2, 0.6)))
-                self.dziury.append((2, x, rng.uniform(1.9, 2.4), gora * rng.uniform(0.45, 0.6)))
-                self.punkty.append(('ciezkie', x))
+                self.dziury.append((1, x, rng.uniform(0.9, 1.3), szczyt + rng.uniform(0.2, 0.6), 2))
+                self.dziury.append((2, x, rng.uniform(1.9, 2.4), gora * rng.uniform(0.45, 0.6), 2))
             else:
-                self.dziury.append((1, x, rng.uniform(1.1, 1.5), szczyt + rng.uniform(0.5, 1.0)))
-                self.dziury.append((2, x, rng.uniform(1.4, 1.8), szczyt + rng.uniform(1.2, 1.8)))
-                self.punkty.append(('lekkie', x))
+                self.dziury.append((1, x, rng.uniform(1.1, 1.5), szczyt + rng.uniform(0.5, 1.0), 2))
+                self.dziury.append((2, x, rng.uniform(1.4, 1.8), szczyt + rng.uniform(1.2, 1.8), 2))
+            self.punkty.append(x)
             if i == wylom:
-                self.dziury.append((3, x, 3.1, gora + 2.2))
+                self.dziury.append((3, x, 3.1, gora + 2.2, 2))
                 self.x_wylomu = x
-        self.usuniete = []  # (stan, środek, rozmiar, materiał)
 
     def stan_usuniecia(self, c):
         """Od którego stanu część o środku c odpada (None = nie odpada nigdy)."""
         wynik = None
         szum = random.Random(f'{self.seed}|{c.x:.2f}|{c.z:.2f}').uniform(-0.22, 0.22)
-        for k, x0, hw, gl in self.dziury:
+        for k, x0, hw, gl, ostr in self.dziury:
             t = abs(c.x - x0) / hw
             if t >= 1.0:
                 continue
-            if c.z > self.gora - gl * (1 - t * t) + szum:
+            if c.z > self.gora - gl * (1 - t ** ostr) + szum:
                 wynik = k if wynik is None else min(wynik, k)
         return wynik
 
@@ -207,7 +217,7 @@ class Plan:
                 if y < y0:
                     ogniska[k].append((x, y, kopce[klucz]))
         # drobne kamyki pod murem już przy lekkim uszkodzeniu
-        for rodzaj, x in self.punkty:
+        for x in self.punkty:
             with sl.warstwa('pojawia_1'):
                 for _ in range(5):
                     s = rng.uniform(0.15, 0.3)
@@ -217,15 +227,22 @@ class Plan:
         self._ogien(sl, rng, ogniska)
 
     def _pekniecia(self, sl, rng):
-        """Ciemne, łamane rysy na licu muru pod miejscami uszkodzeń (stan 1), większe i
+        """Ciemne, łamane rysy na licu pod miejscami uszkodzeń (stan 1), większe rysy i
         osmalenia przy dziurach (stan 2)."""
+        if not self.pekniecia:
+            return
         lica = [(self.lico, -1)] + ([(self.lico_tyl, 1)] if self.lico_tyl is not None else [])
-        for rodzaj, x in self.punkty:
+        rozrzut = getattr(self, 'rozrzut', 1.2)
+        for x in self.punkty:
             for k, ile, dl_seg in ((1, 2, 0.45), (2, 3, 0.6)):
-                gl = max(g for kk, xx, hw, g in self.dziury if xx == x and kk == k)
-                for y_lica, zn in lica:
+                gl = [g for kk, xx, hw, g, o in self.dziury if kk == k and abs(xx - x) < hw]
+                if not gl:
+                    continue
+                gl = max(gl)
+                for lico, zn in lica:
+                    y_lica = lico if callable(lico) else (lambda _x, _y=lico: _y)
                     for j in range(ile):
-                        p = V((x + rng.uniform(-1.2, 1.2), y_lica + zn * 0.05, self.gora - gl - rng.uniform(0.0, 0.3)))
+                        p = V((x + rng.uniform(-rozrzut, rozrzut), 0, self.gora - gl - rng.uniform(0.0, 0.3)))
                         kat = rng.choice((-1, 1)) * rng.uniform(15, 40)
                         for s in range(rng.randint(3, 5)):
                             if p.z < 0.4:
@@ -233,13 +250,15 @@ class Plan:
                             kat = -kat * rng.uniform(0.6, 1.2)
                             r = math.radians(kat)
                             q = p + V((math.sin(r), 0, -math.cos(r))) * dl_seg * rng.uniform(0.7, 1.2)
+                            p.y = q.y = y_lica((p.x + q.x) / 2) + zn * 0.05
                             self._na_licu(sl, k, box(0.08, 0.06, (q - p).length + 0.04, 0.01), 'crack', seg(p, q, (0, 1, 0)))
                             p = q
                     if k == 2:  # osmalenia wokół dziury
                         for _ in range(3):
                             w = rng.uniform(0.5, 0.9)
+                            xs = x + rng.uniform(-rozrzut * 1.8, rozrzut * 1.8)
                             self._na_licu(sl, 2, box(w, 0.04, w * 0.6, 0.01), 'soot',
-                                          mtx((x + rng.uniform(-2.2, 2.2), y_lica + zn * 0.04, self.gora - gl - rng.uniform(0.3, 1.0)),
+                                          mtx((xs, y_lica(xs) + zn * 0.04, self.gora - gl - rng.uniform(0.3, 1.0)),
                                               (0, rng.uniform(-30, 30), 0)))
 
     def _ogien(self, sl, rng, ogniska):
@@ -247,7 +266,7 @@ class Plan:
         for k in (2, 3):
             miejsca = ogniska.get(k, [])
             rng.shuffle(miejsca)
-            for (x, y, z) in miejsca[:2 if k == 2 else 1]:
+            for (x, y, z) in miejsca[:self.ognie if k == 2 else 1]:
                 with sl.warstwa(f'pojawia_{k}'):
                     for i in range(3):
                         a = i * 2.1 + rng.uniform(0, 0.5)

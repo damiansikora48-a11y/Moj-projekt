@@ -445,6 +445,33 @@
       ]
     }
   },
+  "uszkodzenia": {
+    "_opis": "Stan uszkodzenia z wytrzymałości (0–1): pierwszy próg, który wytrzymałość osiąga. Węzły-warstwy w każdym .glb muru/bramy/wieży: *_znika_k widoczne gdy stan < k, *_pojawia_k widoczne gdy stan >= k, *_pokaz_a_b widoczne gdy a <= stan < b. Pusty węzeł \"wylom\" (mury, brama) = środek wyłomu, aktywny w stanie 3.",
+    "stany": {
+      "0": "cały",
+      "1": "lekko uszkodzony",
+      "2": "mocno uszkodzony",
+      "3": "wyłom"
+    },
+    "progi": [
+      {
+        "od_wytrzymalosci": 0.7,
+        "stan": 0
+      },
+      {
+        "od_wytrzymalosci": 0.4,
+        "stan": 1
+      },
+      {
+        "od_wytrzymalosci": 0.0001,
+        "stan": 2
+      },
+      {
+        "od_wytrzymalosci": 0.0,
+        "stan": 3
+      }
+    ]
+  },
   "plac": {
     "pozycja": [
       0.0,

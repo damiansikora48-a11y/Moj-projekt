@@ -104,6 +104,13 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
   - 10–12 Lepszy mur kamienny (7 / 9),
   - 13–15 Warownia (9 / 11).
 - **Brama** i **6 wież** ulepszają się osobno, w tych samych 15 poziomach i progach wyglądu: 2 przednie narożne, 2 tylne na końcach murów przy górze i 2 przy bramie.
+- **Uszkodzenia po ataku widać na modelach.** Każdy mur, brama i wieża ma 4 stany zależne od wytrzymałości:
+  - 100–70% cały,
+  - 70–40% lekko uszkodzony: rysy, strącone blanki, kamienie pod murem,
+  - 40–1% mocno uszkodzony: dziury, sterty gruzu, płonące szczątki; część miejsc dla obrońców znika razem z zawalonym pomostem,
+  - 0% wyłom: mur jest przebity do ziemi i wrogowie mogą tędy wejść; brama traci wrota; wieża zostaje ruiną.
+
+  Naprawa za złoto przywraca wytrzymałość i wygląd.
 - **Atakujący wybiera stronę ataku** (lewa, przód, prawa). Przed każdym murem jest wolna łąka na rozstawienie wojsk.
 - Wnętrze miasta: 52 × 40 m.
 - **Budynki w środku stoją na stałych działkach** (D1–D11). **Budynek główny** stoi na skalnej półce (podwyższeniu) D1 przy ścianie góry, ze schodami na plac i wolnym miejscem wokół. Ma **20 poziomów** i każdy poziom coś widocznie zmienia: od małej drewnianej chaty po okazałą kamienną rezydencję ze zdobieniami. Na środku miasta jest plac ze studnią. Co stoi na pozostałych działkach, ustalamy razem; część zostaje wolna na przyszłe budynki.

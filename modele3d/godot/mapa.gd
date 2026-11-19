@@ -7,6 +7,12 @@
 #   ustaw_poziom_muru("przod", 3)      # ulepszenie muru przedniego do poziomu 3
 #   ustaw_poziom_bramy(2)
 #   miejsca_obroncow("lewy")           # -> Array[Vector3] pozycji dla obrońców na murze
+#   ustaw_uszkodzenie("przod", 0.35)   # wytrzymałość 0–1 -> widoczne uszkodzenia (gruz, dziury, wyłom)
+#   wylom("przod")                     # -> Vector3 środka wyłomu albo null (gdy mur nie jest przebity)
+#
+# USZKODZENIA: każdy .glb muru/bramy/wieży ma warstwy (węzły) *_znika_k, *_pojawia_k, *_pokaz_a_b,
+# które pokazujemy zależnie od stanu 0–3 (progi w uklad.json "uszkodzenia"). Dym w ruchu warto dodać
+# cząsteczkami (GPUParticles3D) w miejscach ognia – modele mają tylko płonące szczątki.
 #
 # UWAGA: napisany pod Godot 4.x, nie był uruchamiany w edytorze – sprawdź przy pierwszym imporcie.
 class_name Miasto
@@ -19,6 +25,7 @@ var poziom_murow := {"lewy": 1, "przod": 1, "prawy": 1}
 var poziom_bramy := 1
 var poziom_wiez := {}   # id wieży -> poziom (6 wież z uklad.json "wieze")
 var poziom_budynku := 1
+var stan_uszkodzen := {}   # klucz elementu -> stan 0 cały, 1 lekko, 2 mocno uszkodzony, 3 wyłom
 var _wezly := {}   # klucz elementu -> instancja sceny
 
 
@@ -46,6 +53,7 @@ func _postaw(klucz: String, opis: Dictionary, poziom: int) -> Node3D:
 	n.rotation_degrees.y = opis["obrot_y_stopnie"]
 	add_child(n)
 	_wezly[klucz] = n
+	_pokaz_uszkodzenia(klucz)   # po ulepszeniu nowy model dostaje ten sam stan uszkodzeń
 	return n
 
 
@@ -86,13 +94,58 @@ func ustaw_poziom_budynku(poziom: int) -> void:
 	_wezly["budynek_glowny"] = n
 
 
+func _klucz(element: String) -> String:
+	return element if (element == "brama" or poziom_wiez.has(element)) else "mur_" + element
+
+
 ## Pozycje (globalne) miejsc dla obrońców: "lewy", "przod", "prawy", "brama" albo id wieży.
+## Miejsca na zawalonych fragmentach (uszkodzenia) są pomijane.
 func miejsca_obroncow(element: String) -> Array[Vector3]:
-	var klucz := element if (element == "brama" or poziom_wiez.has(element)) else "mur_" + element
 	var out: Array[Vector3] = []
-	for dziecko in _wezly[klucz].find_children("obronca_*", "", true, false):
-		out.append((dziecko as Node3D).global_position)
+	for dziecko in _wezly[_klucz(element)].find_children("obronca_*", "", true, false):
+		if (dziecko as Node3D).is_visible_in_tree():
+			out.append((dziecko as Node3D).global_position)
 	return out
+
+
+## Uszkodzenie elementu ("lewy", "przod", "prawy", "brama" albo id wieży) z wytrzymałości 0–1:
+## 100–70% cały, 70–40% lekko, 40–1% mocno uszkodzony, 0% wyłom. Naprawa = wyższa wytrzymałość.
+func ustaw_uszkodzenie(element: String, wytrzymalosc: float) -> int:
+	var stan := 3
+	for p in uklad["uszkodzenia"]["progi"]:
+		if wytrzymalosc >= float(p["od_wytrzymalosci"]):
+			stan = int(p["stan"])
+			break
+	var klucz := _klucz(element)
+	stan_uszkodzen[klucz] = stan
+	_pokaz_uszkodzenia(klucz)
+	return stan
+
+
+## Środek wyłomu (globalnie) – tędy wrogowie wchodzą do miasta; null, gdy element nie jest przebity.
+func wylom(element: String) -> Variant:
+	var klucz := _klucz(element)
+	if stan_uszkodzen.get(klucz, 0) < 3:
+		return null
+	var w := _wezly[klucz].find_child("wylom", true, false) as Node3D
+	return w.global_position if w else null
+
+
+func _pokaz_uszkodzenia(klucz: String) -> void:
+	if not _wezly.has(klucz):
+		return
+	var stan: int = stan_uszkodzen.get(klucz, 0)
+	for n in _wezly[klucz].find_children("*", "Node3D", true, false):
+		var nazwa := String(n.name)
+		if nazwa.contains("_znika_") or nazwa.contains("_pojawia_") or nazwa.contains("_pokaz_"):
+			n.visible = _widoczna(nazwa, stan)
+
+
+static func _widoczna(nazwa: String, stan: int) -> bool:
+	if nazwa.contains("_pokaz_"):
+		return int(nazwa.right(3).left(1)) <= stan and stan < int(nazwa.right(1))
+	var k := int(nazwa.right(1))
+	return stan < k if nazwa.contains("_znika_") else stan >= k
 
 
 ## Działka pod budynek po id (np. "D1"): pozycja i rozmiar z uklad.json.

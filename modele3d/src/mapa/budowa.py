@@ -83,10 +83,10 @@ def _eksport(ob, path):
 
 
 ELEMENTY = {
-    'mur_bok': lambda poz: (lambda sl: M.mur(sl, poz, U.GLEB, 0.0, seed=1, margines=6.5)),
-    'mur_front': lambda poz: (lambda sl: M.mur(sl, poz, U.SZER, U.BRAMA_SZER, seed=2)),
-    'brama': lambda poz: (lambda sl: M.brama(sl, poz)),
-    'wieza': lambda poz: (lambda sl: M.naroznik(sl, poz)),
+    'mur_bok': lambda poz: (lambda sl: M.mur(sl, poz, U.GLEB, 0.0, seed=1, margines=6.5, uszkodzenia=True)),
+    'mur_front': lambda poz: (lambda sl: M.mur(sl, poz, U.SZER, U.BRAMA_SZER, seed=2, uszkodzenia=True)),
+    'brama': lambda poz: (lambda sl: M.brama(sl, poz, uszkodzenia=True)),
+    'wieza': lambda poz: (lambda sl: M.naroznik(sl, poz, uszkodzenia=True)),
 }
 
 
@@ -110,6 +110,14 @@ def uklad_json(liczba_miejsc):
         'poziomy': {str(p): {'etap': e} for p, e in U.POZIOMY.items()},
         'teren': {'plik': 'teren.glb'},
         'mury': {}, 'brama': {}, 'wieze': [], 'dzialki': [], 'strefy_ataku': {},
+        'uszkodzenia': {
+            '_opis': 'Stan uszkodzenia z wytrzymałości (0–1): pierwszy próg, który wytrzymałość osiąga. '
+                     'Węzły-warstwy w każdym .glb muru/bramy/wieży: *_znika_k widoczne gdy stan < k, '
+                     '*_pojawia_k widoczne gdy stan >= k, *_pokaz_a_b widoczne gdy a <= stan < b. '
+                     'Pusty węzeł "wylom" (mury, brama) = środek wyłomu, aktywny w stanie 3.',
+            'stany': {str(k): v for k, v in USZ.STANY.items()},
+            'progi': [{'od_wytrzymalosci': p, 'stan': k} for p, k in USZ.STAN_Z_WYTRZYMALOSCI],
+        },
     }
     for strona, m in U.MURY.items():
         out['mury'][strona] = {'plik': m['element'] + '_etap{etap}.glb', 'pozycja': U.do_godota(*m['srodek']),
@@ -160,16 +168,18 @@ def zbuduj(export_dir, podglad_dir, podglad=False):
     if podglad:
         podglad_budynku(podglad_dir)
         podglady(podglad_dir)
+        podglad_uszkodzen(podglad_dir)
 
 
 # ------------------------------------------------------------------ podglądy
 
-def _scena(poziomy, brama_poz, jednostki=None, budynek=None):
+def _scena(poziomy, brama_poz, jednostki=None, budynek=None, uszkodzenia=None):
     """Składa całe miasto: poziomy = {'lewy': p, 'przod': p, 'prawy': p}."""
     reset_scene()
     ob, _ = _obiekt('teren', T.teren, T.PALETA, normalne=False)
     for strona, m in U.MURY.items():
         o, miejsca = _obiekt(f"{m['element']}_{strona}", ELEMENTY[m['element']](poziomy[strona]), M.PALETA)
+        ustaw_stan(o, (uszkodzenia or {}).get(strona, 0))
         _postaw(o, m['srodek'], m['obrot'])
         if jednostki and strona in jednostki:
             for (n, p), jed in zip(miejsca, jednostki[strona]):
@@ -178,6 +188,7 @@ def _scena(poziomy, brama_poz, jednostki=None, budynek=None):
                     b['arm'].location = _swiat(m['srodek'], m['obrot'], p)
                     b['arm'].rotation_euler = (0, 0, math.radians(m['obrot']))
     o, miejsca = _obiekt('brama', ELEMENTY['brama'](brama_poz), M.PALETA)
+    ustaw_stan(o, (uszkodzenia or {}).get('brama', 0))
     _postaw(o, U.BRAMA['srodek'], 0)
     if jednostki and 'brama' in jednostki:
         for (n, p), jed in zip(miejsca, jednostki['brama']):
@@ -187,6 +198,7 @@ def _scena(poziomy, brama_poz, jednostki=None, budynek=None):
     for nz in U.WIEZE:
         poz = poziomy.get(nz['id'], poziomy['przod'])  # wieże ulepszane osobno
         o, _ = _obiekt(nz['id'], ELEMENTY['wieza'](poz), M.PALETA)
+        ustaw_stan(o, (uszkodzenia or {}).get(nz['id'], 0))
         _postaw(o, nz['srodek'], 0)
     if budynek:
         d1 = next(d for d in U.DZIALKI if d['id'] == U.BUDYNEK_GLOWNY['dzialka'])
@@ -227,6 +239,11 @@ def podglady(katalog):
     render_view(os.path.join(katalog, 'mapa_rozbudowana_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     render_view(os.path.join(katalog, 'mapa_mury_z_bliska.png'), (2, U.PRZOD_Y, 3), 34, 40, 25, lens=35)
     render_view(os.path.join(katalog, 'mapa_budynek_glowny.png'), (0, U.GLEB / 2 - 5.5, 4), 30, 35, 15, lens=35)
+    # 2b) miasto po ataku: różne stany uszkodzeń
+    _scena({'lewy': 3, 'przod': 4, 'prawy': 5, **{w['id']: 4 for w in U.WIEZE}}, 4, budynek=12,
+           uszkodzenia={'lewy': 1, 'przod': 3, 'prawy': 2, 'brama': 2, 'wieza_przod_lewa': 3, 'wieza_brama_prawa': 1})
+    _studio(1600, 1000, 48)
+    render_view(os.path.join(katalog, 'mapa_po_ataku_52st.png'), (0, -4, 4), 118, 52, 0, lens=35)
     # 3) wszystkie poziomy murów obok siebie (fragment muru z bramą i wieżą)
     reset_scene()
     for i, poz in enumerate(sorted(U.ETAPY)):
@@ -279,37 +296,45 @@ def podglad_budynku(katalog, samples=24):
     img.save(os.path.join(katalog, 'budynek_glowny_poziomy.png'))
 
 
-def podglad_uszkodzen(katalog, samples=40):
-    """Kamienne mury (etapy 3–5) w 4 stanach uszkodzeń, obok siebie, z podpisami."""
+def podglad_uszkodzen(katalog, samples=24, tylko=None):
+    """Mury, brama i wieże (etapy 1–5) w 4 stanach uszkodzeń: obrazki uszkodzenia_<rodzaj>.png."""
     from PIL import Image, ImageDraw, ImageFont
     from kit import box as _box
-    kafle = []
-    for poz in (3, 4, 5):
-        rzad = []
-        for stan in range(4):
-            reset_scene()
-            o, _ = _obiekt('mur', lambda sl: M.mur(sl, poz, 22.0, 0.0, seed=3, margines=1.0, uszkodzenia=True), M.PALETA)
-            ustaw_stan(o, stan)
-            _obiekt('trawa', lambda sl: sl.add(_box(80, 60, 0.02), 'grass', 'root', mtx((0, 4, -0.01))), T.PALETA)
-            _studio(800, 470, samples)
-            sc = os.path.join(katalog, f'_usz_{poz}_{stan}.png')
-            render_view(sc, (0, 0.4, 2.2), 21, 38, 14, lens=35)
-            rzad.append(sc)
-        kafle.append(rzad)
-    W, H, P = 800, 470, 40
-    img = Image.new('RGB', (W * 4, P + (H + P) * 3), (238, 240, 236))
-    d = ImageDraw.Draw(img)
+    rodzaje = {
+        # rodzaj: (budowa(poz), kamera(poz) -> (cel, odległość, pochylenie, obrót))
+        'mury': (lambda poz: (lambda sl: M.mur(sl, poz, 22.0, 0.0, seed=3, margines=1.0, uszkodzenia=True)),
+                 lambda poz: ((0, 0.4, 2.2), 21, 38, 14)),
+        'brama': (lambda poz: (lambda sl: M.brama(sl, poz, uszkodzenia=True)),
+                  lambda poz: ((0, 0.3, 2.6 + poz * 0.2), 13 + poz * 0.6, 30, 18)),
+        'wieze': (lambda poz: (lambda sl: M.naroznik(sl, poz, uszkodzenia=True)),
+                  lambda poz: ((0, 0, M.USZ_WIEZA[poz]['gora'] * 0.42), 9 + M.USZ_WIEZA[poz]['gora'] * 1.15, 26, 18)),
+    }
+    W, H, P = 640, 420, 40
     try:
-        f = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 24)
+        f = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 22)
     except OSError:
         f = ImageFont.load_default()
-    for stan in range(4):
-        prog = {0: '100–70%', 1: '70–40%', 2: '40–1%', 3: '0%'}[stan]
-        d.text((stan * W + 14, 8), f'{USZ.STANY[stan].capitalize()} ({prog})', fill=(35, 39, 31), font=f)
-    for r, (poz, rzad) in enumerate(zip((3, 4, 5), kafle)):
-        y = P + r * (H + P)
-        d.text((14, y + H + 6), f"Etap {poz}: {U.ETAPY[poz]['nazwa']}", fill=(90, 95, 85), font=f)
-        for stan, k in enumerate(rzad):
-            img.paste(Image.open(k).convert('RGB'), (stan * W, y))
-            os.remove(k)
-    img.save(os.path.join(katalog, 'mury_uszkodzenia.png'))
+    for rodzaj, (fabryka, kamera) in rodzaje.items():
+        if tylko and rodzaj not in tylko:
+            continue
+        img = Image.new('RGB', (W * 4, P + (H + P) * 5), (238, 240, 236))
+        d = ImageDraw.Draw(img)
+        for stan in range(4):
+            prog = {0: '100–70%', 1: '70–40%', 2: '40–1%', 3: '0%'}[stan]
+            d.text((stan * W + 12, 8), f'{USZ.STANY[stan].capitalize()} ({prog})', fill=(35, 39, 31), font=f)
+        for r, poz in enumerate(sorted(U.ETAPY)):
+            y = P + r * (H + P)
+            for stan in range(4):
+                reset_scene()
+                o, _ = _obiekt('el', fabryka(poz), M.PALETA)
+                ustaw_stan(o, stan)
+                _obiekt('trawa', lambda sl: sl.add(_box(80, 60, 0.02), 'grass', 'root', mtx((0, 4, -0.01))), T.PALETA)
+                _studio(W, H, samples)
+                sc = os.path.join(katalog, f'_usz.png')
+                cel, dist, pitch, yaw = kamera(poz)
+                render_view(sc, cel, dist, pitch, yaw, lens=35)
+                img.paste(Image.open(sc).convert('RGB'), (stan * W, y))
+                os.remove(sc)
+            d.text((12, y + H + 6), f"Etap {poz}: {U.ETAPY[poz]['nazwa']}", fill=(90, 95, 85), font=f)
+        img.save(os.path.join(katalog, f'uszkodzenia_{rodzaj}.png'))
+        print('PODGLAD uszkodzenia', rodzaj)
