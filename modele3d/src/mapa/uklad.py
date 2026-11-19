@@ -34,10 +34,15 @@ MURY = {
     'prawy': {'element': 'mur_bok', 'srodek': (SZER / 2, 0.0), 'obrot': 90, 'dlugosc': GLEB},
 }
 BRAMA = {'element': 'brama', 'srodek': (0.0, PRZOD_Y), 'obrot': 0}
-# wieże na przednich narożnikach: każda ulepszana OSOBNO (poziomy 1–15, jak mury i brama)
-NAROZNIKI = [
-    {'id': 'wieza_lewa', 'element': 'naroznik', 'srodek': (-SZER / 2, PRZOD_Y), 'obrot': 0},
-    {'id': 'wieza_prawa', 'element': 'naroznik', 'srodek': (SZER / 2, PRZOD_Y), 'obrot': 0},
+# 6 wież, każda ulepszana OSOBNO (poziomy 1–15, jak mury i brama); wszystkie mają ten sam wygląd etapów
+WIEZA_BRAMY_X = BRAMA_SZER / 2 + 3.2   # odległość wież przy bramie od środka bramy
+WIEZE = [
+    {'id': 'wieza_przod_lewa', 'element': 'wieza', 'srodek': (-SZER / 2, PRZOD_Y), 'obrot': 0, 'opis': 'przedni lewy narożnik'},
+    {'id': 'wieza_przod_prawa', 'element': 'wieza', 'srodek': (SZER / 2, PRZOD_Y), 'obrot': 0, 'opis': 'przedni prawy narożnik'},
+    {'id': 'wieza_tyl_lewa', 'element': 'wieza', 'srodek': (-SZER / 2, GLEB / 2 - 3.0), 'obrot': 0, 'opis': 'koniec lewego muru przy górze'},
+    {'id': 'wieza_tyl_prawa', 'element': 'wieza', 'srodek': (SZER / 2, GLEB / 2 - 3.0), 'obrot': 0, 'opis': 'koniec prawego muru przy górze'},
+    {'id': 'wieza_brama_lewa', 'element': 'wieza', 'srodek': (-WIEZA_BRAMY_X, PRZOD_Y), 'obrot': 0, 'opis': 'po lewej stronie bramy'},
+    {'id': 'wieza_brama_prawa', 'element': 'wieza', 'srodek': (WIEZA_BRAMY_X, PRZOD_Y), 'obrot': 0, 'opis': 'po prawej stronie bramy'},
 ]
 
 # --- działki pod budynki (środek x, y; rozmiar szer x gł). 'budynek': None = wolna.

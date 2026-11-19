@@ -5,7 +5,7 @@ Pliki:
   teren.glb                          – ziemia, góra, lasy, staw, plac, drogi, działki
   mur_bok_etap<1-5>.glb              – mur boczny (lewy i prawy to ten sam element, obrócony)
   mur_front_etap<1-5>.glb            – mur przedni z prześwitem na bramę
-  brama_etap<1-5>.glb, naroznik_etap<1-5>.glb
+  brama_etap<1-5>.glb, wieza_etap<1-5>.glb (6 wież: narożne, tylne przy górze, przy bramie)
 Poziomy ulepszeń (1–15) wskazują etap wyglądu – mapowanie w uklad.json ('poziomy').
   uklad.json                         – gdzie co postawić w Godot + działki + strefy ataku
   budynek_glowny_poz<01-20>.glb     – budynek główny (stawiany na skalnej półce działki D1)
@@ -64,10 +64,10 @@ def _eksport(ob, path):
 
 
 ELEMENTY = {
-    'mur_bok': lambda poz: (lambda sl: M.mur(sl, poz, U.GLEB, 0.0, seed=1)),
+    'mur_bok': lambda poz: (lambda sl: M.mur(sl, poz, U.GLEB, 0.0, seed=1, margines=6.5)),
     'mur_front': lambda poz: (lambda sl: M.mur(sl, poz, U.SZER, U.BRAMA_SZER, seed=2)),
     'brama': lambda poz: (lambda sl: M.brama(sl, poz)),
-    'naroznik': lambda poz: (lambda sl: M.naroznik(sl, poz)),
+    'wieza': lambda poz: (lambda sl: M.naroznik(sl, poz)),
 }
 
 
@@ -90,7 +90,7 @@ def uklad_json(liczba_miejsc):
         'etapy': {str(k): v for k, v in U.ETAPY.items()},
         'poziomy': {str(p): {'etap': e} for p, e in U.POZIOMY.items()},
         'teren': {'plik': 'teren.glb'},
-        'mury': {}, 'brama': {}, 'narozniki': [], 'dzialki': [], 'strefy_ataku': {},
+        'mury': {}, 'brama': {}, 'wieze': [], 'dzialki': [], 'strefy_ataku': {},
     }
     for strona, m in U.MURY.items():
         out['mury'][strona] = {'plik': m['element'] + '_etap{etap}.glb', 'pozycja': U.do_godota(*m['srodek']),
@@ -98,10 +98,10 @@ def uklad_json(liczba_miejsc):
                                'miejsca_obroncow_na_etap': {str(e): liczba_miejsc[(m['element'], e)] for e in U.ETAPY}}
     out['brama'] = {'plik': 'brama_etap{etap}.glb', 'pozycja': U.do_godota(*U.BRAMA['srodek']), 'obrot_y_stopnie': 0,
                     'miejsca_obroncow_na_etap': {str(e): liczba_miejsc[('brama', e)] for e in U.ETAPY}}
-    for n in U.NAROZNIKI:
-        out['narozniki'].append({'id': n['id'], 'plik': 'naroznik_etap{etap}.glb', 'pozycja': U.do_godota(*n['srodek']),
-                                 'obrot_y_stopnie': 0,
-                                 'miejsca_obroncow_na_etap': {str(e): liczba_miejsc[('naroznik', e)] for e in U.ETAPY}})
+    for n in U.WIEZE:
+        out['wieze'].append({'id': n['id'], 'opis': n['opis'], 'plik': 'wieza_etap{etap}.glb', 'pozycja': U.do_godota(*n['srodek']),
+                             'obrot_y_stopnie': 0,
+                             'miejsca_obroncow_na_etap': {str(e): liczba_miejsc[('wieza', e)] for e in U.ETAPY}})
     for d in U.DZIALKI:
         out['dzialki'].append({'id': d['id'], 'pozycja': U.do_godota(*d['srodek']), 'rozmiar_m': list(d['rozmiar']),
                                'budynek': d['budynek'], 'uwagi': d['uwagi']})
@@ -165,9 +165,9 @@ def _scena(poziomy, brama_poz, jednostki=None, budynek=None):
             if jed:
                 b = build_unit(jed)
                 b['arm'].location = _swiat(U.BRAMA['srodek'], 0, p)
-    for nz in U.NAROZNIKI:
+    for nz in U.WIEZE:
         poz = poziomy.get(nz['id'], poziomy['przod'])  # wieże ulepszane osobno
-        o, _ = _obiekt('naroznik', ELEMENTY['naroznik'](poz), M.PALETA)
+        o, _ = _obiekt(nz['id'], ELEMENTY['wieza'](poz), M.PALETA)
         _postaw(o, nz['srodek'], 0)
     if budynek:
         d1 = next(d for d in U.DZIALKI if d['id'] == U.BUDYNEK_GLOWNY['dzialka'])
@@ -199,7 +199,7 @@ def podglady(katalog):
             'lewy': [jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik']],
             'prawy': [jd['mag_ognia'], jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik'], jd['mag_ognia'], jd['lesny_lucznik']],
             'brama': [jd['zolnierz'], jd['lesny_lucznik'], jd['zolnierz']]}
-    _scena({'lewy': 3, 'przod': 4, 'prawy': 5, 'wieza_lewa': 5, 'wieza_prawa': 5}, 5, jedn, budynek=20)
+    _scena({'lewy': 3, 'przod': 4, 'prawy': 5, **{w['id']: 5 for w in U.WIEZE}}, 5, jedn, budynek=20)
     b = build_unit(jd['kamienny_rycerz'])
     b['arm'].location = (-2.5, U.PRZOD_Y - 4.5, 0)
     b = build_unit(jd['golem'])
@@ -212,12 +212,13 @@ def podglady(katalog):
     reset_scene()
     for i, poz in enumerate(sorted(U.ETAPY)):
         x0 = (i - 2) * 24
-        o, _ = _obiekt(f'm{poz}', lambda sl, p=poz: M.mur(sl, p, 18.0, U.BRAMA_SZER, seed=5), M.PALETA)
+        o, _ = _obiekt(f'm{poz}', lambda sl, p=poz: M.mur(sl, p, 22.0, U.BRAMA_SZER, seed=5), M.PALETA)
         _postaw(o, (x0, 0), 0)
         o, _ = _obiekt(f'b{poz}', ELEMENTY['brama'](poz), M.PALETA)
         _postaw(o, (x0, 0), 0)
-        o, _ = _obiekt(f'n{poz}', ELEMENTY['naroznik'](poz), M.PALETA)
-        _postaw(o, (x0 - 9.5, 0), 0)
+        for sg in (1, -1):  # wieże przy bramie
+            o, _ = _obiekt(f'n{poz}{sg}', ELEMENTY['wieza'](poz), M.PALETA)
+            _postaw(o, (x0 + sg * U.WIEZA_BRAMY_X, 0), 0)
     o, _ = _obiekt('trawa', lambda sl: sl.add(__import__('kit').box(160, 40, 0.02), 'grass', 'root', mtx((0, 4, -0.01))), T.PALETA)
     _studio(1800, 700, 48)
     render_view(os.path.join(katalog, 'mapa_poziomy_murow.png'), (-1, 0, 3), 122, 22, 0, lens=35)

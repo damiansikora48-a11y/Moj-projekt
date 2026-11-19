@@ -165,7 +165,7 @@ Miasto pod wysoką górą (z wodospadem, jeziorem i rzeką po prawej, półkami 
 | 10–12 | 4 | Lepszy mur kamienny | 7 / 9 |
 | 13–15 | 5 | Warownia | 9 / 11 |
 
-Brama i obie wieże na przednich narożnikach też ulepszają się **osobno**, w tych samych 15 poziomach i progach wyglądu. Liczbę poziomów i progi zmieniasz w `src/mapa/uklad.py` (`LICZBA_POZIOMOW`, `POZIOMY`).
+Brama i **6 wież** też ulepszają się **osobno**, w tych samych 15 poziomach i progach wyglądu: dwie przednie narożne, dwie tylne (na końcach murów bocznych przy górze) i dwie przy bramie (`wieza_przod_lewa`, `wieza_przod_prawa`, `wieza_tyl_lewa`, `wieza_tyl_prawa`, `wieza_brama_lewa`, `wieza_brama_prawa`). Wszystkie korzystają z tych samych modeli `wieza_etap<1-5>.glb`. Sama brama to wrota, krata i łuk na filarach. Liczbę poziomów i progi zmieniasz w `src/mapa/uklad.py` (`LICZBA_POZIOMOW`, `POZIOMY`).
 
 | Chcę zmienić… | Plik |
 |---|---|
@@ -178,11 +178,11 @@ Brama i obie wieże na przednich narożnikach też ulepszają się **osobno**, w
 Polecenie: `python build.py --mapa` (eksport) albo `python build.py --mapa --podglad` (eksport + rendery).
 
 Pliki w `export/mapa/`:
-- `teren.glb`, `mur_bok_etap<1-5>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_etap<1-5>.glb`, `brama_etap<1-5>.glb`, `naroznik_etap<1-5>.glb`;
+- `teren.glb`, `mur_bok_etap<1-5>.glb` (lewy i prawy to ten sam element, obrócony), `mur_front_etap<1-5>.glb`, `brama_etap<1-5>.glb`, `wieza_etap<1-5>.glb` (6 wież);
 - w każdym murze, bramie i wieży są puste węzły `obronca_01`, `obronca_02`… czyli **miejsca dla obrońców**. Wyższy poziom ma więcej miejsc;
 - `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D11; D1 przy skalnej ścianie góry to budynek główny, reszta wolna), plac ze studnią na środku i **strefy ataku** przed każdym murem.
 
-W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `ustaw_poziom_wiezy("wieza_lewa", 9)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
+W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `ustaw_poziom_wiezy("wieza_tyl_lewa", 9)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
 
 **Budynek główny** stoi na skalnej półce (podwyższeniu 1,6 m) przy ścianie góry, ze schodami na plac; wokół zostaje wolne miejsce. Ma **20 poziomów** i każdy coś zmienia: 1–5 drewniana chata, 6–10 duży drewniany dom, 11–15 kamienna sala, 16–20 okazała rezydencja (pliki `budynek_glowny_poz01…20.glb`, podgląd wszystkich: `podglad/budynek_glowny_poziomy.png`). W Godocie: `ustaw_poziom_budynku(12)`.
 

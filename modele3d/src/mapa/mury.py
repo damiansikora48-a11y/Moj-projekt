@@ -34,12 +34,15 @@ POMOST = {1: 0.0, 2: 2.6, 3: 3.6, 4: 4.2, 5: 5.0}
 OBRONCY_NA_28M = {1: 0, 2: 2, 3: 3, 4: 5, 5: 6}
 
 
-def _miejsca(poz, L, brama_szer, y):
+def _miejsca(poz, L, brama_szer, y, margines=0.0, strefa_bramy=0.0):
+    """Miejsca dla obrońców wzdłuż pomostu – z pominięciem końców muru (margines, tam stoją wieże)
+    i okolicy bramy (strefa_bramy: bramа i wieże przy bramie)."""
     if OBRONCY_NA_28M[poz] == 0:
         return []
     n = max(1, round(OBRONCY_NA_28M[poz] * L / 28.0))
     out = []
-    odcinki = [(-L / 2, -brama_szer / 2 - 1.0), (brama_szer / 2 + 1.0, L / 2)] if brama_szer else [(-L / 2, L / 2)]
+    a0, b0 = -L / 2 + margines, L / 2 - margines
+    odcinki = [(a0, -strefa_bramy), (strefa_bramy, b0)] if brama_szer else [(a0, b0)]
     dl = sum(b - a for a, b in odcinki)
     for i in range(n):
         s = (i + 0.5) * dl / n
@@ -199,7 +202,7 @@ def _odcinek(sl, poz, a, b, rng):
             k += 1
 
 
-def mur(sl, poz, L, brama_szer=0.0, seed=1):
+def mur(sl, poz, L, brama_szer=0.0, seed=1, margines=3.6, strefa_bramy=9.6):
     rng = random.Random(seed * 100 + poz)
     if brama_szer:
         _odcinek(sl, poz, -L / 2, -brama_szer / 2, rng)
@@ -207,7 +210,7 @@ def mur(sl, poz, L, brama_szer=0.0, seed=1):
     else:
         _odcinek(sl, poz, -L / 2, L / 2, rng)
     y = {1: 0.0, 2: 1.25, 3: 0.55, 4: 0.6, 5: 0.6}[poz]
-    return _miejsca(poz, L, brama_szer, y)
+    return _miejsca(poz, L, brama_szer, y, margines, strefa_bramy if brama_szer else 0.0)
 
 
 # ------------------------------------------------------------------ brama (środek prześwitu w 0,0)
@@ -251,36 +254,32 @@ def brama(sl, poz):
     elif poz == 3:  # słaby kamień: filary z polnego kamienia, drewniany pomost nad bramą
         rng = random.Random(30)
         for sg in (1, -1):
-            _bloki(sl, rng, sg * 3.9 - 1.0, sg * 3.9 + 1.0, 0.5, 2.6, 0.0, 4.6, wys_rzedu=0.9,
+            _bloki(sl, rng, sg * 3.45 - 0.45, sg * 3.45 + 0.45, 0.5, 2.6, 0.0, 4.6, wys_rzedu=0.9,
                    mat=('stone_dark', 'stone', 'stone_dark'))
-        sl.add(box(9.8, 2.2, 0.16, 0.03), 'wood_light', 'root', mtx((0, 0.5, 4.6)))
-        sl.add(box(9.8, 0.14, 0.9, 0.02), 'wood', 'root', mtx((0, -0.55, 5.1)))
+        sl.add(box(7.8, 2.2, 0.16, 0.03), 'wood_light', 'root', mtx((0, 0.5, 4.6)))
+        sl.add(box(7.8, 0.14, 0.9, 0.02), 'wood', 'root', mtx((0, -0.55, 5.1)))
         sl.add(box(6.4, 0.5, 0.5, 0.06), 'wood_dark', 'root', mtx((0, -0.2, 4.3)))
         wrota(4.0, True)
         miejsca = [('obronca_01', (-1.5, 0.6, 4.7)), ('obronca_02', (1.5, 0.6, 4.7))]
     elif poz == 4:
         rng = random.Random(33)
         for sg in (1, -1):
-            _bloki(sl, rng, sg * 4.2 - 1.3, sg * 4.2 + 1.3, 0.6, 3.4, 0.0, 6.0)
-            for i in range(2):
-                sl.add(box(0.8, 0.5, 0.8, 0.06), 'stone', 'root', mtx((sg * 4.2 + (i - 0.5) * 1.3, -0.95, 6.4)))
+            _bloki(sl, rng, sg * 3.45 - 0.45, sg * 3.45 + 0.45, 0.6, 3.4, 0.0, 6.0)
+            sl.add(box(0.8, 0.5, 0.8, 0.06), 'stone', 'root', mtx((sg * 3.45, -0.95, 6.4)))
         _bloki(sl, rng, -3.0, 3.0, 0.6, 3.4, 4.4, 6.0, wys_rzedu=0.8)
-        sl.add(box(10.8, 3.2, 0.14, 0.02), 'stone_light', 'root', mtx((0, 0.6, 6.07)))
+        sl.add(box(7.8, 3.2, 0.14, 0.02), 'stone_light', 'root', mtx((0, 0.6, 6.07)))
         for x in (-1.9, -0.6, 0.7, 2.0):
             sl.add(box(0.8, 0.5, 0.8, 0.06), 'stone', 'root', mtx((x, -0.95, 6.47)))
         wrota(4.3, True)
         miejsca = [('obronca_01', (-3.6, 0.8, 6.15)), ('obronca_02', (0.0, 0.8, 6.15)), ('obronca_03', (3.6, 0.8, 6.15))]
     elif poz == 5:
         rng = random.Random(44)
-        for sg in (1, -1):
-            _wieza(sl, rng, 2.65, 2.3, 0.0, 8.0, cx=sg * 4.7, cy=0.3, wys_rzedu=0.75)
-            sl.add(cyl(2.4, 2.4, 0.3, 16), 'stone_dark', 'root', mtx((sg * 4.7, 0.3, 8.1)))
-            _dach(sl, sg * 4.7, 0.3, 8.2, 2.6, 3.0, boki=16, rzedy=6)
-            sl.add(cyl(0.05, 0.05, 1.4, 6), 'iron', 'root', mtx((sg * 4.7, 0.3, 11.8)))
-            sl.add(box(0.7, 0.04, 0.45, 0.01), 'banner', 'root', mtx((sg * 4.7 + 0.37, 0.3, 12.2)))
-            sl.add(box(0.36, 0.06, 0.36, 0.02), 'rune', 'root', mtx((sg * 4.7, -2.0, 4.2), (0, 45, 0)))
-        _bloki(sl, rng, -2.6, 2.6, 0.6, 3.6, 4.6, 7.0, wys_rzedu=0.8)
-        sl.add(box(5.4, 3.4, 0.14, 0.02), 'stone_light', 'root', mtx((0, 0.6, 7.07)))
+        for sg in (1, -1):  # filary bramy (wieże przy bramie są osobnymi elementami)
+            _bloki(sl, rng, sg * 3.45 - 0.45, sg * 3.45 + 0.45, 0.6, 3.6, 0.0, 7.0, wys_rzedu=0.75)
+            sl.add(box(0.36, 0.06, 0.36, 0.02), 'rune', 'root', mtx((sg * 3.45, -1.23, 4.2), (0, 45, 0)))
+            sl.add(box(0.85, 0.55, 0.9, 0.06), 'stone', 'root', mtx((sg * 3.45, -1.0, 7.5)))
+        _bloki(sl, rng, -3.0, 3.0, 0.6, 3.6, 4.6, 7.0, wys_rzedu=0.8)
+        sl.add(box(7.8, 3.4, 0.14, 0.02), 'stone_light', 'root', mtx((0, 0.6, 7.07)))
         for x in (-1.8, -0.6, 0.6, 1.8):
             sl.add(box(0.85, 0.55, 0.9, 0.06), 'stone', 'root', mtx((x, -1.0, 7.5)))
         sl.add(box(1.6, 0.06, 2.4, 0.02), 'banner', 'root', mtx((0, -1.25, 5.5)))
@@ -296,7 +295,7 @@ def brama(sl, poz):
     return miejsca
 
 
-# ------------------------------------------------------------------ wieża narożna (środek w 0,0)
+# ------------------------------------------------------------------ wieża (narożna, tylna albo przy bramie; środek w 0,0)
 
 def naroznik(sl, poz):
     if poz == 1:  # palisada: wiązka grubych pali na rogu, bez miejsca dla obrońcy
