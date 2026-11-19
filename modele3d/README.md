@@ -165,7 +165,7 @@ Miasto pod wysoką górą (z wodospadem, jeziorem i rzeką po prawej, półkami 
 | 10–12 | 4 | Lepszy mur kamienny | 7 / 9 |
 | 13–15 | 5 | Warownia | 9 / 11 |
 
-Brama zmienia wygląd na tych samych progach. Wieże na przednich narożnikach przyjmują poziom wyższego z dwóch sąsiednich murów. Liczbę poziomów i progi zmieniasz w `src/mapa/uklad.py` (`LICZBA_POZIOMOW`, `POZIOMY`).
+Brama i obie wieże na przednich narożnikach też ulepszają się **osobno**, w tych samych 15 poziomach i progach wyglądu. Liczbę poziomów i progi zmieniasz w `src/mapa/uklad.py` (`LICZBA_POZIOMOW`, `POZIOMY`).
 
 | Chcę zmienić… | Plik |
 |---|---|
@@ -182,7 +182,7 @@ Pliki w `export/mapa/`:
 - w każdym murze, bramie i wieży są puste węzły `obronca_01`, `obronca_02`… czyli **miejsca dla obrońców**. Wyższy poziom ma więcej miejsc;
 - `uklad.json`: gdzie postawić każdy element (już w układzie współrzędnych Godota), który etap wyglądu odpowiada poziomowi 1–15, liczba miejsc obrońców na etap, **działki pod budynki** (D1–D11; D1 przy skalnej ścianie góry to budynek główny, reszta wolna), plac ze studnią na środku i **strefy ataku** przed każdym murem.
 
-W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
+W Godocie `godot/mapa.gd` składa miasto z tych plików i ma funkcje `ustaw_poziom_muru("przod", 7)` (poziom 1–15), `ustaw_poziom_bramy(2)`, `ustaw_poziom_wiezy("wieza_lewa", 9)`, `miejsca_obroncow("lewy")` i `dzialka("D1")`. Skrypt nie był jeszcze uruchamiany w edytorze.
 
 **Budynek główny** stoi na skalnej półce (podwyższeniu 1,6 m) przy ścianie góry, ze schodami na plac; wokół zostaje wolne miejsce. Ma **20 poziomów** i każdy coś zmienia: 1–5 drewniana chata, 6–10 duży drewniany dom, 11–15 kamienna sala, 16–20 okazała rezydencja (pliki `budynek_glowny_poz01…20.glb`, podgląd wszystkich: `podglad/budynek_glowny_poziomy.png`). W Godocie: `ustaw_poziom_budynku(12)`.
 

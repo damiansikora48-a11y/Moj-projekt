@@ -17,6 +17,7 @@ extends Node3D
 var uklad: Dictionary
 var poziom_murow := {"lewy": 1, "przod": 1, "prawy": 1}
 var poziom_bramy := 1
+var poziom_wiez := {"wieza_lewa": 1, "wieza_prawa": 1}
 var poziom_budynku := 1
 var _wezly := {}   # klucz elementu -> instancja sceny
 
@@ -47,19 +48,19 @@ func _postaw(klucz: String, opis: Dictionary, poziom: int) -> Node3D:
 
 
 func _odswiez_narozniki() -> void:
-	var i := 0
 	for nz in uklad["narozniki"]:
-		var poz := 1
-		for s in nz["poziom_jak_wyzszy_z"]:
-			poz = max(poz, poziom_murow[s])
-		_postaw("naroznik_%d" % i, nz, poz)
-		i += 1
+		_postaw(nz["id"], nz, poziom_wiez[nz["id"]])
 
 
 ## Ulepszenie (lub zmiana) poziomu jednego muru: "lewy", "przod" albo "prawy" (poziom 1–15).
 func ustaw_poziom_muru(strona: String, poziom: int) -> void:
 	poziom_murow[strona] = poziom
 	_postaw("mur_" + strona, uklad["mury"][strona], poziom)
+
+
+## Ulepszenie wieży narożnej: "wieza_lewa" albo "wieza_prawa" (poziom 1–15), niezależnie od murów.
+func ustaw_poziom_wiezy(id: String, poziom: int) -> void:
+	poziom_wiez[id] = poziom
 	_odswiez_narozniki()
 
 
@@ -82,9 +83,9 @@ func ustaw_poziom_budynku(poziom: int) -> void:
 	_wezly["budynek_glowny"] = n
 
 
-## Pozycje (globalne) miejsc dla obrońców na danym elemencie: "lewy", "przod", "prawy", "brama".
+## Pozycje (globalne) miejsc dla obrońców: "lewy", "przod", "prawy", "brama", "wieza_lewa", "wieza_prawa".
 func miejsca_obroncow(element: String) -> Array[Vector3]:
-	var klucz := "brama" if element == "brama" else "mur_" + element
+	var klucz := element if element in ["brama", "wieza_lewa", "wieza_prawa"] else "mur_" + element
 	var out: Array[Vector3] = []
 	for dziecko in _wezly[klucz].find_children("obronca_*", "", true, false):
 		out.append((dziecko as Node3D).global_position)

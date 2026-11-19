@@ -99,8 +99,9 @@ def uklad_json(liczba_miejsc):
     out['brama'] = {'plik': 'brama_etap{etap}.glb', 'pozycja': U.do_godota(*U.BRAMA['srodek']), 'obrot_y_stopnie': 0,
                     'miejsca_obroncow_na_etap': {str(e): liczba_miejsc[('brama', e)] for e in U.ETAPY}}
     for n in U.NAROZNIKI:
-        out['narozniki'].append({'plik': 'naroznik_etap{etap}.glb', 'pozycja': U.do_godota(*n['srodek']),
-                                 'obrot_y_stopnie': 0, 'poziom_jak_wyzszy_z': n['sasiedzi']})
+        out['narozniki'].append({'id': n['id'], 'plik': 'naroznik_etap{etap}.glb', 'pozycja': U.do_godota(*n['srodek']),
+                                 'obrot_y_stopnie': 0,
+                                 'miejsca_obroncow_na_etap': {str(e): liczba_miejsc[('naroznik', e)] for e in U.ETAPY}})
     for d in U.DZIALKI:
         out['dzialki'].append({'id': d['id'], 'pozycja': U.do_godota(*d['srodek']), 'rozmiar_m': list(d['rozmiar']),
                                'budynek': d['budynek'], 'uwagi': d['uwagi']})
@@ -165,7 +166,7 @@ def _scena(poziomy, brama_poz, jednostki=None, budynek=None):
                 b = build_unit(jed)
                 b['arm'].location = _swiat(U.BRAMA['srodek'], 0, p)
     for nz in U.NAROZNIKI:
-        poz = max(poziomy[s] for s in nz['sasiedzi'])
+        poz = poziomy.get(nz['id'], poziomy['przod'])  # wieże ulepszane osobno
         o, _ = _obiekt('naroznik', ELEMENTY['naroznik'](poz), M.PALETA)
         _postaw(o, nz['srodek'], 0)
     if budynek:
@@ -198,7 +199,7 @@ def podglady(katalog):
             'lewy': [jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik']],
             'prawy': [jd['mag_ognia'], jd['lesny_lucznik'], jd['zolnierz'], jd['lesny_lucznik'], jd['mag_ognia'], jd['lesny_lucznik']],
             'brama': [jd['zolnierz'], jd['lesny_lucznik'], jd['zolnierz']]}
-    _scena({'lewy': 3, 'przod': 4, 'prawy': 5}, 5, jedn, budynek=20)
+    _scena({'lewy': 3, 'przod': 4, 'prawy': 5, 'wieza_lewa': 5, 'wieza_prawa': 5}, 5, jedn, budynek=20)
     b = build_unit(jd['kamienny_rycerz'])
     b['arm'].location = (-2.5, U.PRZOD_Y - 4.5, 0)
     b = build_unit(jd['golem'])

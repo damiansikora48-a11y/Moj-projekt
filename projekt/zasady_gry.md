@@ -103,7 +103,7 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
   - 7–9 Słaby mur kamienny (4 / 6),
   - 10–12 Lepszy mur kamienny (7 / 9),
   - 13–15 Warownia (9 / 11).
-- Brama zmienia wygląd na tych samych progach.
+- **Brama** i **obie wieże narożne** (lewa i prawa) ulepszają się osobno, w tych samych 15 poziomach i progach wyglądu.
 - **Atakujący wybiera stronę ataku** (lewa, przód, prawa). Przed każdym murem jest wolna łąka na rozstawienie wojsk.
 - Wnętrze miasta: 52 × 40 m.
 - **Budynki w środku stoją na stałych działkach** (D1–D11). **Budynek główny** stoi na skalnej półce (podwyższeniu) D1 przy ścianie góry, ze schodami na plac i wolnym miejscem wokół. Ma **20 poziomów** i każdy poziom coś widocznie zmienia: od małej drewnianej chaty po okazałą kamienną rezydencję ze zdobieniami. Na środku miasta jest plac ze studnią. Co stoi na pozostałych działkach, ustalamy razem; część zostaje wolna na przyszłe budynki.

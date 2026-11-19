@@ -34,10 +34,10 @@ MURY = {
     'prawy': {'element': 'mur_bok', 'srodek': (SZER / 2, 0.0), 'obrot': 90, 'dlugosc': GLEB},
 }
 BRAMA = {'element': 'brama', 'srodek': (0.0, PRZOD_Y), 'obrot': 0}
-# wieże na przednich narożnikach: poziom = wyższy z dwóch sąsiednich murów
+# wieże na przednich narożnikach: każda ulepszana OSOBNO (poziomy 1–15, jak mury i brama)
 NAROZNIKI = [
-    {'element': 'naroznik', 'srodek': (-SZER / 2, PRZOD_Y), 'obrot': 0, 'sasiedzi': ['lewy', 'przod']},
-    {'element': 'naroznik', 'srodek': (SZER / 2, PRZOD_Y), 'obrot': 0, 'sasiedzi': ['prawy', 'przod']},
+    {'id': 'wieza_lewa', 'element': 'naroznik', 'srodek': (-SZER / 2, PRZOD_Y), 'obrot': 0},
+    {'id': 'wieza_prawa', 'element': 'naroznik', 'srodek': (SZER / 2, PRZOD_Y), 'obrot': 0},
 ]
 
 # --- działki pod budynki (środek x, y; rozmiar szer x gł). 'budynek': None = wolna.
