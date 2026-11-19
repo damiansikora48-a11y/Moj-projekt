@@ -76,18 +76,18 @@
     "lewy": {
       "plik": "mur_bok_etap{etap}.glb",
       "pozycja": [
-        -18.0,
+        -26.0,
         0.0,
         -0.0
       ],
       "obrot_y_stopnie": -90,
-      "dlugosc_m": 28.0,
+      "dlugosc_m": 40.0,
       "miejsca_obroncow_na_etap": {
         "1": 0,
-        "2": 2,
-        "3": 3,
-        "4": 5,
-        "5": 6
+        "2": 3,
+        "3": 4,
+        "4": 7,
+        "5": 9
       }
     },
     "przod": {
@@ -95,33 +95,33 @@
       "pozycja": [
         0.0,
         0.0,
-        14.0
+        20.0
       ],
       "obrot_y_stopnie": 0,
-      "dlugosc_m": 36.0,
+      "dlugosc_m": 52.0,
       "miejsca_obroncow_na_etap": {
         "1": 0,
-        "2": 3,
-        "3": 4,
-        "4": 6,
-        "5": 8
+        "2": 4,
+        "3": 6,
+        "4": 9,
+        "5": 11
       }
     },
     "prawy": {
       "plik": "mur_bok_etap{etap}.glb",
       "pozycja": [
-        18.0,
+        26.0,
         0.0,
         -0.0
       ],
       "obrot_y_stopnie": 90,
-      "dlugosc_m": 28.0,
+      "dlugosc_m": 40.0,
       "miejsca_obroncow_na_etap": {
         "1": 0,
-        "2": 2,
-        "3": 3,
-        "4": 5,
-        "5": 6
+        "2": 3,
+        "3": 4,
+        "4": 7,
+        "5": 9
       }
     }
   },
@@ -130,7 +130,7 @@
     "pozycja": [
       0.0,
       0.0,
-      14.0
+      20.0
     ],
     "obrot_y_stopnie": 0,
     "miejsca_obroncow_na_etap": {
@@ -145,9 +145,9 @@
     {
       "plik": "naroznik_etap{etap}.glb",
       "pozycja": [
-        -18.0,
+        -26.0,
         0.0,
-        14.0
+        20.0
       ],
       "obrot_y_stopnie": 0,
       "poziom_jak_wyzszy_z": [
@@ -158,9 +158,9 @@
     {
       "plik": "naroznik_etap{etap}.glb",
       "pozycja": [
-        18.0,
+        26.0,
         0.0,
-        14.0
+        20.0
       ],
       "obrot_y_stopnie": 0,
       "poziom_jak_wyzszy_z": [
@@ -175,7 +175,7 @@
       "pozycja": [
         0.0,
         0.0,
-        -8.75
+        -14.75
       ],
       "rozmiar_m": [
         14.0,
@@ -187,13 +187,13 @@
     {
       "id": "D2",
       "pozycja": [
-        -10.5,
+        -15.0,
         0.0,
-        6.5
+        10.0
       ],
       "rozmiar_m": [
-        6.0,
-        6.0
+        7.0,
+        7.0
       ],
       "budynek": null,
       "uwagi": ""
@@ -201,13 +201,13 @@
     {
       "id": "D3",
       "pozycja": [
-        -10.5,
+        -15.0,
         0.0,
-        -1.0
+        -0.0
       ],
       "rozmiar_m": [
-        6.0,
-        6.0
+        7.0,
+        7.0
       ],
       "budynek": null,
       "uwagi": ""
@@ -215,27 +215,27 @@
     {
       "id": "D4",
       "pozycja": [
-        -9.75,
+        -15.0,
         0.0,
-        -7.5
+        -9.5
       ],
       "rozmiar_m": [
-        4.5,
-        4.0
+        6.5,
+        6.0
       ],
       "budynek": null,
-      "uwagi": "obok stawu z wodospadem"
+      "uwagi": ""
     },
     {
       "id": "D5",
       "pozycja": [
-        10.5,
+        15.0,
         0.0,
-        6.5
+        10.0
       ],
       "rozmiar_m": [
-        6.0,
-        6.0
+        7.0,
+        7.0
       ],
       "budynek": null,
       "uwagi": ""
@@ -243,13 +243,13 @@
     {
       "id": "D6",
       "pozycja": [
-        10.5,
+        15.0,
         0.0,
-        -1.0
+        -0.0
       ],
       "rozmiar_m": [
-        6.0,
-        6.0
+        7.0,
+        7.0
       ],
       "budynek": null,
       "uwagi": ""
@@ -257,13 +257,13 @@
     {
       "id": "D7",
       "pozycja": [
-        10.75,
+        15.0,
         0.0,
-        -8.0
+        -9.5
       ],
       "rozmiar_m": [
-        5.5,
-        5.0
+        6.5,
+        6.0
       ],
       "budynek": null,
       "uwagi": ""
@@ -271,13 +271,13 @@
     {
       "id": "D8",
       "pozycja": [
-        -4.5,
+        -6.5,
         0.0,
-        8.5
+        13.5
       ],
       "rozmiar_m": [
-        4.0,
-        3.5
+        5.0,
+        4.0
       ],
       "budynek": null,
       "uwagi": "mała, przy bramie"
@@ -285,53 +285,81 @@
     {
       "id": "D9",
       "pozycja": [
-        4.5,
+        6.5,
         0.0,
-        8.5
+        13.5
       ],
       "rozmiar_m": [
-        4.0,
-        3.5
+        5.0,
+        4.0
       ],
       "budynek": null,
       "uwagi": "mała, przy bramie"
+    },
+    {
+      "id": "D10",
+      "pozycja": [
+        -12.0,
+        0.0,
+        -16.0
+      ],
+      "rozmiar_m": [
+        5.0,
+        4.0
+      ],
+      "budynek": null,
+      "uwagi": "obok półki budynku głównego"
+    },
+    {
+      "id": "D11",
+      "pozycja": [
+        12.0,
+        0.0,
+        -16.0
+      ],
+      "rozmiar_m": [
+        5.0,
+        4.0
+      ],
+      "budynek": null,
+      "uwagi": "obok półki budynku głównego"
     }
   ],
   "strefy_ataku": {
     "przod": {
       "od": [
-        -20.0,
+        -26.0,
         0,
-        24.0
+        30.0
       ],
       "do": [
-        20.0,
+        26.0,
         0,
-        42.0
+        52.0
       ]
     },
     "lewy": {
       "od": [
-        -48.0,
+        -58.0,
         0,
-        -8.0
+        -6.0
       ],
       "do": [
-        -28.0,
+        -34.0,
         0,
-        12.0
+        16.0
       ]
     },
     "prawy": {
       "od": [
-        28.0,
+        34.0,
         0,
-        -0.0
+        4.0
       ],
       "do": [
-        48.0,
+        58.0,
         0,
-        18.0
+        24.0
       ]
     }
   },
@@ -339,9 +367,9 @@
     "pozycja": [
       0.0,
       0.0,
-      -0.5
+      -2.0
     ],
-    "promien_m": 4.5
+    "promien_m": 5.0
   },
   "budynek_glowny": {
     "plik": "budynek_glowny_poz{poziom:02}.glb",
@@ -349,7 +377,7 @@
     "pozycja": [
       0.0,
       1.6,
-      -8.75
+      -14.75
     ],
     "obrot_y_stopnie": 0,
     "zmiany": {
