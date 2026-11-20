@@ -119,11 +119,53 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
   - **Koszary** (D6): szkolenie jednostek i zdobywanie doświadczenia; od namiotu z ogniskiem po okazałe koszary z wieżą,
   - **Kuźnia** (D2): ulepszanie broni i pancerzy; od szopy z kowadłem po kamienną kuźnię z piecem hutniczym.
   - **Magazyn** (D5): przechowuje złoto i zapasy (wyższy poziom = większa pojemność); od wiaty ze skrzyniami po kamienny magazyn ze złotą kopułą skarbca,
-  - **Akademia** (D4): badania i odkrycia, czyli ulepszenia działające na całe miasto (np. szybsza budowa, tańsze naprawy murów); od chatki uczonego po akademię z obserwatorium.
+  - **Akademia** (D4): badania i odkrycia, czyli ulepszenia działające na całe miasto (szczegóły w punkcie 4a); od chatki uczonego po akademię z obserwatorium.
   Wolne działki: D7–D11 (na przyszłe budynki; oznaczone palikami ze sznurkiem).
 - **Drogi:** brukowana droga od bramy do placu, a od placu wijące się ścieżki z płyt do wejść budynków. Zabudowane działki nie mają widocznego prostokąta: podwórze jest częścią budynku i zmienia się z poziomem (ubita ziemia → żwir → płyty → bruk z krzewami).
 - **Tablica ogłoszeń** przy studni na placu: aktualizacje, wydarzenia i wiadomości dla graczy (np. dymek „!” przy nowej aktualizacji).
 - Klimat: dużo zieleni (łąki, lasy, staw z wodospadem), a góra ma trawiaste zbocza, półki skalne z sosnami, głazy, śnieżny szczyt i duży wodospad po prawej z jeziorem i rzeką.
+
+## 4a. Badania (Akademia)
+
+**Nazwa:** Akademia. Krótka, od razu kojarzy się z badaniami i pasuje do wyglądu budynku: biblioteka, obserwatorium, alchemia.
+
+### Zasady
+- **Każdy poziom Akademii odblokowuje 1–2 nowe badania.** Dalsze badania wymagają wyższego poziomu budynku.
+- **Każdy poziom Akademii przyspiesza badania o 1%** **(propozycja)**: czas = czas bazowy / (1 + 0,01 × poziom Akademii), czyli na poziomie 20 badania idą o 20% szybciej.
+- **Im dalsze badanie, tym dłużej trwa i więcej kosztuje.** Czas bazowy rośnie o ok. 30% na każdy próg **(propozycja)**: od ok. 10 min (próg 1) do ok. 24 h (próg 20). Koszt w złocie rośnie podobnie.
+- **Jedno badanie naraz.** Zbadane badanie działa na stałe.
+- **Rubiny** mogą tylko skrócić czas badania, tak jak budowę. Nie odblokowują badań wcześniej.
+- Efekty badań są **małe, ale się sumują**. Nie dają nic, czego nie dałoby się zdobyć grą: żadnych dodatkowych kolejek ani szansy na Przebudzenie (te zostają przy budynku fuzji i katalizatorach).
+
+### Lista badań **(propozycja: nazwy i wartości do balansu)**
+Kategorie: 🏗️ Budownictwo, 🛡️ Obrona, ⚔️ Wojsko, ✨ Fuzje, 💰 Gospodarka.
+
+| Poziom Akademii | Odblokowane badania | Efekt |
+|---|---|---|
+| 1 | 🏗️ Narzędzia budowlane | −5% czasu budowy |
+| 1 | ⚔️ Zwiad | podgląd siły wroga przed obroną |
+| 2 | 🛡️ Ciosany kamień | −5% kosztu ulepszeń murów, bramy i wież |
+| 3 | ⚔️ Musztra | +5% doświadczenia jednostek z bitew |
+| 4 | 🛡️ Smoła i wrzący olej | obrońcy na murach +5% obrażeń |
+| 5 | 💰 Spis zapasów | +10% pojemności magazynu |
+| 6 | 🛡️ Zaprawa murarska | −10% kosztu naprawy murów |
+| 7 | ⚔️ Hartowanie stali | +3% obrażeń jednostek walczących wręcz |
+| 8 | ✨ Wiedza o runach | −10% czasu fuzji |
+| 9 | 🛡️ Strzelnice w wieżach | +10% zasięgu obrońców w wieżach |
+| 10 | 💰 Szlaki kupieckie | +5% złota z bitew |
+| 10 | 🏗️ Rusztowania | −10% czasu napraw |
+| 11 | 🛡️ Okute wrota | +10% wytrzymałości bramy |
+| 12 | ⚔️ Medycyna polowa | −15% czasu leczenia rannych jednostek |
+| 13 | ⚔️ Zbrojmistrzostwo | +5% pancerza jednostek |
+| 14 | ✨ Alchemia żywiołów | fuzja zachowuje 30% doświadczenia zamiast 25% |
+| 15 | 🛡️ Fundamenty warowni | +10% wytrzymałości murów i wież |
+| 16 | ⚔️ Taktyka | wszystkie jednostki +3% obrażeń |
+| 17 | 💰 Skarbiec królewski | +15% pojemności magazynu |
+| 18 | 🛡️ Runy ochronne | mury i wieże −10% obrażeń od czarów |
+| 19 | ✨ Mistrzostwo fuzji | −20% czasu fuzji |
+| 20 | 🏗️ Złoty wiek | −10% czasu budowy i badań |
+
+Nowe badania w aktualizacjach: dopisujemy je do istniejących poziomów (np. drugie badanie na poziomie 5) albo do nowych poziomów Akademii, jeśli kiedyś podniesiemy limit ponad 20. Gracze dowiedzą się o nich z tablicy ogłoszeń.
 
 ## 5. Ekonomia
 
@@ -164,5 +206,6 @@ Cel na premierę **(propozycja)**: 4 jednostki podstawowe + 3–4 fuzje.
 - [ ] Czy rubiny mogą kupić złoto (i z jakim limitem)?
 - [ ] Rodzaje wrogów i ich słabości na żywioły.
 - [ ] Koszty ulepszeń murów i bramy na każdym z 15 poziomów (oraz co poza wyglądem daje każdy poziom, np. wytrzymałość).
-- [ ] Co dają kolejne poziomy budynku fuzji, koszar, kuźni, magazynu i akademii (koszty, czasy, bonusy, lista badań).
+- [ ] Co dają kolejne poziomy budynku fuzji, koszar, kuźni i magazynu (koszty, czasy, bonusy).
+- [ ] Balans badań: czasy, koszty i wartości efektów (punkt 4a).
 - [ ] Co stanie na wolnych działkach D7–D11.
