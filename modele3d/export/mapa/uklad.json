@@ -1,0 +1,701 @@
+{
+  "_opis": "Układ miasta dla Godota. Pozycje w układzie Godota (x, y w górę, z), metry. Poziom ulepszenia (1–15) -> etap wyglądu w \"poziomy\"; w nazwie pliku wstaw etap w miejsce {etap}. Przód miasta (brama) jest od strony +Z.",
+  "etapy": {
+    "1": {
+      "nazwa": "Palisada",
+      "opis": "pale z zaostrzonymi końcami, bez pomostu – brak miejsc dla obrońców"
+    },
+    "2": {
+      "nazwa": "Mur drewniany",
+      "opis": "grubsze podwójne pale, okucia, kamienny fundament, pomost – mało obrońców"
+    },
+    "3": {
+      "nazwa": "Słaby mur kamienny",
+      "opis": "nieobrobione kamienie, drewniane blanki i pomost"
+    },
+    "4": {
+      "nazwa": "Lepszy mur kamienny",
+      "opis": "mur z ciosanych bloków z kamiennymi blankami"
+    },
+    "5": {
+      "nazwa": "Warownia",
+      "opis": "grubszy i wyższy mur, przypory, sztandary, runy, kosze z ogniem"
+    }
+  },
+  "poziomy": {
+    "1": {
+      "etap": 1
+    },
+    "2": {
+      "etap": 1
+    },
+    "3": {
+      "etap": 1
+    },
+    "4": {
+      "etap": 2
+    },
+    "5": {
+      "etap": 2
+    },
+    "6": {
+      "etap": 2
+    },
+    "7": {
+      "etap": 3
+    },
+    "8": {
+      "etap": 3
+    },
+    "9": {
+      "etap": 3
+    },
+    "10": {
+      "etap": 4
+    },
+    "11": {
+      "etap": 4
+    },
+    "12": {
+      "etap": 4
+    },
+    "13": {
+      "etap": 5
+    },
+    "14": {
+      "etap": 5
+    },
+    "15": {
+      "etap": 5
+    }
+  },
+  "teren": {
+    "plik": "teren.glb"
+  },
+  "mury": {
+    "lewy": {
+      "plik": "mur_bok_etap{etap}.glb",
+      "pozycja": [
+        -26.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": -90,
+      "dlugosc_m": 40.0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 3,
+        "3": 4,
+        "4": 7,
+        "5": 9
+      }
+    },
+    "przod": {
+      "plik": "mur_front_etap{etap}.glb",
+      "pozycja": [
+        0.0,
+        0.0,
+        20.0
+      ],
+      "obrot_y_stopnie": 0,
+      "dlugosc_m": 52.0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 4,
+        "3": 6,
+        "4": 9,
+        "5": 11
+      }
+    },
+    "prawy": {
+      "plik": "mur_bok_etap{etap}.glb",
+      "pozycja": [
+        26.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": 90,
+      "dlugosc_m": 40.0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 3,
+        "3": 4,
+        "4": 7,
+        "5": 9
+      }
+    }
+  },
+  "brama": {
+    "plik": "brama_etap{etap}.glb",
+    "pozycja": [
+      0.0,
+      0.0,
+      20.0
+    ],
+    "obrot_y_stopnie": 0,
+    "miejsca_obroncow_na_etap": {
+      "1": 0,
+      "2": 2,
+      "3": 2,
+      "4": 3,
+      "5": 3
+    }
+  },
+  "wieze": [
+    {
+      "id": "wieza_przod_lewa",
+      "opis": "przedni lewy narożnik",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        -26.0,
+        0.0,
+        20.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_przod_prawa",
+      "opis": "przedni prawy narożnik",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        26.0,
+        0.0,
+        20.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_tyl_lewa",
+      "opis": "koniec lewego muru przy górze",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        -26.0,
+        0.0,
+        -17.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_tyl_prawa",
+      "opis": "koniec prawego muru przy górze",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        26.0,
+        0.0,
+        -17.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_brama_lewa",
+      "opis": "po lewej stronie bramy",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        -6.2,
+        0.0,
+        20.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    },
+    {
+      "id": "wieza_brama_prawa",
+      "opis": "po prawej stronie bramy",
+      "plik": "wieza_etap{etap}.glb",
+      "pozycja": [
+        6.2,
+        0.0,
+        20.0
+      ],
+      "obrot_y_stopnie": 0,
+      "miejsca_obroncow_na_etap": {
+        "1": 0,
+        "2": 1,
+        "3": 1,
+        "4": 2,
+        "5": 2
+      }
+    }
+  ],
+  "dzialki": [
+    {
+      "id": "D1",
+      "pozycja": [
+        0.0,
+        0.0,
+        -14.75
+      ],
+      "rozmiar_m": [
+        14.0,
+        8.5
+      ],
+      "budynek": "budynek_glowny",
+      "uwagi": "skalna półka (podwyższenie) przy ścianie góry ze schodami – budynek główny z wolnym miejscem wokół"
+    },
+    {
+      "id": "D2",
+      "pozycja": [
+        -15.0,
+        0.0,
+        10.0
+      ],
+      "rozmiar_m": [
+        7.0,
+        7.0
+      ],
+      "budynek": "kuznia",
+      "uwagi": "Kuźnia"
+    },
+    {
+      "id": "D3",
+      "pozycja": [
+        -15.0,
+        0.0,
+        -0.0
+      ],
+      "rozmiar_m": [
+        7.0,
+        7.0
+      ],
+      "budynek": "budynek_fuzji",
+      "uwagi": "Budynek fuzji"
+    },
+    {
+      "id": "D4",
+      "pozycja": [
+        -15.0,
+        0.0,
+        -9.5
+      ],
+      "rozmiar_m": [
+        6.5,
+        6.0
+      ],
+      "budynek": "akademia",
+      "uwagi": "Akademia (badania)"
+    },
+    {
+      "id": "D5",
+      "pozycja": [
+        15.0,
+        0.0,
+        10.0
+      ],
+      "rozmiar_m": [
+        7.0,
+        7.0
+      ],
+      "budynek": "magazyn",
+      "uwagi": "Magazyn"
+    },
+    {
+      "id": "D6",
+      "pozycja": [
+        15.0,
+        0.0,
+        -0.0
+      ],
+      "rozmiar_m": [
+        7.0,
+        7.0
+      ],
+      "budynek": "koszary",
+      "uwagi": "Koszary"
+    },
+    {
+      "id": "D7",
+      "pozycja": [
+        15.0,
+        0.0,
+        -9.5
+      ],
+      "rozmiar_m": [
+        6.5,
+        6.0
+      ],
+      "budynek": null,
+      "uwagi": ""
+    },
+    {
+      "id": "D8",
+      "pozycja": [
+        -6.5,
+        0.0,
+        13.5
+      ],
+      "rozmiar_m": [
+        5.0,
+        4.0
+      ],
+      "budynek": null,
+      "uwagi": "mała, przy bramie"
+    },
+    {
+      "id": "D9",
+      "pozycja": [
+        6.5,
+        0.0,
+        13.5
+      ],
+      "rozmiar_m": [
+        5.0,
+        4.0
+      ],
+      "budynek": null,
+      "uwagi": "mała, przy bramie"
+    },
+    {
+      "id": "D10",
+      "pozycja": [
+        -12.0,
+        0.0,
+        -16.0
+      ],
+      "rozmiar_m": [
+        5.0,
+        4.0
+      ],
+      "budynek": null,
+      "uwagi": "obok półki budynku głównego"
+    },
+    {
+      "id": "D11",
+      "pozycja": [
+        12.0,
+        0.0,
+        -16.0
+      ],
+      "rozmiar_m": [
+        5.0,
+        4.0
+      ],
+      "budynek": null,
+      "uwagi": "obok półki budynku głównego"
+    }
+  ],
+  "strefy_ataku": {
+    "przod": {
+      "od": [
+        -26.0,
+        0,
+        30.0
+      ],
+      "do": [
+        26.0,
+        0,
+        52.0
+      ]
+    },
+    "lewy": {
+      "od": [
+        -58.0,
+        0,
+        -6.0
+      ],
+      "do": [
+        -34.0,
+        0,
+        16.0
+      ]
+    },
+    "prawy": {
+      "od": [
+        34.0,
+        0,
+        4.0
+      ],
+      "do": [
+        58.0,
+        0,
+        24.0
+      ]
+    }
+  },
+  "uszkodzenia": {
+    "_opis": "Stan uszkodzenia z wytrzymałości (0–1): pierwszy próg, który wytrzymałość osiąga. Węzły-warstwy w każdym .glb muru/bramy/wieży: *_znika_k widoczne gdy stan < k, *_pojawia_k widoczne gdy stan >= k, *_pokaz_a_b widoczne gdy a <= stan < b. Pusty węzeł \"wylom\" (mury, brama) = środek wyłomu, aktywny w stanie 3.",
+    "stany": {
+      "0": "cały",
+      "1": "lekko uszkodzony",
+      "2": "mocno uszkodzony",
+      "3": "wyłom"
+    },
+    "progi": [
+      {
+        "od_wytrzymalosci": 0.7,
+        "stan": 0
+      },
+      {
+        "od_wytrzymalosci": 0.4,
+        "stan": 1
+      },
+      {
+        "od_wytrzymalosci": 0.0001,
+        "stan": 2
+      },
+      {
+        "od_wytrzymalosci": 0.0,
+        "stan": 3
+      }
+    ]
+  },
+  "plac": {
+    "pozycja": [
+      0.0,
+      0.0,
+      -2.0
+    ],
+    "promien_m": 5.0
+  },
+  "tablica_ogloszen": {
+    "plik": "tablica_ogloszen.glb",
+    "pozycja": [
+      2.7,
+      0.0,
+      0.9
+    ],
+    "obrot_y_stopnie": -15
+  },
+  "budynki": [
+    {
+      "id": "kuznia",
+      "nazwa": "Kuźnia",
+      "dzialka": "D2",
+      "plik": "kuznia_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        -15.0,
+        0.0,
+        10.0
+      ],
+      "obrot_y_stopnie": 90,
+      "zmiany": {
+        "1": "szopa z bali z daszkiem i kowadłem na pniu",
+        "2": "kamienne palenisko z ogniem",
+        "3": "kamienny komin",
+        "4": "koryto z wodą i kamień szlifierski",
+        "5": "stojak z bronią i tarczami",
+        "6": "warsztat z muru pruskiego z dużym zadaszeniem",
+        "7": "skórzany miech przy palenisku",
+        "8": "drugie kowadło, sterta węgla i beczka",
+        "9": "szyld z kowadłem na wysięgniku",
+        "10": "wysoki komin i latarnie",
+        "11": "kamienna kuźnia z łukowym, rozżarzonym wejściem",
+        "12": "wielki piec hutniczy",
+        "13": "stojaki z pełnymi zbrojami",
+        "14": "żuraw z łańcuchem i zawieszonym ładunkiem",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazała kuźnia: jasne narożniki, łukowe okna, dwa kominy",
+        "17": "runiczne kowadło świecące na niebiesko",
+        "18": "kanał z płynnym metalem od pieca",
+        "19": "złoty młot-godło na fasadzie i posąg kowala",
+        "20": "kryształowe płomienie na kominach i świecące okna"
+      }
+    },
+    {
+      "id": "budynek_fuzji",
+      "nazwa": "Budynek fuzji",
+      "dzialka": "D3",
+      "plik": "budynek_fuzji_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        -15.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": 90,
+      "zmiany": {
+        "1": "krąg kamieni z ołtarzem i małym kryształem",
+        "2": "drewniany daszek nad ołtarzem",
+        "3": "świecące runy na kamieniach",
+        "4": "dwa kosze z fioletowym ogniem",
+        "5": "pulpit z księgą przepisów",
+        "6": "okrągła sala z kamienną podstawą i stożkowym dachem",
+        "7": "kryształ na szczycie dachu",
+        "8": "świecący krąg run przed wejściem",
+        "9": "dwa unoszące się kryształy",
+        "10": "fioletowe sztandary",
+        "11": "kamienna rotunda z kolumnadą",
+        "12": "kopuła",
+        "13": "dwa świecące obeliski",
+        "14": "runiczny łuk-brama przed wejściem",
+        "15": "kopuła z niebieskiej dachówki i złota iglica",
+        "16": "okazała dwupoziomowa świątynia fuzji",
+        "17": "złote pierścienie krążące wokół kryształu",
+        "18": "więcej obelisków i złote zdobienia",
+        "19": "posągi golema i rycerza (symbol fuzji)",
+        "20": "wielki unoszący się kryształ i świecące okna"
+      }
+    },
+    {
+      "id": "akademia",
+      "nazwa": "Akademia",
+      "dzialka": "D4",
+      "plik": "akademia_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        -15.0,
+        0.0,
+        -9.5
+      ],
+      "obrot_y_stopnie": 90,
+      "zmiany": {
+        "1": "chatka uczonego ze stołem i zwojami",
+        "2": "regał ze zwojami i latarnia",
+        "3": "luneta na trójnogu",
+        "4": "ogródek z ziołami",
+        "5": "globus na stojaku",
+        "6": "dom nauki z muru pruskiego z dużymi oknami",
+        "7": "przybudówka biblioteki",
+        "8": "taras obserwacyjny z lunetą na dachu",
+        "9": "stół alchemiczny z kolorowymi kolbami",
+        "10": "tablica z zapiskami, sztandary i latarnie",
+        "11": "kamienna akademia z łukowymi oknami",
+        "12": "wieżyczka obserwatorium z kopułą",
+        "13": "złota sfera armilarna na placu",
+        "14": "posąg uczonego z księgą",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazała akademia z portykiem i kolumnami",
+        "17": "duże obserwatorium z wielkim teleskopem",
+        "18": "złote zdobienia i świecące runiczne okna",
+        "19": "unoszące się księgi i magiczne kule",
+        "20": "gwiezdny kryształ nad kopułą"
+      }
+    },
+    {
+      "id": "magazyn",
+      "nazwa": "Magazyn",
+      "dzialka": "D5",
+      "plik": "magazyn_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        15.0,
+        0.0,
+        10.0
+      ],
+      "obrot_y_stopnie": -90,
+      "zmiany": {
+        "1": "wiata ze skrzyniami i workami",
+        "2": "mała szopa z bali",
+        "3": "stos beczek",
+        "4": "wózek z towarem",
+        "5": "ogrodzony plac składowy z kolejnymi skrzyniami",
+        "6": "duża drewniana stodoła z podwójnymi wrotami",
+        "7": "belka z bloczkiem i workiem na strych",
+        "8": "przybudówka ze stosami drewna",
+        "9": "skrzynia ze złotem przy wrotach i latarnia",
+        "10": "drzwi strychu i wiatrowskaz",
+        "11": "kamienny magazyn z łukowymi wrotami",
+        "12": "rampa załadunkowa ze skrzyniami",
+        "13": "dźwig z ładunkiem",
+        "14": "okuty skarbczyk i budka strażnika",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazały magazyn z dwiema wieżyczkami",
+        "17": "stosy złotych monet i skrzynie na placu",
+        "18": "złote zdobienia i herb z monetą",
+        "19": "kryty wóz kupiecki z towarem",
+        "20": "złota kopuła skarbca ze świecącą monetą"
+      }
+    },
+    {
+      "id": "koszary",
+      "nazwa": "Koszary",
+      "dzialka": "D6",
+      "plik": "koszary_poz{poziom:02}.glb",
+      "poziomy": 20,
+      "pozycja": [
+        15.0,
+        0.0,
+        -0.0
+      ],
+      "obrot_y_stopnie": -90,
+      "zmiany": {
+        "1": "namiot i ognisko",
+        "2": "drugi namiot i stojak z bronią",
+        "3": "manekin treningowy",
+        "4": "drewniany płotek placu ćwiczeń",
+        "5": "tarcza strzelnicza",
+        "6": "długi budynek z bali",
+        "7": "maszt z flagą i ławka",
+        "8": "piętro z muru pruskiego",
+        "9": "trzy manekiny i worki z piaskiem",
+        "10": "drewniana strażnica przy budynku",
+        "11": "kamienne koszary z piętrem",
+        "12": "piaszczysta arena ćwiczeń otoczona kamieniami",
+        "13": "rząd tarcz-herbów na fasadzie",
+        "14": "zbrojownia z bronią pod zadaszeniem",
+        "15": "dach z niebieskiej dachówki i sztandary",
+        "16": "okazałe koszary z blankami i wieżyczkami",
+        "17": "posąg wojownika",
+        "18": "złote herby i czerwone sztandary",
+        "19": "brukowany plac musztry z koszami ognia",
+        "20": "wysoka wieża z wielkim sztandarem i złotą iglicą"
+      }
+    }
+  ],
+  "budynek_glowny": {
+    "plik": "budynek_glowny_poz{poziom:02}.glb",
+    "poziomy": 20,
+    "pozycja": [
+      0.0,
+      1.6,
+      -14.75
+    ],
+    "obrot_y_stopnie": 0,
+    "zmiany": {
+      "1": "mała chata z bali z drzwiami",
+      "2": "okna z okiennicami, ławka i beczka",
+      "3": "kamienny komin",
+      "4": "zadaszony ganek, latarnie przy schodach",
+      "5": "drewniana dobudówka z boku",
+      "6": "duży drewniany dom na kamiennym fundamencie",
+      "7": "piętro z muru pruskiego, donice z kwiatami",
+      "8": "skrzydło boczne, lukarny w dachu",
+      "9": "drewniana wieża obserwacyjna, sztandary przy wejściu",
+      "10": "duży kamienny komin, latarnie na fasadzie, herb nad drzwiami",
+      "11": "kamienna sala z piętrem z muru pruskiego i lukarnami",
+      "12": "łukowy portal, narożniki z jasnego kamienia, drewniany balkon, balustrada na półce",
+      "13": "pierwsza kamienna wieża",
+      "14": "druga kamienna wieża, kosze z ogniem przy schodach",
+      "15": "dachy z niebieskiej dachówki i flagi",
+      "16": "okazała rezydencja: łukowe okna, lukarny, kominy, balkon nad wejściem",
+      "17": "złote gzymsy i ozdoby na kalenicy, obramienia okien, herb, posągi",
+      "18": "portyk z kolumnami i dużym balkonem na nim",
+      "19": "wysokie wieże z balkonami i długimi sztandarami, czerwony dywan",
+      "20": "iglica z kryształem, świecące okna, złote zwieńczenia"
+    }
+  }
+}

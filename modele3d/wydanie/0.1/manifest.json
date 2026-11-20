@@ -1,0 +1,137 @@
+{
+  "wersja_gry": "0.1",
+  "data": "2026-11-18",
+  "jednostki": {
+    "zolnierz": {
+      "wersja": 1,
+      "odcisk": {
+        "czesci": {
+          "Arms": "35fae51ce064535d",
+          "Back": "f3512ef6f7da55bf",
+          "Body": "9fee514a3ebdaca1",
+          "Head": "ebc869b44c63967a",
+          "Headgear": "e53698be49aacf2a",
+          "Legs": "cec35b0fc0e52210",
+          "Offhand": "ba3c69980ad2730e",
+          "Weapon": "8fb041cbae3547b0"
+        },
+        "animacje": {
+          "Attack": "7aeec319f07c2494",
+          "Death": "2a9f7565e3b827e3",
+          "Hit": "0573a9fcc94227be",
+          "Idle_loop": "70dbd9c109d60a90",
+          "Walk_loop": "6b9ed9ecbd8ef9b0"
+        },
+        "szkielet": "accdddfe5dbaed5b"
+      }
+    },
+    "golem": {
+      "wersja": 1,
+      "odcisk": {
+        "czesci": {
+          "Arms": "386bcf6598c8392f",
+          "Body": "2015dccb5bbe6098",
+          "Head": "50c377bbadcd6ce1",
+          "Legs": "ae287d7c697c8120",
+          "Prop": "76aa169704ba49dd"
+        },
+        "animacje": {
+          "Attack": "b63219588b4c65b4",
+          "Death": "a41e2c3efd37777a",
+          "Hit": "2690eeb90fd2a260",
+          "Idle_loop": "31ff69e95a255f29",
+          "Walk_loop": "c2782f5c2e61289c"
+        },
+        "szkielet": "587c1791346dd076"
+      }
+    },
+    "kamienny_rycerz": {
+      "wersja": 1,
+      "odcisk": {
+        "czesci": {
+          "Arms": "cb394a233e7004d2",
+          "Back": "b167ca6adaf09da9",
+          "Body": "3e8df05a6e4c1099",
+          "Head": "6271fea2476441a2",
+          "Legs": "110fee354bd763f9",
+          "Weapon": "5fe39c9f1631225f"
+        },
+        "animacje": {
+          "Attack": "89d5eb70bd8e3703",
+          "Death": "62e97bede14f8c7f",
+          "Hit": "059fb3cbef159a08",
+          "Idle_loop": "d2abff633600190f",
+          "Walk_loop": "06d17788f4badd82"
+        },
+        "szkielet": "ba1517e4722b0211"
+      }
+    },
+    "mag_ognia": {
+      "wersja": 1,
+      "odcisk": {
+        "czesci": {
+          "Arms": "95e4bfe9f8b6a9d8",
+          "Body": "2c6dc3980ad8eab2",
+          "Head": "44b2d017435469c3",
+          "Headgear": "e828ddc489380ad0",
+          "Legs": "ed058b8004bcf338",
+          "Offhand": "4a5347b64c86a9f4",
+          "Weapon": "52156cd1d8461b0c"
+        },
+        "animacje": {
+          "Attack": "683886d0121cce9a",
+          "Death": "eeff6a8941e08c5e",
+          "Hit": "a9ea191521189967",
+          "Idle_loop": "27e9e921e4e09fae",
+          "Walk_loop": "71445cd6e3034481"
+        },
+        "szkielet": "a9fdf4efdd6683ae"
+      }
+    },
+    "lesny_lucznik": {
+      "wersja": 1,
+      "odcisk": {
+        "czesci": {
+          "Arms": "a8fc48d2777e7932",
+          "Back": "09d3c8cd08d451e4",
+          "Body": "2b1b98ed6c196b9b",
+          "Head": "db299f3ea88c308b",
+          "Headgear": "f61603c325dc4df6",
+          "Legs": "7cdccaf06cb29247",
+          "Offhand": "3041180fb5564d51",
+          "Prop": "36972dd602b7e753"
+        },
+        "animacje": {
+          "Attack": "d74ff9bdd993d644",
+          "Death": "e89de98e97dd0bd7",
+          "Hit": "9ef5d0d1a7d64c04",
+          "Idle_loop": "a75706623c1750e3",
+          "Walk_loop": "0d671d56517ec1fe"
+        },
+        "szkielet": "52829047f162b211"
+      }
+    },
+    "kamienny_rycerz_przebudzony": {
+      "wersja": 1,
+      "odcisk": {
+        "czesci": {
+          "Arms": "14c82cc2d0609818",
+          "Aura": "26a485c64a252480",
+          "Back": "b167ca6adaf09da9",
+          "Body": "09670aa8609193c6",
+          "Head": "13db53361cf7a29f",
+          "Legs": "f409230fbf59eea7",
+          "Weapon": "fc8063685c2e0fd7"
+        },
+        "animacje": {
+          "Attack": "89d5eb70bd8e3703",
+          "Death": "62e97bede14f8c7f",
+          "Hit": "059fb3cbef159a08",
+          "Idle_loop": "d2abff633600190f",
+          "Walk_loop": "06d17788f4badd82"
+        },
+        "szkielet": "a195405493a4fb4b"
+      }
+    }
+  }
+}

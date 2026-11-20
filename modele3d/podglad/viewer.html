@@ -1,0 +1,207 @@
+<title>Kuźnia Jednostek</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+/* Layout: warsztat — duża scena 3D po lewej, karta jednostki po prawej; na telefonie jedna kolumna */
+:root {
+  --bg: #eef0ec;
+  --panel: #ffffff;
+  --ink: #23271f;
+  --muted: #646b5c;
+  --line: #d6dacf;
+  --stage: #c9d2bd;
+  --accent: #2f8fb0;
+  --accent-ink: #ffffff;
+  --rune: #1d7fa3;
+  --display: "Rubik", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171a16; --panel: #20241e; --ink: #e9ece4; --muted: #a2a99a; --line: #343a30;
+    --stage: #2b3227; --accent: #49b6d9; --accent-ink: #0d1a1f; --rune: #6fd3f2; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171a16; --panel: #20241e; --ink: #e9ece4; --muted: #a2a99a; --line: #343a30;
+  --stage: #2b3227; --accent: #49b6d9; --accent-ink: #0d1a1f; --rune: #6fd3f2; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 32px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 4vw, 36px); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; background: var(--stage); border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 3; max-width: 100%; }
+model-viewer { width: 100%; height: 100%; --poster-color: transparent; background: radial-gradient(ellipse at 50% 35%, color-mix(in srgb, var(--stage) 70%, #ffffff 30%), var(--stage) 70%); }
+.hud { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; pointer-events: none; }
+.hud > * { pointer-events: auto; }
+.seg { display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 3px; gap: 2px; }
+.seg button {
+  font: 600 13px/1 var(--body); color: var(--ink); background: transparent; border: 0; border-radius: 999px;
+  padding: 8px 12px; cursor: pointer;
+}
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg button:focus-visible, .unit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+aside { display: grid; gap: 12px; }
+.units { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.unit {
+  text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1.5px solid var(--line);
+  border-radius: 12px; padding: 12px; cursor: pointer; display: grid; gap: 2px;
+}
+.unit[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.unit b { font-family: var(--display); font-size: 18px; font-weight: 700; }
+.unit span { color: var(--muted); font-size: 12px; }
+.unit b { font-size: 15px; }
+.ver { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.attack p { margin: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 10px; }
+.card h2 { font-family: var(--display); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 0; }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; }
+dt { color: var(--muted); }
+dd { margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 12px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink); }
+.note { color: var(--muted); font-size: 13px; margin: 0; }
+.note code { font-family: var(--mono); font-size: 12px; color: var(--rune); }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Kuźnia Jednostek</h1>
+    <p class="sub">Modele do gry w Godot · styl chunky · wspólny szkielet</p>
+  </header>
+
+  <div class="grid">
+    <div class="stage">
+      <model-viewer id="mv" alt="Model 3D jednostki" camera-controls touch-action="pan-y"
+        autoplay animation-name="Idle_loop" shadow-intensity="1.1" shadow-softness="0.6" exposure="1.05"
+        camera-orbit="30deg 38deg auto" field-of-view="30deg" interaction-prompt="none"></model-viewer>
+      <div class="hud">
+        <div class="seg" role="group" aria-label="Animacja">
+          <button id="a-idle" aria-pressed="true" data-anim="idle">Idle</button>
+          <button id="a-walk" aria-pressed="false" data-anim="walk">Walk</button>
+          <button id="a-attack" aria-pressed="false" data-anim="attack">Atak</button>
+          <button id="a-hit" aria-pressed="false" data-anim="hit">Trafienie</button>
+          <button id="a-death" aria-pressed="false" data-anim="death">Śmierć</button>
+        </div>
+        <div class="seg" role="group" aria-label="Kamera">
+          <button id="c-game" aria-pressed="true" data-cam="game">Kamera gry 52°</button>
+          <button id="c-front" aria-pressed="false" data-cam="front">Przód</button>
+          <button id="c-spin" aria-pressed="false" data-cam="spin">Obrót</button>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="units" id="units" role="group" aria-label="Jednostka"></div>
+
+      <div class="card">
+        <h2 id="u-name">Jednostka</h2>
+        <p class="note" id="u-desc"></p>
+        <p class="note" id="u-parents" hidden></p>
+      </div>
+
+      <div class="card">
+        <h2>Atak</h2>
+        <dl>
+          <dt>Ruch</dt><dd id="atk-move">–</dd>
+          <dt>Efekt</dt><dd id="atk-fx">–</dd>
+          <dt>Typ</dt><dd id="atk-type">–</dd>
+          <dt>Moment</dt><dd id="atk-time">–</dd>
+        </dl>
+      </div>
+
+      <div class="card">
+        <h2>Dane modelu</h2>
+        <dl>
+          <dt>Plik</dt><dd id="d-file">–</dd>
+          <dt>Wersja</dt><dd id="d-ver">–</dd>
+          <dt>Trójkąty</dt><dd id="d-tris">–</dd>
+          <dt>Kości</dt><dd>21</dd>
+        </dl>
+        <div class="chips" id="slots"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+// Dane wstrzykuje pack_viewer.py: window.UNITS (units.json + statystyki) i window.EMBED (modele base64).
+const UNITS = window.UNITS || {};
+const EVENT_PL = { hit: 'trafienie', release: 'wypuszczenie', impact: 'uderzenie w ziemię' };
+const TYPE_PL = { wrecz: 'wręcz', pocisk: 'pocisk', obszar: 'obszar', rzut: 'rzut' };
+const CAMS = { game: '30deg 38deg auto', front: '20deg 82deg auto' };
+const mv = document.getElementById('mv');
+const blobUrls = {};
+let current = Object.keys(UNITS)[0];
+
+function srcFor(id) {
+  const b64 = window.EMBED && window.EMBED[id];
+  if (!b64) return '../export/' + UNITS[id].plik;
+  if (!blobUrls[id]) {
+    const bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    blobUrls[id] = URL.createObjectURL(new Blob([bytes], { type: 'model/gltf-binary' }));
+  }
+  return blobUrls[id];
+}
+function press(groupSel, el) {
+  document.querySelectorAll(groupSel).forEach(b => b.setAttribute('aria-pressed', String(b === el)));
+}
+function animFor(key) { return UNITS[current].animacje[key]; }
+function text(id, v) { document.getElementById(id).textContent = v; }
+
+function showUnit(id) {
+  const u = UNITS[id], a = u.atak;
+  current = id;
+  mv.src = srcFor(id);
+  text('u-name', u.nazwa);
+  text('u-desc', u.opis);
+  const par = document.getElementById('u-parents');
+  par.hidden = !u.rodzice.length;
+  par.textContent = u.rodzice.length ? 'Fuzja: ' + u.rodzice.map(r => UNITS[r] ? UNITS[r].nazwa : r).join(' + ') : '';
+  text('atk-move', a.ruch);
+  text('atk-fx', a.efekt || 'brak');
+  text('atk-type', TYPE_PL[a.typ] || a.typ);
+  text('atk-time', `${EVENT_PL[a.zdarzenie] || a.zdarzenie}: ${a.moment_s.toFixed(2)} s z ${a.dlugosc_s.toFixed(2)} s`);
+  text('d-file', u.plik);
+  text('d-ver', 'v' + u.wersja);
+  text('d-tris', u.trojkaty || '–');
+  document.getElementById('slots').innerHTML = (u.sloty || []).map(s => `<span class="chip">${s}</span>`).join('');
+}
+
+const box = document.getElementById('units');
+Object.entries(UNITS).forEach(([id, u], i) => {
+  const b = document.createElement('button');
+  b.className = 'unit'; b.id = 'u-' + id; b.dataset.unit = id;
+  b.setAttribute('aria-pressed', String(i === 0));
+  b.innerHTML = `<b></b><span class="ver"></span>`;
+  b.querySelector('b').textContent = u.nazwa;
+  b.querySelector('.ver').textContent = (u.rodzice.length ? 'fuzja · ' : '') + 'v' + u.wersja;
+  b.addEventListener('click', () => { press('[data-unit]', b); showUnit(id); });
+  box.appendChild(b);
+});
+document.querySelectorAll('[data-anim]').forEach(b => b.addEventListener('click', () => {
+  press('[data-anim]', b); mv.animationName = animFor(b.dataset.anim); mv.play();
+}));
+document.querySelectorAll('[data-cam]').forEach(b => b.addEventListener('click', () => {
+  press('[data-cam]', b);
+  const c = b.dataset.cam;
+  if (c === 'spin') { mv.setAttribute('auto-rotate', ''); mv.cameraOrbit = '0deg 70deg auto'; }
+  else { mv.removeAttribute('auto-rotate'); mv.cameraOrbit = CAMS[c]; }
+  mv.jumpCameraToGoal?.();
+}));
+mv.addEventListener('load', () => { mv.animationName = animFor(document.querySelector('[data-anim][aria-pressed="true"]').dataset.anim); mv.play(); });
+if (current) showUnit(current);
+</script>
